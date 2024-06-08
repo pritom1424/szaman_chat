@@ -11,8 +11,9 @@ class GroupListTemplet extends StatelessWidget {
   final String imageUrl;
   final bool isSeen;
 
-  GroupListTemplet(this.userId, this.username, this.lastText, this.lastTextDate,
-      this.imageUrl, this.isSeen);
+  const GroupListTemplet(this.userId, this.username, this.lastText,
+      this.lastTextDate, this.imageUrl, this.isSeen,
+      {super.key});
   @override
   Widget build(BuildContext context) {
     return Dismissible(

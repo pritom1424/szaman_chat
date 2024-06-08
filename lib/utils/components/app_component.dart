@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:szaman_chat/utils/constants/app_colors.dart';
 
 class AppComponent {
@@ -77,4 +80,45 @@ class AppComponent {
       ),
     ],
   );
+
+  static Future<void> pictureButtonMethod(
+      File imgFile, BuildContext context) async {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return AlertDialog(
+            alignment: Alignment.bottomRight,
+            title: const Text(
+              "Preview Image",
+              textAlign: TextAlign.center,
+            ),
+            content: Image.file(
+              imgFile,
+              width: 150,
+              height: 100,
+              fit: BoxFit.cover,
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: Text("Ok")),
+            ],
+          );
+        });
+  }
+
+  static Future<File?> clickOrGetPhoto(ImageSource imgSrc) async {
+    final imPicker = ImagePicker();
+    final imageFile = await imPicker.pickImage(
+        source: imgSrc, imageQuality: 75, maxHeight: 700, maxWidth: 700);
+
+    if (imageFile == null) {
+      return null;
+    }
+
+    return File(imageFile.path);
+  }
 }

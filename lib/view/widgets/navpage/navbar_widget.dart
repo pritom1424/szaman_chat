@@ -35,9 +35,9 @@ class NavBarWidget extends StatelessWidget {
           Data.navBarData.length,
           (index) => BottomNavigationBarItem(
               icon: Icon(
-                Data.navBarData[index].entries.toList()[0].value,
+                Data.navBarData.entries.toList()[index].value,
               ),
-              label: Data.navBarData[index].entries.toList()[0].key)),
+              label: Data.navBarData.entries.toList()[index].key)),
     ));
   }
 }
