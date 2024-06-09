@@ -1,15 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:szaman_chat/utils/constants/app_paths.dart';
 
 class AuthRepos {
   String _refreshToken = "";
   Timer _authTimer = Timer(Duration.zero, () {});
   final _params = {
-    'key': 'YOUR_FIREBASE_API_KEY',
+    'key': 'AIzaSyA1Hortv46XM9Nc8QummVhoqa3JWBycHJY',
     // Replace with your actual API key
   };
 /*   String _token = "";
@@ -34,7 +40,8 @@ class AuthRepos {
   } */
 
   Future<Map<String, dynamic>> authenticate(
-      String email, String password, String urlSegment) async {
+      String email, String password, String urlSegment,
+      [String? name, File? imageFile]) async {
     final url = Uri.https(
       "identitytoolkit.googleapis.com",
       "/v1/accounts:$urlSegment",
@@ -53,10 +60,42 @@ class AuthRepos {
         ),
       );
       final responseData = jsonDecode(response.body);
+
       if (responseData['error'] != null) {
+        print(" response: ${responseData['error']['message']}");
         throw Exception(responseData['error']['message']);
       }
+      print("responseLid ${responseData['localId']} $name");
+      if (name != null) {
+        final link =
+            Uri.https('szaman-chat-default-rtdb.firebaseio.com', '/users.json');
 
+        final ref =
+            FirebaseStorage.instance.ref().child('profile_images').child(name);
+
+        print("responseRef ${FirebaseStorage.instance.ref()}");
+        if (imageFile != null) {
+          print("responseB0 ${responseData['localId']} $name");
+          await ref.putFile(imageFile);
+          print("responseB1 ${responseData['localId']} $name");
+        } else {
+          final ByteData byteData =
+              await rootBundle.load(AppPaths.charplaceholderPath);
+          final Uint8List imageData = byteData.buffer.asUint8List();
+
+          await ref.putData(imageData);
+        }
+        final durl = await ref.getDownloadURL();
+        print("responseB ${responseData['localId']} $name");
+        await http.post(link,
+            body: json.encode({
+              "name": name,
+              "email": email,
+              "imageUrl": durl,
+              "creatorId": DateTime.now().toIso8601String(),
+            }));
+        print("responseLast ${responseData['localId']} $name");
+      }
       final prefs = await SharedPreferences.getInstance();
       final expiryDate = DateTime.now().add(
         Duration(seconds: int.parse(responseData['expiresIn'])),

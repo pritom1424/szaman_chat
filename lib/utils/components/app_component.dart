@@ -46,6 +46,7 @@ class AppComponent {
         buttonColor: Color(0xFFEE7843),
         textTheme: ButtonTextTheme.primary,
       ),
+      dialogTheme: DialogTheme(backgroundColor: Colors.white),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: Color(0xFFEE7843),
       ),
@@ -110,8 +111,10 @@ class AppComponent {
         });
   }
 
-  static Future<File?> clickOrGetPhoto(ImageSource imgSrc) async {
+  static Future<File?> clickOrGetPhoto(
+      ImageSource imgSrc, BuildContext ctx) async {
     final imPicker = ImagePicker();
+
     final imageFile = await imPicker.pickImage(
         source: imgSrc, imageQuality: 75, maxHeight: 700, maxWidth: 700);
 
@@ -120,5 +123,52 @@ class AppComponent {
     }
 
     return File(imageFile.path);
+  }
+
+  static Future<File?> selectpictureAlert(BuildContext context) async {
+    File? pickedFile;
+    await showDialog(
+        context: context,
+        barrierDismissible: true,
+        builder: (context) => AlertDialog(
+              title: Text(
+                'Select/Click Profile Photo!',
+                style: Theme.of(context).textTheme.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
+              content: Text(
+                "Select a method!",
+                style: Theme.of(context).textTheme.bodySmall,
+                textAlign: TextAlign.center,
+              ),
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    TextButton.icon(
+                        onPressed: () async {
+                          pickedFile = await clickOrGetPhoto(
+                              ImageSource.camera, context);
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        icon: const Icon(Icons.camera_alt_rounded),
+                        label: const Text("Camera")),
+                    TextButton.icon(
+                        onPressed: () async {
+                          pickedFile = await clickOrGetPhoto(
+                              ImageSource.gallery, context);
+                          if (context.mounted) {
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        icon: const Icon(Icons.photo),
+                        label: const Text("Gallery"))
+                  ],
+                )
+              ],
+            ));
+    return pickedFile;
   }
 }

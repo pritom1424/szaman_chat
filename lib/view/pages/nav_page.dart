@@ -4,6 +4,7 @@ import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/constants/data.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
 import 'package:szaman_chat/view/pages/navpages/chatlist_page.dart';
+import 'package:szaman_chat/view/pages/navpages/coworkerlist_page.dart';
 import 'package:szaman_chat/view/pages/navpages/grouplist_page.dart';
 import 'package:szaman_chat/view/pages/navpages/profile_page.dart';
 
@@ -17,7 +18,12 @@ class NavPage extends ConsumerWidget {
     /*  List<String> navPageTitles = ["Szaman Chat", "Group Chat", "My Profile"]; */
 
     List<Widget?> navViews() {
-      return [ChatListPage(), GroupListPage(), ProfileForm()];
+      return [
+        ChatListPage(),
+        GroupListPage(),
+        CoworkerlistPage(),
+        ProfileForm()
+      ];
     }
 
     AppVars.screenSize = MediaQuery.of(context).size;

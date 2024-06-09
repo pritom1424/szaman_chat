@@ -119,7 +119,7 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
               color: Theme.of(context).primaryColor,
               onPressed: () async {
                 final fl =
-                    await AppComponent.clickOrGetPhoto(ImageSource.camera);
+                    await AppComponent.clickOrGetPhoto(ImageSource.camera, ctx);
                 (fl == null) ? didImageExist = true : didImageExist = false;
                 // clickOrGetPhoto(ImageSource.camera);
               },
@@ -128,8 +128,8 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
             IconButton(
               color: Theme.of(context).primaryColor,
               onPressed: () async {
-                final fl =
-                    await AppComponent.clickOrGetPhoto(ImageSource.gallery);
+                final fl = await AppComponent.clickOrGetPhoto(
+                    ImageSource.gallery, ctx);
                 (fl == null) ? didImageExist = false : didImageExist = true;
                 // clickOrGetPhoto(ImageSource.gallery);
               },

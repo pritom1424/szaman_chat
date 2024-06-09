@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "434564582098",
+    "project_id": "szaman-chat",
+    "storage_bucket": "szaman-chat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:434564582098:android:fdec4b070aca961bbd3b0b",
+        "android_client_info": {
+          "package_name": "com.szamantech.szaman_chat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAcHQuKlLrw59V6hD96CxEzqhjSj94LmJA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

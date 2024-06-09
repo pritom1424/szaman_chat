@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 
 class Data {
   static Map<String, IconData> navBarData = {
-    "Home": Icons.home,
+    "Chat": Icons.chat,
     "Groups": CupertinoIcons.person_2,
-    "Profile": CupertinoIcons.person
+    "Co-worker": CupertinoIcons.person_alt_circle,
+    "Profile": CupertinoIcons.person,
+
 /*     {"Leave": Icons.flight_takeoff},
     {"Attendance": Icons.calendar_month},
     {"Me": CupertinoIcons.profile_circled}, */

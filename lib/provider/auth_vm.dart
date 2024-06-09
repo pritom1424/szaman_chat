@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
@@ -7,8 +8,19 @@ import 'package:szaman_chat/data/repositories/auth_repos.dart';
 class AuthVm with ChangeNotifier {
   bool _isLoading = false;
 
+  File? _storedImage;
+
+  File? get storedImage {
+    return _storedImage;
+  }
+
   bool get isLoading {
     return _isLoading;
+  }
+
+  void setStoreImage(File? stImage) {
+    _storedImage = stImage;
+    notifyListeners();
   }
 
   void setIsLoading(bool isLoad) {
@@ -44,9 +56,13 @@ class AuthVm with ChangeNotifier {
     return _refreshToken;
   }
 
-  Future<bool> signup(String email, String password) async {
+  Future<bool> signup(
+      String email, String password, String name, File? file) async {
     try {
-      final authData = await _authRepos.authenticate(email, password, 'signUp');
+      final authData =
+          await _authRepos.authenticate(email, password, 'signUp', name, file);
+
+      print("authData: $authData");
 
       _token = authData['token'];
       _expiryDate = DateTime.parse(authData['expiryDate']);
