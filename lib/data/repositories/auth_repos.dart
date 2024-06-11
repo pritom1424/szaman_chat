@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
+
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,6 +15,7 @@ class AuthRepos {
   Timer _authTimer = Timer(Duration.zero, () {});
   final _params = {
     'key': 'AIzaSyA1Hortv46XM9Nc8QummVhoqa3JWBycHJY',
+
     // Replace with your actual API key
   };
 /*   String _token = "";
@@ -41,7 +41,7 @@ class AuthRepos {
 
   Future<Map<String, dynamic>> authenticate(
       String email, String password, String urlSegment,
-      [String? name, File? imageFile]) async {
+      [String? name, File? imageFile, bool isAdmin = false]) async {
     final url = Uri.https(
       "identitytoolkit.googleapis.com",
       "/v1/accounts:$urlSegment",
@@ -62,40 +62,14 @@ class AuthRepos {
       final responseData = jsonDecode(response.body);
 
       if (responseData['error'] != null) {
-        print(" response: ${responseData['error']['message']}");
         throw Exception(responseData['error']['message']);
       }
-      print("responseLid ${responseData['localId']} $name");
-      if (name != null) {
-        final link =
-            Uri.https('szaman-chat-default-rtdb.firebaseio.com', '/users.json');
 
-        final ref =
-            FirebaseStorage.instance.ref().child('profile_images').child(name);
+      final params = {'auth': responseData['idToken']};
 
-        print("responseRef ${FirebaseStorage.instance.ref()}");
-        if (imageFile != null) {
-          print("responseB0 ${responseData['localId']} $name");
-          await ref.putFile(imageFile);
-          print("responseB1 ${responseData['localId']} $name");
-        } else {
-          final ByteData byteData =
-              await rootBundle.load(AppPaths.charplaceholderPath);
-          final Uint8List imageData = byteData.buffer.asUint8List();
+      await _addInfoTOServer(name, responseData['localId'], imageFile, email,
+          isAdmin, responseData['idToken'], params);
 
-          await ref.putData(imageData);
-        }
-        final durl = await ref.getDownloadURL();
-        print("responseB ${responseData['localId']} $name");
-        await http.post(link,
-            body: json.encode({
-              "name": name,
-              "email": email,
-              "imageUrl": durl,
-              "creatorId": DateTime.now().toIso8601String(),
-            }));
-        print("responseLast ${responseData['localId']} $name");
-      }
       final prefs = await SharedPreferences.getInstance();
       final expiryDate = DateTime.now().add(
         Duration(seconds: int.parse(responseData['expiresIn'])),
@@ -112,6 +86,61 @@ class AuthRepos {
       return data;
     } catch (error) {
       rethrow;
+    }
+  }
+
+  Future<void> _addInfoTOServerUpdateToken(
+      String idToken, String userId, Map<String, dynamic> params) async {
+    final link = Uri.https('szaman-chat-default-rtdb.firebaseio.com',
+        '/users/$userId.json', params);
+
+    await http.patch(link, body: json.encode({"token": idToken}));
+  }
+
+  Future<void> _addInfoTOServer(
+      String? username,
+      String userId,
+      File? imageFile,
+      String email,
+      bool isAdmin,
+      String token,
+      Map<String, dynamic> params) async {
+    if (username != null) {
+      final link = Uri.https('szaman-chat-default-rtdb.firebaseio.com',
+          '/users/$userId.json', params);
+
+      final ref =
+          FirebaseStorage.instanceFor(bucket: "gs://szaman-chat.appspot.com")
+              .ref()
+              .child('profile_images')
+              .child(userId) //responseData['localId']
+          ;
+      // await ref.putFile(imageFile);
+      if (imageFile != null) {
+        await ref.putFile(imageFile);
+      } else {
+        final ByteData byteData =
+            await rootBundle.load(AppPaths.charplaceholderPath);
+        final Uint8List imageData = byteData.buffer.asUint8List();
+
+        await ref.putData(imageData);
+      }
+      final durl = await ref.getDownloadURL();
+
+      await http.put(link,
+          body: json.encode({
+            "name": username,
+            "email": email,
+            "imageUrl": durl,
+            "isAdmin": isAdmin,
+            "creatorId": DateTime.now().toIso8601String(),
+            "token": token
+          }));
+    } else {
+      if (token.isNotEmpty && userId.isNotEmpty) {
+        final params = {'auth': token};
+        await _addInfoTOServerUpdateToken(token, userId, params);
+      }
     }
   }
 
@@ -142,9 +171,15 @@ class AuthRepos {
     if (expiryDate.isBefore(DateTime.now())) {
       final data = await _refreshTokenIfNeeded();
       final date = DateTime.parse(data['expiryDate']);
+      final params = {'auth': extractedData['token']};
+      await _addInfoTOServerUpdateToken(
+          extractedData['token'], extractedData['userId'], params);
       _autoLogout(date);
       return data;
     } else {
+      final params = {'auth': extractedData['token']};
+      await _addInfoTOServerUpdateToken(
+          extractedData['token'], extractedData['userId'], params);
       _autoLogout(expiryDate);
       return extractedData;
     }
@@ -201,5 +236,93 @@ class AuthRepos {
     }
     final timeToExpiry = expiryDate.difference(DateTime.now()).inSeconds;
     _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
+  }
+
+  Future<Map<String, dynamic>> updateAccount(String token, String newEmail,
+      String name, File? imageFile, bool isAdmin) async {
+    final url = Uri.https(
+      "identitytoolkit.googleapis.com",
+      "/v1/accounts:update",
+      _params,
+    );
+
+    Map<String, dynamic> data = {};
+
+    data = {'idToken': token, 'email': newEmail, 'returnSecureToken': true};
+
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode(data),
+      );
+      final responseData = jsonDecode(response.body);
+
+      if (responseData['error'] != null) {
+        throw Exception(responseData['error']['message']);
+      }
+
+      final params = {'auth': responseData['idToken']};
+      await _addInfoTOServer(name, responseData['localId'], imageFile, newEmail,
+          isAdmin, responseData['idToken'], params);
+
+      // Update the email in the Realtime Database if necessary
+      final prefs = await SharedPreferences.getInstance();
+      final userData =
+          json.decode(prefs.getString('userData')!) as Map<String, dynamic>;
+      userData['email'] = newEmail;
+      prefs.setString('userData', json.encode(userData));
+      print("response Data: ${responseData as Map<String, dynamic>}");
+      return responseData;
+    } catch (error) {
+      rethrow;
+    }
+  }
+
+  Future<bool> deleteUser(String token, String userId) async {
+    final params = {'auth': token};
+
+    print("token&id $token userid $userId");
+
+    final url = Uri.https(
+      "identitytoolkit.googleapis.com",
+      "/v1/accounts:delete",
+      _params,
+    );
+    final refr =
+        FirebaseStorage.instanceFor(bucket: "gs://szaman-chat.appspot.com")
+            .ref()
+            .child('profile_images')
+            .child(userId) //responseData['localId']
+        ;
+
+    try {
+      //delete database of user
+      final link = Uri.https('szaman-chat-default-rtdb.firebaseio.com',
+          '/users/$userId.json', params);
+      //delete cloud storage of user
+      await http.delete(
+        link,
+      );
+      await refr.delete();
+      //delete auth id of user
+      final response = await http.post(
+        url,
+        body: json.encode(
+          {
+            'key': 'AIzaSyA1Hortv46XM9Nc8QummVhoqa3JWBycHJY',
+            'idToken': token,
+          },
+        ),
+      );
+      final responseData = jsonDecode(response.body);
+
+      if (responseData['error'] != null) {
+        throw Exception(responseData['error']['message']);
+      }
+
+      return true;
+    } catch (error) {
+      rethrow;
+    }
   }
 }

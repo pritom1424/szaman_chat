@@ -4,11 +4,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
 import 'package:szaman_chat/data/repositories/auth_repos.dart';
+import 'package:szaman_chat/utils/credential/UserCredential.dart';
 
 class AuthVm with ChangeNotifier {
   bool _isLoading = false;
 
   File? _storedImage;
+  bool _isAdmin = false;
+
+  bool get isAdmin {
+    return _isAdmin;
+  }
 
   File? get storedImage {
     return _storedImage;
@@ -16,6 +22,11 @@ class AuthVm with ChangeNotifier {
 
   bool get isLoading {
     return _isLoading;
+  }
+
+  void setAdmin(bool didAdmin) {
+    _isAdmin = didAdmin;
+    notifyListeners();
   }
 
   void setStoreImage(File? stImage) {
@@ -56,13 +67,13 @@ class AuthVm with ChangeNotifier {
     return _refreshToken;
   }
 
-  Future<bool> signup(
-      String email, String password, String name, File? file) async {
+  Future<bool> signup(String email, String password, String name, File? file,
+      bool isAdmin) async {
     try {
-      final authData =
-          await _authRepos.authenticate(email, password, 'signUp', name, file);
-
-      print("authData: $authData");
+      setIsLoading(true);
+      final authData = await _authRepos.authenticate(
+          email, password, 'signUp', name, file, isAdmin);
+      setIsLoading(false);
 
       _token = authData['token'];
       _expiryDate = DateTime.parse(authData['expiryDate']);
@@ -71,6 +82,7 @@ class AuthVm with ChangeNotifier {
 
       return true;
     } catch (e) {
+      setIsLoading(false);
       print(e);
       return false;
     }
@@ -78,18 +90,35 @@ class AuthVm with ChangeNotifier {
 
   Future<bool> login(String email, String password) async {
     try {
+      setIsLoading(true);
       final authData =
           await _authRepos.authenticate(email, password, 'signInWithPassword');
+
       _token = authData['token'];
       _expiryDate = DateTime.parse(authData['expiryDate']);
       _userId = authData['userId'];
       _refreshToken = authData['refreshToken'];
-
+      Usercredential.id = userId;
+      Usercredential.token = _token;
+      setIsLoading(false);
       return true;
     } catch (e) {
+      setIsLoading(false);
       print(e);
       return false;
     }
+  }
+
+  Future<bool> update(
+      String token, String email, String name, File? imageFile) async {
+    final authData =
+        await _authRepos.updateAccount(token, email, name, imageFile, isAdmin);
+    print("Credential ${authData}");
+    if (authData.isEmpty) {
+      return false;
+    }
+
+    return true;
   }
 
   Future<void> logout() async {
@@ -116,11 +145,23 @@ class AuthVm with ChangeNotifier {
       _userId = authData['userId']!;
       _refreshToken = authData['refreshToken']!;
       _expiryDate = DateTime.parse(authData['expiryDate']);
-
+      print("user $userId");
+      Usercredential.id = userId;
+      Usercredential.token = _token;
       notifyListeners();
       return true;
     } else {
       notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> deleteUser(String tk, String uId) async {
+    final authData = await _authRepos.deleteUser(tk, uId);
+
+    if (authData) {
+      return true;
+    } else {
       return false;
     }
   }

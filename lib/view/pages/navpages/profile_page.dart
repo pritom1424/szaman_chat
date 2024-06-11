@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:szaman_chat/data/models/profile_model.dart';
+import 'package:szaman_chat/utils/components/app_component.dart';
+import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'dart:io';
+
+import 'package:szaman_chat/utils/constants/app_paths.dart';
+import 'package:szaman_chat/utils/credential/UserCredential.dart';
+import 'package:szaman_chat/utils/view_models/view_models.dart';
 
 class ProfileForm extends StatefulWidget {
   @override
@@ -8,43 +16,98 @@ class ProfileForm extends StatefulWidget {
 }
 
 class _ProfileFormState extends State<ProfileForm> {
+  bool isInit = false;
   final _usernameController = TextEditingController();
-  File? _profileImage;
+  final _emailController = TextEditingController();
+
+  ProfileModel? profileModel;
+
+  String? token, id;
 
   @override
   void initState() {
+    isInit = false;
+    print("token : ${Usercredential.token}");
     super.initState();
-    // Load initial user data (you can replace this with actual data loading logic)
-    _usernameController.text = 'John Doe'; // Initial username
   }
 
-  void _pickImage() async {
-    final pickedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (pickedImage != null) {
-      setState(() {
-        _profileImage = File(pickedImage.path);
-      });
-    }
-  }
-
-  void _saveProfile() {
-    // Save profile changes (you can replace this with actual saving logic)
+  void _saveProfile(WidgetRef ref) async {
+    // Save profile changes (you caan replace this with actual saving logic)
     final username = _usernameController.text;
-    final profileImage = _profileImage;
+    final email = _emailController.text;
+    final profileImage = ref.read(profileViewModel).storedImage;
+    FocusScope.of(context).unfocus();
+    ref.watch(profileViewModel).setIsLoading(true);
+    print("aaab token ${profileImage?.path}");
+    final didUpdate = await ref
+        .read(authViewModel)
+        .update(Usercredential.token!, email, username, profileImage);
 
-    // For demonstration purposes
-    print('Username: $username');
-    print('Profile Image: ${profileImage?.path}');
+    if (didUpdate) {
+      // Show a success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Profile updated successfully!'),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Profile updated failed!'),
+        ),
+      );
+    }
+    ref.read(profileViewModel).setIsLoading(false);
+    ref.watch(profileViewModel).setEditBool(false);
+  }
 
-    // Show a success message
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text('Profile updated successfully!'),
-    ));
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+
+    // TODO: implement dispose
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    return (Usercredential.id == null || Usercredential.token == null)
+        ? Center(
+            child: Text("Access Denied!"),
+          )
+        : Consumer(builder: (ctx, ref, _) {
+            final refProv = ref.read(profileViewModel);
+            if (!isInit) {
+              return FutureBuilder(
+                  future: refProv.getInfo(
+                      Usercredential.token!, Usercredential.id!),
+                  builder: (ctx, snap) {
+                    if (snap.connectionState == ConnectionState.waiting) {
+                      return Container(
+                        height: AppVars.screenSize.height,
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+                    if (!snap.hasData) {
+                      return Center(
+                        child: Text("no data found"),
+                      );
+                    }
+                    isInit = true;
+                    profileModel = snap.data;
+
+                    return profileBody(context, ref);
+                  });
+            }
+
+            return profileBody(context, ref);
+          });
+  }
+
+  Widget profileBody(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -54,32 +117,87 @@ class _ProfileFormState extends State<ProfileForm> {
               children: <Widget>[
                 CircleAvatar(
                   radius: 50,
-                  backgroundImage: _profileImage != null
-                      ? FileImage(_profileImage!)
-                      : AssetImage('assets/images/default_avatar.png')
-                          as ImageProvider,
+                  backgroundImage:
+                      (ref.read(profileViewModel).storedImage != null)
+                          ? FileImage(ref.read(profileViewModel).storedImage!)
+                          : AssetImage(AppPaths.charplaceholderPath)
+                              as ImageProvider,
                 ),
                 Positioned(
                   bottom: 0,
                   right: 0,
                   child: IconButton(
                     icon: Icon(Icons.camera_alt),
-                    onPressed: _pickImage,
+                    onPressed: () async {
+                      File? selectedFile =
+                          await AppComponent.selectpictureAlert(context);
+
+                      ref.watch(profileViewModel).setStoreImage(selectedFile);
+                    },
                   ),
                 ),
               ],
             ),
           ),
           SizedBox(height: 16),
-          TextField(
-            controller: _usernameController,
-            decoration: InputDecoration(labelText: 'Username'),
-          ),
+          (ref.read(profileViewModel).isEditMode)
+              ? TextField(
+                  controller: _usernameController,
+                  decoration: InputDecoration(labelText: 'Edit Name'),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(profileModel?.name ?? "no name"),
+                    IconButton(
+                        onPressed: () {
+                          _emailController.text = profileModel?.email ?? "";
+                          _usernameController.text = profileModel?.name ?? "";
+                          ref.watch(profileViewModel).setEditBool(true);
+                        },
+                        icon: Icon(Icons.edit))
+                  ],
+                ),
           SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _saveProfile,
-            child: Text('Save Changes'),
+          (ref.read(profileViewModel).isEditMode)
+              ? TextField(
+                  controller: _emailController,
+                  decoration: InputDecoration(labelText: 'Email'),
+                )
+              : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(profileModel?.email ?? ""),
+                    IconButton(
+                        onPressed: () {
+                          _emailController.text = profileModel?.email ?? "";
+                          _usernameController.text = profileModel?.name ?? "";
+
+                          ref.watch(profileViewModel).setEditBool(true);
+                        },
+                        icon: Icon(Icons.edit))
+                  ],
+                ),
+          if (ref.read(profileViewModel).isEditMode) SizedBox(height: 16),
+          if (ref.read(profileViewModel).isEditMode)
+            ElevatedButton(
+              onPressed: (ref.read(profileViewModel).isLoading)
+                  ? null
+                  : () {
+                      _saveProfile(ref);
+                    },
+              child: Text('Save Changes'),
+            ),
+          const SizedBox(
+            height: 20,
           ),
+          (ref.watch(profileViewModel).isLoading)
+              ? Center(
+                  child: CircularProgressIndicator(
+                      //  color: Appcolors.contentColorPurple,
+                      ),
+                )
+              : SizedBox.shrink()
         ],
       ),
     );

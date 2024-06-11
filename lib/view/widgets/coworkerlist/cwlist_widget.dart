@@ -1,12 +1,17 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
+import 'package:szaman_chat/data/models/user_model.dart';
+import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/view/widgets/coworkerlist/cwlist_template.dart';
 
 class CwlistWidget extends StatelessWidget {
-  const CwlistWidget({super.key});
+  final Map<String, UserModel> uModel;
+  const CwlistWidget({super.key, required this.uModel});
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> data = [
+    /*  List<Map<String, dynamic>> data = [
       {
         "uId": "0",
         "username": "user0",
@@ -31,13 +36,18 @@ class CwlistWidget extends StatelessWidget {
         "imageUrl":
             "https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png",
       },
-    ];
+    ]; */
     return ListView.builder(
-        itemCount: data.length,
-        itemBuilder: (ctx, ind) => CwlistTemplate(
-              uid: data[ind]["uId"],
-              imageURL: data[ind]["imageUrl"],
-              userName: data[ind]["username"],
-            ));
+        itemCount: uModel.length,
+        itemBuilder: (ctx, ind) => (uModel.keys.toList()[ind] ==
+                Usercredential.id)
+            ? SizedBox.shrink()
+            : CwlistTemplate(
+                token: uModel.entries.toList()[ind].value.token,
+                uid: uModel.keys.toList()[ind],
+                imageURL: uModel.entries.toList()[ind].value.imageUrl,
+                userName: uModel.entries.toList()[ind].value.name,
+                isAdmin: uModel.entries.toList()[ind].value.isAdmin ?? false,
+              ));
   }
 }

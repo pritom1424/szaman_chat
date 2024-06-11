@@ -41,58 +41,6 @@ class _RegistrationFormState extends State<RegistrationForm> {
     nameController.dispose();
   }
 
-  /* Future<void> _clickOrChoosePhoto(ImageSource imageSource) async {
-    final picker = ImagePicker();
-    Navigator.of(context).pop();
-    final imageFile = await picker.pickImage(
-        source: imageSource, maxWidth: 600, imageQuality: 100);
-    if (imageFile == null) {
-      return;
-    }
-
-    setState(() {
-      _storedImage = File(imageFile.path);
-      //widget.onSelectImage(_storedImage);
-    });
-  }
-
-  Future<void> _pictureButtonMethod() async {
-    return showDialog(
-        context: context,
-        barrierDismissible: true,
-        builder: (context) => AlertDialog(
-              title: Text(
-                'Select/Click Profile Photo!',
-                style: Theme.of(context).textTheme.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
-              content: Text(
-                "Select a method!",
-                style: Theme.of(context).textTheme.bodySmall,
-                textAlign: TextAlign.center,
-              ),
-              actions: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    TextButton.icon(
-                        onPressed: () {
-                          _clickOrChoosePhoto(ImageSource.camera);
-                        },
-                        icon: const Icon(Icons.camera_alt_rounded),
-                        label: const Text("Camera")),
-                    TextButton.icon(
-                        onPressed: () {
-                          _clickOrChoosePhoto(ImageSource.gallery);
-                        },
-                        icon: const Icon(Icons.photo),
-                        label: const Text("Gallery"))
-                  ],
-                )
-              ],
-            ));
-  } */
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -267,46 +215,68 @@ class _RegistrationFormState extends State<RegistrationForm> {
                           return null;
                         },
                       ),
+                      Container(
+                        padding: EdgeInsets.only(left: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text("Are you admin?"),
+                            Checkbox(
+                              value: ref.read(authViewModel).isAdmin,
+                              onChanged: (val) {
+                                ref.watch(authViewModel).setAdmin(val ?? false);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 50),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(vertical: 5),
-                            shape: RoundedRectangleBorder(
+                            shape: const RoundedRectangleBorder(
                               borderRadius:
-                                  const BorderRadius.all(Radius.circular(10)),
+                                  BorderRadius.all(Radius.circular(10)),
                             ),
                             backgroundColor: Appcolors.assignButtonColor,
                             foregroundColor: actionButtonFgColor),
-                        onPressed: () async {
-                          FocusScope.of(context).unfocus();
-                          if (_formInfoKey.currentState == null) {
-                            return;
-                          }
-                          if (_formInfoKey.currentState!.validate()) {
-                            _formInfoKey.currentState!.save();
+                        onPressed: (ref.read(authViewModel).isLoading)
+                            ? null
+                            : () async {
+                                FocusScope.of(context).unfocus();
+                                if (_formInfoKey.currentState == null) {
+                                  return;
+                                }
+                                if (_formInfoKey.currentState!.validate()) {
+                                  _formInfoKey.currentState!.save();
 
-                            final authVm = ref.read(authViewModel);
-                            print("pass controller ${passController.text}");
-                            final didRegister = await authVm.signup(
-                                emailController.text,
-                                passController.text,
-                                nameController.text,
-                                authVm.storedImage);
+                                  final authVm = ref.read(authViewModel);
 
-                            if (didRegister) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text("Registration Success!")));
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text("Registration failed!")));
-                            }
-                            nameController.text = "";
-                            emailController.text = "";
-                            passController.text = "";
-                            ref.watch(authViewModel).setStoreImage(null);
-                            /*    final prov = Provider.of<HrmsAuthController>(context,
+                                  final didRegister = await authVm.signup(
+                                      emailController.text,
+                                      passController.text,
+                                      nameController.text,
+                                      authVm.storedImage,
+                                      authVm.isAdmin);
+
+                                  if (didRegister) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(
+                                            content:
+                                                Text("Registration Success!")));
+                                    Navigator.of(context).maybePop();
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content:
+                                                Text("Registration failed!")));
+                                  }
+                                  nameController.text = "";
+                                  emailController.text = "";
+                                  passController.text = "";
+                                  ref.watch(authViewModel).setStoreImage(null);
+                                  authVm.setAdmin(false);
+                                  /*    final prov = Provider.of<HrmsAuthController>(context,
                                 listen: false);
                             prov.setLoading(true);
                             final result = await prov.Authenticate(
@@ -322,8 +292,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
                               AppMethods().snackBar(
                                   AppStrings.loginErrorMessage, context);
                             } */
-                          }
-                        },
+                                }
+                              },
                         child: const Text(
                           'Add Member',
                           style: TextStyle(fontSize: 25),

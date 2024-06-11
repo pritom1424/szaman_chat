@@ -9,6 +9,8 @@ import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/constants/app_colors.dart';
 import 'package:szaman_chat/utils/constants/app_paths.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
+import 'package:szaman_chat/view/pages/nav_page.dart';
+import 'package:szaman_chat/view/pages/navpages/chatlist_page.dart';
 
 class LoginForm extends StatefulWidget {
   final String? title;
@@ -26,7 +28,6 @@ class _LoginFormState extends State<LoginForm> {
   Color actionButtonFgColor = Colors.white;
   final _formInfoKey = GlobalKey<FormState>();
 
-  File? _storedImage;
   @override
   void initState() {
     super.initState();
@@ -77,8 +78,20 @@ class _LoginFormState extends State<LoginForm> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
-                      SizedBox(
+                      /* const SizedBox(height: 10),
+                      Container(
+                          decoration: BoxDecoration(
+                              color: Appcolors.assignButtonColor,
+                              borderRadius: BorderRadius.circular(10)),
+                          child: Text(
+                            "Login",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 45,
+                                fontWeight: FontWeight.bold),
+                          )), */
+                      /*  SizedBox(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -91,7 +104,7 @@ class _LoginFormState extends State<LoginForm> {
                             ),
                           ],
                         ),
-                      ),
+                      ), */
                       const SizedBox(height: 20),
                       TextFormField(
                         //focusNode: emailFocusNode,
@@ -166,14 +179,38 @@ class _LoginFormState extends State<LoginForm> {
                             ),
                             backgroundColor: Appcolors.assignButtonColor,
                             foregroundColor: actionButtonFgColor),
-                        onPressed: () async {
-                          FocusScope.of(context).unfocus();
-                          if (_formInfoKey.currentState == null) {
-                            return;
-                          }
-                          if (_formInfoKey.currentState!.validate()) {
-                            _formInfoKey.currentState!.save();
-                            /*    final prov = Provider.of<HrmsAuthController>(context,
+                        onPressed: (ref.read(authViewModel).isLoading)
+                            ? null
+                            : () async {
+                                FocusScope.of(context).unfocus();
+                                if (_formInfoKey.currentState == null) {
+                                  return;
+                                }
+                                if (_formInfoKey.currentState!.validate()) {
+                                  _formInfoKey.currentState!.save();
+
+                                  final authVm = ref.read(authViewModel);
+
+                                  final didRegister = await authVm.login(
+                                    emailController.text,
+                                    passController.text,
+                                  );
+
+                                  if (didRegister) {
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (ctx) => NavPage()));
+                                  } else {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                            content: Text("Login failed!")));
+                                  }
+
+                                  emailController.text = "";
+                                  passController.text = "";
+                                  ref.watch(authViewModel).setStoreImage(null);
+                                  authVm.setAdmin(false);
+                                  /*    final prov = Provider.of<HrmsAuthController>(context,
                                 listen: false);
                             prov.setLoading(true);
                             final result = await prov.Authenticate(
@@ -189,10 +226,10 @@ class _LoginFormState extends State<LoginForm> {
                               AppMethods().snackBar(
                                   AppStrings.loginErrorMessage, context);
                             } */
-                          }
-                        },
+                                }
+                              },
                         child: const Text(
-                          'Login',
+                          'Sign In',
                           style: TextStyle(fontSize: 25),
                         ),
                       ),
@@ -205,7 +242,7 @@ class _LoginFormState extends State<LoginForm> {
                                   //  color: Appcolors.contentColorPurple,
                                   ),
                             )
-                          : SizedBox.shrink()
+                          : SizedBox.shrink(),
                     ],
                   ),
                 ),
