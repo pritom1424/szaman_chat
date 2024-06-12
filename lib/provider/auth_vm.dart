@@ -109,16 +109,20 @@ class AuthVm with ChangeNotifier {
     }
   }
 
-  Future<bool> update(
+  Future<String> update(
       String token, String email, String name, File? imageFile) async {
-    final authData =
-        await _authRepos.updateAccount(token, email, name, imageFile, isAdmin);
-    print("Credential ${authData}");
-    if (authData.isEmpty) {
-      return false;
+    try {
+      final authData = await _authRepos.updateAccount(
+          token, email, name, imageFile, isAdmin);
+
+      if (authData.isEmpty) {
+        return "no data found";
+      }
+    } catch (err) {
+      return err.toString();
     }
 
-    return true;
+    return "info updated successfully";
   }
 
   Future<void> logout() async {
@@ -145,7 +149,7 @@ class AuthVm with ChangeNotifier {
       _userId = authData['userId']!;
       _refreshToken = authData['refreshToken']!;
       _expiryDate = DateTime.parse(authData['expiryDate']);
-      print("user $userId");
+
       Usercredential.id = userId;
       Usercredential.token = _token;
       notifyListeners();

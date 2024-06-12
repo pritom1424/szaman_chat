@@ -11,6 +11,7 @@ import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
 
 class ProfileForm extends StatefulWidget {
+  const ProfileForm({super.key});
   @override
   _ProfileFormState createState() => _ProfileFormState();
 }
@@ -23,11 +24,11 @@ class _ProfileFormState extends State<ProfileForm> {
   ProfileModel? profileModel;
 
   String? token, id;
-
   @override
   void initState() {
     isInit = false;
-    print("token : ${Usercredential.token}");
+
+    // TODO: implement initState
     super.initState();
   }
 
@@ -38,27 +39,21 @@ class _ProfileFormState extends State<ProfileForm> {
     final profileImage = ref.read(profileViewModel).storedImage;
     FocusScope.of(context).unfocus();
     ref.watch(profileViewModel).setIsLoading(true);
-    print("aaab token ${profileImage?.path}");
-    final didUpdate = await ref
+    print(
+        "profile:-> ${Usercredential.token}-${email}-${username}-${profileImage}  ");
+    final message = await ref
         .read(authViewModel)
         .update(Usercredential.token!, email, username, profileImage);
 
-    if (didUpdate) {
-      // Show a success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Profile updated successfully!'),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Profile updated failed!'),
-        ),
-      );
-    }
+    // Show a success message
     ref.read(profileViewModel).setIsLoading(false);
     ref.watch(profileViewModel).setEditBool(false);
+    isInit = false;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 
   @override
@@ -78,7 +73,9 @@ class _ProfileFormState extends State<ProfileForm> {
           )
         : Consumer(builder: (ctx, ref, _) {
             final refProv = ref.read(profileViewModel);
+
             if (!isInit) {
+              print('first init');
               return FutureBuilder(
                   future: refProv.getInfo(
                       Usercredential.token!, Usercredential.id!),
@@ -96,7 +93,9 @@ class _ProfileFormState extends State<ProfileForm> {
                         child: Text("no data found"),
                       );
                     }
+                    print("first init reah");
                     isInit = true;
+
                     profileModel = snap.data;
 
                     return profileBody(context, ref);
@@ -120,8 +119,11 @@ class _ProfileFormState extends State<ProfileForm> {
                   backgroundImage:
                       (ref.read(profileViewModel).storedImage != null)
                           ? FileImage(ref.read(profileViewModel).storedImage!)
-                          : AssetImage(AppPaths.charplaceholderPath)
-                              as ImageProvider,
+                          : (profileModel!.imageUrl != null ||
+                                  profileModel!.imageUrl!.isNotEmpty)
+                              ? NetworkImage(profileModel!.imageUrl!)
+                              : AssetImage(AppPaths.charplaceholderPath)
+                                  as ImageProvider,
                 ),
                 Positioned(
                   bottom: 0,
@@ -131,8 +133,10 @@ class _ProfileFormState extends State<ProfileForm> {
                     onPressed: () async {
                       File? selectedFile =
                           await AppComponent.selectpictureAlert(context);
-
+                      _emailController.text = profileModel?.email ?? "";
+                      _usernameController.text = profileModel?.name ?? "";
                       ref.watch(profileViewModel).setStoreImage(selectedFile);
+                      ref.read(profileViewModel).setEditBool(true);
                     },
                   ),
                 ),
@@ -191,7 +195,7 @@ class _ProfileFormState extends State<ProfileForm> {
           const SizedBox(
             height: 20,
           ),
-          (ref.watch(profileViewModel).isLoading)
+          (ref.read(profileViewModel).isLoading)
               ? Center(
                   child: CircularProgressIndicator(
                       //  color: Appcolors.contentColorPurple,

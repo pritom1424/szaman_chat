@@ -127,15 +127,18 @@ class AuthRepos {
       }
       final durl = await ref.getDownloadURL();
 
-      await http.put(link,
+      print("profile name update: $username");
+      final response = await http.put(link,
           body: json.encode({
-            "name": username,
+            "creatorId": DateTime.now().toIso8601String(),
             "email": email,
             "imageUrl": durl,
             "isAdmin": isAdmin,
-            "creatorId": DateTime.now().toIso8601String(),
+            "name": username,
             "token": token
           }));
+      print(
+          "profile name update: ${response.statusCode}: ${json.decode(response.body)}");
     } else {
       if (token.isNotEmpty && userId.isNotEmpty) {
         final params = {'auth': token};
@@ -243,7 +246,7 @@ class AuthRepos {
     final url = Uri.https(
       "identitytoolkit.googleapis.com",
       "/v1/accounts:update",
-      _params,
+      {'auth': token, 'key': 'AIzaSyA1Hortv46XM9Nc8QummVhoqa3JWBycHJY'},
     );
 
     Map<String, dynamic> data = {};
@@ -262,8 +265,9 @@ class AuthRepos {
       }
 
       final params = {'auth': responseData['idToken']};
+
       await _addInfoTOServer(name, responseData['localId'], imageFile, newEmail,
-          isAdmin, responseData['idToken'], params);
+          isAdmin, token, params);
 
       // Update the email in the Realtime Database if necessary
       final prefs = await SharedPreferences.getInstance();
@@ -271,7 +275,7 @@ class AuthRepos {
           json.decode(prefs.getString('userData')!) as Map<String, dynamic>;
       userData['email'] = newEmail;
       prefs.setString('userData', json.encode(userData));
-      print("response Data: ${responseData as Map<String, dynamic>}");
+
       return responseData;
     } catch (error) {
       rethrow;
@@ -280,8 +284,6 @@ class AuthRepos {
 
   Future<bool> deleteUser(String token, String userId) async {
     final params = {'auth': token};
-
-    print("token&id $token userid $userId");
 
     final url = Uri.https(
       "identitytoolkit.googleapis.com",

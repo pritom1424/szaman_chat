@@ -10,15 +10,13 @@ class ProfileRepos {
     if (token == null || uid == null) {
       return {'error': 'unauthorized access'};
     }
-    print("uid $uid");
-    print("toke $token");
+
     var params = {'auth': token};
 
     final url = Uri.https(ApiLinks.baseUrl, '/users/$uid.json', params);
-    print("urlk ${url.toString()}"); //, params
+
     final response = await http.get(url);
 
-    print("respose ${response.body}");
     Map<String, dynamic> responseMap = {};
     if (response.statusCode == 200) {
       responseMap = json.decode(response.body) as Map<String, dynamic>;

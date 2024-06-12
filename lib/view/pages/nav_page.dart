@@ -19,8 +19,6 @@ class NavPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    /*  List<String> navPageTitles = ["Szaman Chat", "Group Chat", "My Profile"]; */
-    print("token : ${Usercredential.token}");
     List<Widget?> navViews() {
       return [
         ChatListPage(),
@@ -33,108 +31,86 @@ class NavPage extends ConsumerWidget {
     AppVars.screenSize = MediaQuery.of(context).size;
     final widthSize = 0.5;
     return Scaffold(
-      body: FutureBuilder(
-          future: ref
-              .read(profileViewModel)
-              .getInfo(Usercredential.token!, Usercredential.id!),
-          builder: (ctx, snapProf) {
-            if (snapProf.connectionState == ConnectionState.waiting) {
-              return SizedBox(
-                height: AppVars.screenSize.height,
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              );
-            }
+      body: (!ref.read(navpageViewModel).isInit)
+          ? FutureBuilder(
+              future: ref
+                  .read(profileViewModel)
+                  .getInfo(Usercredential.token!, Usercredential.id!),
+              builder: (ctx, snapProf) {
+                if (snapProf.connectionState == ConnectionState.waiting) {
+                  return SizedBox(
+                    height: AppVars.screenSize.height,
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
+                }
 
-            if (!snapProf.hasData) {
-              return Blockpage();
-            }
-            Usercredential.isAdmin = snapProf.data!.isAdmin;
+                if (!snapProf.hasData) {
+                  return Blockpage();
+                }
+                Usercredential.isAdmin = snapProf.data!.isAdmin;
+                ref.read(navpageViewModel).setIsInit(true);
+                return mainBody(widthSize, ref, context, navViews);
+              })
+          : mainBody(widthSize, ref, context, navViews),
+    );
+  }
 
-            return Scaffold(
-              appBar: AppBar(
-                foregroundColor: Colors.white,
-                automaticallyImplyLeading: false,
-                titleSpacing: 0,
-                leadingWidth: 50,
-                title: Container(
-                  width: AppVars.screenSize.width * (widthSize),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      FittedBox(
-                          child: Padding(
-                              padding: const EdgeInsets.only(right: 5),
-                              child: CircleAvatar(
-                                child: Icon(Icons.person),
-                              ) /* (ref.read(authViewModel).userId == "")
-                        ? CircleAvatar(
-                            backgroundImage:
-                                AssetImage(ImagePath.proPicPlaceholderPath))
-                        : FutureBuilder(
-                            future: Provider.of<EmployeeProfileController>(
-                                    context,
-                                    listen: false)
-                                .getEmployeeProfile(ApiLinks.employeeProfileLink,
-                                    UserCredential.userid!),
-                            builder: (ctx, snap) {
-                              if (!snap.hasData) {
-                                return CircleAvatar(
-                                  backgroundImage:
-                                      AssetImage(ImagePath.proPicPlaceholderPath),
-                                );
-                              } else {
-                                if (snap.data!.image == null) {
-                                  return CircleAvatar(
-                                    backgroundImage: AssetImage(
-                                        ImagePath.proPicPlaceholderPath),
-                                  );
-                                }
-                                return CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      "https://hrms.szamantech.com/storage/employee/${snap.data!.image}"),
-                                );
-                              }
-                            }), */
-                              )),
-                      Text(
-                        Data.navBarData.entries
-                            .toList()[ref.read(navpageViewModel).selectIndex]
-                            .key,
-                        overflow: TextOverflow.ellipsis,
-                        softWrap: false,
-                        maxLines: 1,
-                        textAlign: TextAlign.left,
-                      ),
-                    ],
-                  ),
-                ),
-                actions: [
-                  TextButton.icon(
-                      onPressed: () async {
-                        await ref.read(authViewModel).logout();
-                        Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(builder: (ctx) => LoginForm()));
-                      },
-                      icon: const Icon(
-                        Icons.power_settings_new,
-                        color: Colors.white,
-                      ),
-                      label: const Text(
-                        "logout",
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold),
-                      ))
-                ], //TextButton(onPressed: () {}, child: Text("Logout"))
+  Scaffold mainBody(double widthSize, WidgetRef ref, BuildContext context,
+      List<Widget?> navViews()) {
+    return Scaffold(
+      appBar: AppBar(
+        foregroundColor: Colors.white,
+        automaticallyImplyLeading: false,
+        titleSpacing: 0,
+        leadingWidth: 50,
+        title: Container(
+          width: AppVars.screenSize.width * (widthSize),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              FittedBox(
+                  child: Padding(
+                      padding: const EdgeInsets.only(right: 5),
+                      child: CircleAvatar(
+                        child: Icon(Icons.person),
+                      ))),
+              Text(
+                Data.navBarData.entries
+                    .toList()[ref.read(navpageViewModel).selectIndex]
+                    .key,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                maxLines: 1,
+                textAlign: TextAlign.left,
               ),
-              bottomNavigationBar: NavBarWidget(
-                currentIndex: ref.read(navpageViewModel).selectIndex,
-                onTap: ref.watch(navpageViewModel).setIndex,
+            ],
+          ),
+        ),
+        actions: [
+          TextButton.icon(
+              onPressed: () async {
+                await ref.read(authViewModel).logout();
+                Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (ctx) => LoginForm()));
+              },
+              icon: const Icon(
+                Icons.power_settings_new,
+                color: Colors.white,
               ),
-              body: navViews()[ref.read(navpageViewModel).selectIndex],
-            );
-          }),
+              label: const Text(
+                "logout",
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ))
+        ], //TextButton(onPressed: () {}, child: Text("Logout"))
+      ),
+      bottomNavigationBar: NavBarWidget(
+        currentIndex: ref.read(navpageViewModel).selectIndex,
+        onTap: ref.watch(navpageViewModel).setIndex,
+      ),
+      body: navViews()[ref.read(navpageViewModel).selectIndex],
     );
   }
 }
