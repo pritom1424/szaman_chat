@@ -73,8 +73,8 @@ class GroupListTemplet extends StatelessWidget {
             ),
             trailing: Text(lastTextDate),
             onTap: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (ctx) => InboxPage()));
+              /*     Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (ctx) => InboxPage())); */
             }),
       ),
     );

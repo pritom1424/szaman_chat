@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/view/pages/inbox_page.dart';
 
 class ChatListTemplet extends StatelessWidget {
@@ -6,7 +7,7 @@ class ChatListTemplet extends StatelessWidget {
 
   final String userId;
   final String username;
-  final String lastText;
+  final String? lastText;
   final String lastTextDate;
   final String imageUrl;
   final bool isSeen;
@@ -66,14 +67,14 @@ class ChatListTemplet extends StatelessWidget {
                   fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
             ),
             subtitle: Text(
-              lastText,
+              lastText ?? "sent a photo",
               style: TextStyle(
                   fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
             ),
             trailing: Text(lastTextDate),
             onTap: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (ctx) => InboxPage()));
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (ctx) => InboxPage(userId))); //fID
             }),
       ),
     );

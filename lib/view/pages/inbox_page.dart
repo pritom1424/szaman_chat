@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/constants/app_colors.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
@@ -7,7 +8,8 @@ import 'package:szaman_chat/view/widgets/inboxpage/inbox_messages_widget.dart';
 import 'package:szaman_chat/view/widgets/inboxpage/input_inbox_widget.dart';
 
 class InboxPage extends ConsumerWidget {
-  const InboxPage({super.key});
+  final String fId;
+  const InboxPage(this.fId, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -74,7 +76,10 @@ class InboxPage extends ConsumerWidget {
         color: Color.fromARGB(255, 226, 204, 195),
         child: Column(
           children: [
-            Expanded(child: InboxMessagesWidget()),
+            /*   Expanded(
+                child: InboxMessagesWidget(
+              messages: messages,
+            )) ,*/
             InputInboxWidget()
           ],
         ),

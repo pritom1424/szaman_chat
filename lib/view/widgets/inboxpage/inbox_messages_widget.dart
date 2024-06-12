@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:szaman_chat/data/models/message_model.dart';
+import 'package:szaman_chat/utils/constants/app_methods.dart';
 import 'package:szaman_chat/view/widgets/inboxpage/chat_bubble.dart';
 
 class InboxMessagesWidget extends StatelessWidget {
-  const InboxMessagesWidget({super.key});
+  final List<MessageModel> messages;
+  const InboxMessagesWidget({super.key, required this.messages});
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> data = [
+    /*  List<Map<String, dynamic>> data = [
       {
         "date": "6-6-2024",
         "isMe": false,
@@ -47,15 +50,16 @@ class InboxMessagesWidget extends StatelessWidget {
         "message":
             "hi there! how are you im jack and you and what is your purpose 3"
       }
-    ];
+    ]; */
+
     return ListView.builder(
-        itemCount: data.length,
+        itemCount: messages.length,
         itemBuilder: (ctx, ind) => ChatBubble(
-            date: data[ind]['date'],
-            isMe: data[ind]['isMe'],
-            username: data[ind]['username'],
-            message: data[ind]['message'],
-            userimage: data[ind]['userimage'],
-            didImageExist: data[ind]['didExist']));
+            date: AppMethods().dateFormatter(messages[ind].createdAt),
+            isMe: messages[ind].isME,
+            username: messages[ind].name ?? "User",
+            message: messages[ind].message ?? "",
+            userimage: messages[ind].imageUrl ?? "",
+            didImageExist: messages[ind].isImageExist ?? true));
   }
 }

@@ -47,11 +47,12 @@ class GrouplistWidget extends StatelessWidget {
     return ListView.builder(
         itemCount: data.length,
         itemBuilder: (ctx, ind) => ChatListTemplet(
-            data[ind]["uId"],
-            data[ind]["username"],
-            data[ind]["lastText"],
-            data[ind]["lastTextDate"],
-            data[ind]["imageUrl"],
-            data[ind]["isSeen"]));
+              data[ind]["uId"],
+              data[ind]["username"],
+              data[ind]["lastText"],
+              data[ind]["lastTextDate"],
+              data[ind]["imageUrl"],
+              data[ind]["isSeen"], /*fID*/
+            ));
   }
 }
