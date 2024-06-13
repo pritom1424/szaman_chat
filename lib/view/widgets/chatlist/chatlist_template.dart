@@ -63,7 +63,7 @@ class ChatListTemplet extends StatelessWidget {
               backgroundImage: NetworkImage(imageUrl),
             ),
             title: Text(
-              (isMe) ? "You" : username,
+              friendName,
               style: TextStyle(
                   fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
             ),

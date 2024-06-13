@@ -51,7 +51,7 @@ class InboxMessagesWidget extends StatelessWidget {
             "hi there! how are you im jack and you and what is your purpose 3"
       }
     ]; */
-    print("image: ${messages[1].imageUrl}");
+    print("imageLength: ${messages.length}");
     return ListView.builder(
         itemCount: messages.length,
         reverse: true,
