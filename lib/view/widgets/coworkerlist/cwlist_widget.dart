@@ -37,6 +37,7 @@ class CwlistWidget extends StatelessWidget {
             "https://cdn.pixabay.com/photo/2020/07/01/12/58/icon-5359553_1280.png",
       },
     ]; */
+    final meNameMod = uModel[Usercredential.id];
     return ListView.builder(
         itemCount: uModel.length,
         itemBuilder: (ctx, ind) => (uModel.keys.toList()[ind] ==
@@ -48,6 +49,7 @@ class CwlistWidget extends StatelessWidget {
                 imageURL: uModel.entries.toList()[ind].value.imageUrl,
                 userName: uModel.entries.toList()[ind].value.name,
                 isAdmin: uModel.entries.toList()[ind].value.isAdmin ?? false,
+                meName: meNameMod?.name ?? "Me",
               ));
   }
 }

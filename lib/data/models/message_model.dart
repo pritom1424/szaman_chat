@@ -57,3 +57,63 @@ class MessageModel {
         "isME": isME
       };
 }
+/*
+
+// To parse this JSON data, do
+//
+//     final userModel = userModelFromJson(jsonString);
+
+import 'dart:convert';
+
+Map<String, UserModel> userModelFromJson(String str) => Map.from(json.decode(str)).map((k, v) => MapEntry<String, UserModel>(k, UserModel.fromJson(v)));
+
+String userModelToJson(Map<String, UserModel> data) => json.encode(Map.from(data).map((k, v) => MapEntry<String, dynamic>(k, v.toJson())));
+
+class UserModel {
+    DateTime createdAt;
+    String friendName;
+    String imageUrl;
+    bool isDeleted;
+    bool isImageExist;
+    bool isMe;
+    String message;
+    String name;
+
+    UserModel({
+        required this.createdAt,
+        required this.friendName,
+        required this.imageUrl,
+        required this.isDeleted,
+        required this.isImageExist,
+        required this.isMe,
+        required this.message,
+        required this.name,
+    });
+
+    factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
+        createdAt: DateTime.parse(json["createdAt"]),
+        friendName: json["friendName"],
+        imageUrl: json["imageUrl"],
+        isDeleted: json["isDeleted"],
+        isImageExist: json["isImageExist"],
+        isMe: json["isME"],
+        message: json["message"],
+        name: json["name"],
+    );
+
+    Map<String, dynamic> toJson() => {
+        "createdAt": createdAt.toIso8601String(),
+        "friendName": friendName,
+        "imageUrl": imageUrl,
+        "isDeleted": isDeleted,
+        "isImageExist": isImageExist,
+        "isME": isMe,
+        "message": message,
+        "name": name,
+    };
+}
+
+
+
+
+ */

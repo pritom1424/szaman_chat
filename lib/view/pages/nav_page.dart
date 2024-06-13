@@ -49,6 +49,7 @@ class NavPage extends ConsumerWidget {
                 if (!snapProf.hasData) {
                   return Blockpage();
                 }
+                Usercredential.name = snapProf.data!.name;
                 Usercredential.isAdmin = snapProf.data!.isAdmin;
                 ref.read(navpageViewModel).setIsInit(true);
                 return mainBody(widthSize, ref, context, navViews);

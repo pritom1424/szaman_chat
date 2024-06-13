@@ -19,7 +19,7 @@ class ChatlistWidget extends ConsumerWidget {
               if (!snapId.hasData) {
                 return SizedBox.shrink();
               }
-
+              print("id print ${snapId.data!.length}");
               return ListView.builder(
                   itemCount: snapId.data!.length,
                   itemBuilder: (ctx, ind) => FutureBuilder(
@@ -28,8 +28,10 @@ class ChatlistWidget extends ConsumerWidget {
                           .getInfo(Usercredential.token!, snapId.data![ind]),
                       builder: (context, snapPhoto) {
                         if (!snapPhoto.hasData) {
+                          print("photo print");
                           return SizedBox.shrink();
                         }
+                        print("photo print success");
                         return FutureBuilder(
                             future: ref.read(inboxpageViewModel).getAllMessages(
                                 Usercredential.token!,
@@ -39,15 +41,20 @@ class ChatlistWidget extends ConsumerWidget {
                               if (!snap.hasData) {
                                 return SizedBox.shrink();
                               }
+                              print(
+                                  "message print success  ${snap.data!.length}(${snapId.data![ind]})");
                               return ChatListTemplet(
-                                snapId.data![ind],
-                                snap.data![ind].friendName ?? "user",
-                                snap.data![ind].message ?? "message",
-                                AppMethods()
-                                    .dateFormatter(snap.data![ind].createdAt),
-                                snapPhoto.data!.imageUrl!,
-                                false, // data[ind]["isSeen"]
-                              );
+                                  snapId.data![ind],
+                                  snap.data![0].name ?? "user",
+                                  snap.data![0].message ?? "message",
+                                  AppMethods()
+                                      .dateFormatter(snap.data![0].createdAt),
+                                  snapPhoto.data!.imageUrl!,
+                                  false,
+                                  snap.data![0].isME,
+                                  snap.data![0].friendName ?? "friend"
+                                  // data[ind]["isSeen"]
+                                  );
                             });
                       }));
             },

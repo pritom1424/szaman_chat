@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
 
@@ -7,10 +8,12 @@ class CwlistTemplate extends ConsumerWidget {
   final String? imageURL, userName, uid;
   final bool isAdmin;
   final String? token;
+  final String meName;
   const CwlistTemplate(
       {super.key,
       this.token,
       this.imageURL,
+      required this.meName,
       this.userName,
       this.uid,
       required this.isAdmin});
@@ -43,7 +46,31 @@ class CwlistTemplate extends ConsumerWidget {
                 ), */
                 IconButton(
                   icon: Icon(Icons.person_add),
-                  onPressed: () {},
+                  onPressed: () async {
+                    final mod = MessageModel(
+                        createdAt: DateTime.now(),
+                        message: "Welcome",
+                        imageUrl: imageURL,
+                        isImageExist: false,
+                        isDeleted: false,
+                        name: meName,
+                        friendName: userName,
+                        isME: true);
+                    if (uid != null) {
+                      final didSuccess =
+                          await ref.read(userViewModel).addFriend(mod, uid!);
+                      if (didSuccess) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Employee Added!")));
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("Employee Not Added!")));
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("No User Found")));
+                    }
+                  },
                 ),
                 (Usercredential.isAdmin ?? false)
                     ? IconButton(

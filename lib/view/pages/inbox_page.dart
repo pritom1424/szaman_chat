@@ -3,13 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/constants/app_colors.dart';
+import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
 import 'package:szaman_chat/view/widgets/inboxpage/inbox_messages_widget.dart';
 import 'package:szaman_chat/view/widgets/inboxpage/input_inbox_widget.dart';
 
 class InboxPage extends ConsumerWidget {
-  final String fId;
-  const InboxPage(this.fId, {super.key});
+  final String fId, fName;
+  final String userimageUrl;
+  const InboxPage(this.fId, this.fName, this.userimageUrl, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -74,15 +76,40 @@ class InboxPage extends ConsumerWidget {
       body: Container(
         width: double.infinity,
         color: Color.fromARGB(255, 226, 204, 195),
-        child: Column(
-          children: [
-            /*   Expanded(
-                child: InboxMessagesWidget(
-              messages: messages,
-            )) ,*/
-            InputInboxWidget()
-          ],
-        ),
+        child: (Usercredential.id == null || Usercredential.token == null)
+            ? Text("no data found")
+            : Column(
+                children: [
+                  StreamBuilder(
+                      stream: ref.read(inboxpageViewModel).getAllMessagesStream(
+                          Usercredential.token!, Usercredential.id!, fId),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return SizedBox(
+                            height: AppVars.screenSize.height,
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
+
+                        if (!snapshot.hasData) {
+                          return SizedBox.shrink();
+                        }
+
+                        return Expanded(
+                            child: InboxMessagesWidget(
+                          messages: snapshot.data!,
+                        ));
+                      }),
+                  InputInboxWidget(
+                    fId: fId,
+                    fName: fName,
+                    userUrl: userimageUrl,
+                  )
+                ],
+              ),
       ),
     );
   }

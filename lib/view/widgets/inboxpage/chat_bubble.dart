@@ -23,7 +23,7 @@ class ChatBubble extends StatelessWidget {
     return Row(
       mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
-        if (!isMe) CircleAvatar(backgroundImage: NetworkImage(userimage)),
+        // if (!isMe) CircleAvatar(backgroundImage: NetworkImage(userimage)),
         Expanded(
           child: Container(
             decoration: BoxDecoration(

@@ -11,9 +11,10 @@ class ChatListTemplet extends StatelessWidget {
   final String lastTextDate;
   final String imageUrl;
   final bool isSeen;
-
+  final bool isMe;
+  final String friendName;
   ChatListTemplet(this.userId, this.username, this.lastText, this.lastTextDate,
-      this.imageUrl, this.isSeen);
+      this.imageUrl, this.isSeen, this.isMe, this.friendName);
   @override
   Widget build(BuildContext context) {
     return Dismissible(
@@ -62,7 +63,7 @@ class ChatListTemplet extends StatelessWidget {
               backgroundImage: NetworkImage(imageUrl),
             ),
             title: Text(
-              username,
+              (isMe) ? "You" : username,
               style: TextStyle(
                   fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
             ),
@@ -73,8 +74,9 @@ class ChatListTemplet extends StatelessWidget {
             ),
             trailing: Text(lastTextDate),
             onTap: () {
-              Navigator.of(context).push(
-                  MaterialPageRoute(builder: (ctx) => InboxPage(userId))); //fID
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (ctx) => InboxPage(
+                      userId, (isMe) ? friendName : username, imageUrl))); //fID
             }),
       ),
     );

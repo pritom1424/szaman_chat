@@ -51,9 +51,10 @@ class InboxMessagesWidget extends StatelessWidget {
             "hi there! how are you im jack and you and what is your purpose 3"
       }
     ]; */
-
+    print("image: ${messages[1].imageUrl}");
     return ListView.builder(
         itemCount: messages.length,
+        reverse: true,
         itemBuilder: (ctx, ind) => ChatBubble(
             date: AppMethods().dateFormatter(messages[ind].createdAt),
             isMe: messages[ind].isME,

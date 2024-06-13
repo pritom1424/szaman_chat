@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:szaman_chat/data/models/message_model.dart';
 
 import 'package:szaman_chat/utils/components/app_component.dart';
+import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
 
 class InputInboxWidget extends StatefulWidget {
-  const InputInboxWidget({super.key});
+  final String fId;
+  final String fName;
+  final String userUrl;
+  const InputInboxWidget(
+      {super.key,
+      required this.fId,
+      required this.fName,
+      required this.userUrl});
   static TextStyle customHintTextStyle = TextStyle(
     color: Colors.grey.withOpacity(0.5),
     fontSize: 15, /* fontFamily: AppStrings.currentFontFamily */
@@ -84,7 +93,19 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (ctx, ref, _) {
+      print("url len code:${widget.userUrl}");
       void _sendMessages() {
+        final resultModel = MessageModel(
+            createdAt: DateTime.now(),
+            message: _controller.text,
+            imageUrl: widget.userUrl,
+            isImageExist: false,
+            isDeleted: false,
+            name: Usercredential.name,
+            friendName: widget.fName,
+            isME: true);
+        ref.watch(inboxpageViewModel).addMessage(
+            Usercredential.token!, resultModel, Usercredential.id!, widget.fId);
         FocusScope.of(context).unfocus();
         ref.read(inboxpageViewModel).setInputText("");
         _controller.clear();
