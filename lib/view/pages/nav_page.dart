@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
@@ -21,15 +20,15 @@ class NavPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     List<Widget?> navViews() {
       return [
-        ChatListPage(),
-        GroupListPage(),
-        CoworkerlistPage(),
-        ProfileForm()
+        const ChatListPage(),
+        const GroupListPage(),
+        const CoworkerlistPage(),
+        const ProfileForm()
       ];
     }
 
     AppVars.screenSize = MediaQuery.of(context).size;
-    final widthSize = 0.5;
+    const widthSize = 0.5;
     return Scaffold(
       body: (!ref.read(navpageViewModel).isInit)
           ? FutureBuilder(
@@ -40,14 +39,14 @@ class NavPage extends ConsumerWidget {
                 if (snapProf.connectionState == ConnectionState.waiting) {
                   return SizedBox(
                     height: AppVars.screenSize.height,
-                    child: Center(
+                    child: const Center(
                       child: CircularProgressIndicator(),
                     ),
                   );
                 }
 
                 if (!snapProf.hasData) {
-                  return Blockpage();
+                  return const Blockpage();
                 }
                 Usercredential.name = snapProf.data!.name;
                 Usercredential.isAdmin = snapProf.data!.isAdmin;
@@ -59,21 +58,21 @@ class NavPage extends ConsumerWidget {
   }
 
   Scaffold mainBody(double widthSize, WidgetRef ref, BuildContext context,
-      List<Widget?> navViews()) {
+      List<Widget?> Function() navViews) {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
         automaticallyImplyLeading: false,
         titleSpacing: 0,
         leadingWidth: 50,
-        title: Container(
+        title: SizedBox(
           width: AppVars.screenSize.width * (widthSize),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              FittedBox(
+              const FittedBox(
                   child: Padding(
-                      padding: const EdgeInsets.only(right: 5),
+                      padding: EdgeInsets.only(right: 5),
                       child: CircleAvatar(
                         child: Icon(Icons.person),
                       ))),
@@ -94,7 +93,7 @@ class NavPage extends ConsumerWidget {
               onPressed: () async {
                 await ref.read(authViewModel).logout();
                 Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (ctx) => LoginForm()));
+                    MaterialPageRoute(builder: (ctx) => const LoginForm()));
               },
               icon: const Icon(
                 Icons.power_settings_new,

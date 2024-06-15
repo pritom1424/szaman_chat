@@ -1,4 +1,3 @@
-import 'dart:ffi';
 
 import 'package:flutter/material.dart';
 import 'package:szaman_chat/data/models/user_model.dart';
@@ -42,7 +41,7 @@ class CwlistWidget extends StatelessWidget {
         itemCount: uModel.length,
         itemBuilder: (ctx, ind) => (uModel.keys.toList()[ind] ==
                 Usercredential.id)
-            ? SizedBox.shrink()
+            ? const SizedBox.shrink()
             : CwlistTemplate(
                 token: uModel.entries.toList()[ind].value.token,
                 uid: uModel.keys.toList()[ind],

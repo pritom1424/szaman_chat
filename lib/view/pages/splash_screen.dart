@@ -6,7 +6,7 @@ import 'package:szaman_chat/utils/constants/app_paths.dart';
 import 'package:szaman_chat/view/pages/root_page.dart';
 
 class SplashScreen extends StatefulWidget {
-  SplashScreen({super.key});
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -17,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     Timer(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (ctx) => RootPage()));
+          context, MaterialPageRoute(builder: (ctx) => const RootPage()));
     });
     // TODO: implement initState
     super.initState();
@@ -28,7 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
     Size scSize = MediaQuery.of(context).size;
     AppVars.screenSize = scSize;
     return Scaffold(
-        body: Container(
+        body: SizedBox(
       height: scSize.height,
       width: double.infinity,
       child: Row(

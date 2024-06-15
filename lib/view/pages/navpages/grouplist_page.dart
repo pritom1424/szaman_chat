@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:szaman_chat/view/widgets/chatlist/chatlist_widget.dart';
 import 'package:szaman_chat/view/widgets/grouplist/grouplist_widget.dart';
 
 class GroupListPage extends StatelessWidget {
@@ -11,10 +10,10 @@ class GroupListPage extends StatelessWidget {
     return Scaffold(
       appBar: (title != null)
           ? AppBar(
-              title: Text("Szaman Chat"),
+              title: const Text("Szaman Chat"),
             )
           : null,
-      body: GrouplistWidget(),
+      body: const GrouplistWidget(),
     );
   }
 }

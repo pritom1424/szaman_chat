@@ -94,7 +94,7 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
   Widget build(BuildContext context) {
     return Consumer(builder: (ctx, ref, _) {
       print("url len code:${widget.userUrl}");
-      void _sendMessages() {
+      void sendMessages() {
         final resultModel = MessageModel(
             createdAt: DateTime.now(),
             message: _controller.text,
@@ -113,7 +113,7 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
 
       return Container(
         decoration: AppComponent.customboxDecoration,
-        margin: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+        margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
         padding: const EdgeInsets.symmetric(horizontal: 5),
         child: Row(
           children: [
@@ -163,7 +163,7 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
                           "") /* ||
                       didImageExist */
                   )
-                  ? _sendMessages
+                  ? sendMessages
                   : null,
               icon: const Icon(Icons.send),
             )

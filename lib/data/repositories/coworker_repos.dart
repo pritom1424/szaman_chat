@@ -1,9 +1,7 @@
-import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:szaman_chat/data/models/user_model.dart';
 import 'package:szaman_chat/utils/constants/api_links.dart';
-import 'package:szaman_chat/utils/constants/data.dart';
 import 'package:szaman_chat/data/models/message_model.dart';
 
 class CoworkerRepos {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:szaman_chat/view/pages/inbox_page.dart';
 
 class GroupListTemplet extends StatelessWidget {
   // const ChatTemplet({super.key});

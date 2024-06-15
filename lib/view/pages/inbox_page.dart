@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
-import 'package:szaman_chat/utils/constants/app_colors.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
 import 'package:szaman_chat/view/widgets/inboxpage/inbox_messages_widget.dart';
@@ -15,21 +13,21 @@ class InboxPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final widthSize = 0.5;
+    const widthSize = 0.5;
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
         // automaticallyImplyLeading: true,
         titleSpacing: 0,
         leadingWidth: 50,
-        title: Container(
+        title: SizedBox(
           width: AppVars.screenSize.width * (widthSize),
-          child: Row(
+          child: const Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               FittedBox(
                   child: Padding(
-                      padding: const EdgeInsets.only(right: 5),
+                      padding: EdgeInsets.only(right: 5),
                       child: CircleAvatar(
                         child: Icon(Icons.person),
                       ) /* (ref.read(authViewModel).userId == "")
@@ -75,9 +73,9 @@ class InboxPage extends ConsumerWidget {
       ),
       body: Container(
         width: double.infinity,
-        color: Color.fromARGB(255, 226, 204, 195),
+        color: const Color.fromARGB(255, 226, 204, 195),
         child: (Usercredential.id == null || Usercredential.token == null)
-            ? Text("no data found")
+            ? const Text("no data found")
             : Column(
                 children: [
                   StreamBuilder(
@@ -88,14 +86,14 @@ class InboxPage extends ConsumerWidget {
                             ConnectionState.waiting) {
                           return SizedBox(
                             height: AppVars.screenSize.height,
-                            child: Center(
+                            child: const Center(
                               child: CircularProgressIndicator(),
                             ),
                           );
                         }
 
                         if (!snapshot.hasData) {
-                          return SizedBox.shrink();
+                          return const SizedBox.shrink();
                         }
 
                         return Expanded(

@@ -10,10 +10,10 @@ class ChatListPage extends StatelessWidget {
     return Scaffold(
       appBar: (title != null)
           ? AppBar(
-              title: Text("Szaman Chat"),
+              title: const Text("Szaman Chat"),
             )
           : null,
-      body: ChatlistWidget(),
+      body: const ChatlistWidget(),
     );
   }
 }

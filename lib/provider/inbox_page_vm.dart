@@ -51,7 +51,7 @@ class InboxPageVm with ChangeNotifier {
 
   Stream<List<MessageModel>> getAllMessagesStream(
       String token, String uid, String fid) {
-    return Stream.periodic(Duration(seconds: 2)).asyncMap((_) async {
+    return Stream.periodic(const Duration(seconds: 2)).asyncMap((_) async {
       try {
         final data = await _inboxRepos.getMessages(token, uid, fid);
         List<MessageModel> messages = [];

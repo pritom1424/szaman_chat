@@ -2,25 +2,27 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:szaman_chat/provider/auth_vm.dart';
 import 'package:szaman_chat/utils/components/app_component.dart';
 
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/constants/app_colors.dart';
 import 'package:szaman_chat/utils/constants/app_paths.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
+import 'package:szaman_chat/view/pages/nav_page.dart';
 
-class RegistrationForm extends StatefulWidget {
+class LoginPhoneForm extends StatefulWidget {
   final String? title;
-  const RegistrationForm({super.key, this.title});
+  const LoginPhoneForm({super.key, this.title});
 
   @override
-  State<RegistrationForm> createState() => _RegistrationFormState();
+  State<LoginPhoneForm> createState() => _RegistrationFormState();
 }
 
-class _RegistrationFormState extends State<RegistrationForm> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passController = TextEditingController();
+class _RegistrationFormState extends State<LoginPhoneForm> {
+  TextEditingController mobileController = TextEditingController();
   TextEditingController nameController = TextEditingController();
+  TextEditingController otpController = TextEditingController();
   Color actionButtonBgColor = const Color.fromARGB(255, 68, 156, 204);
   Color actionButtonFgColor = Colors.white;
   final _formInfoKey = GlobalKey<FormState>();
@@ -33,9 +35,9 @@ class _RegistrationFormState extends State<RegistrationForm> {
   @override
   void dispose() {
     super.dispose();
-    emailController.dispose();
-    passController.dispose();
+    mobileController.dispose();
     nameController.dispose();
+    otpController.dispose();
   }
 
   @override
@@ -93,32 +95,37 @@ class _RegistrationFormState extends State<RegistrationForm> {
                                     : AssetImage(AppPaths.charplaceholderPath)
                                         as ImageProvider,
                               ),
-                              TextButton(
-                                onPressed: () async {
-                                  File? selectedFile =
-                                      await AppComponent.selectpictureAlert(
-                                          context);
+                              if ((!ref.read(authViewModel).isMessageSent))
+                                TextButton(
+                                  onPressed: () async {
+                                    File? selectedFile =
+                                        await AppComponent.selectpictureAlert(
+                                            context);
 
-                                  ref
-                                      .watch(authViewModel)
-                                      .setStoreImage(selectedFile);
-                                },
-                                child: Text(
-                                  (ref.read(authViewModel).storedImage == null)
-                                      ? "Add Profile Picture"
-                                      : "Update Profile Picture",
-                                  style: const TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold),
+                                    ref
+                                        .watch(authViewModel)
+                                        .setStoreImage(selectedFile);
+                                  },
+                                  child: Text(
+                                    (ref.read(authViewModel).storedImage ==
+                                            null)
+                                        ? "Add Profile Picture"
+                                        : "Update Profile Picture",
+                                    style: const TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
+                                  ),
                                 ),
-                              ),
                             ],
                           ),
                         ),
                       ),
                       const SizedBox(height: 10),
                       TextFormField(
+                        readOnly: (ref.read(authViewModel).isMessageSent)
+                            ? true
+                            : false,
                         //focusNode: emailFocusNode,
                         controller: nameController,
                         style: const TextStyle(
@@ -150,8 +157,12 @@ class _RegistrationFormState extends State<RegistrationForm> {
                       ),
                       const SizedBox(height: 20),
                       TextFormField(
+                        readOnly: (ref.read(authViewModel).isMessageSent)
+                            ? true
+                            : false,
                         //focusNode: emailFocusNode,
-                        controller: emailController,
+                        controller: mobileController,
+                        keyboardType: TextInputType.phone,
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.normal),
                         //autofocus: false,
@@ -166,8 +177,8 @@ class _RegistrationFormState extends State<RegistrationForm> {
                           enabledBorder: OutlineInputBorder(
                               borderSide:
                                   BorderSide(color: Colors.grey, width: 0.3)),
-                          hintText: 'Email',
-                          labelText: 'Email',
+                          hintText: 'Phone',
+                          labelText: 'Phone',
                           labelStyle:
                               TextStyle(fontSize: 18, color: Colors.grey),
                           prefixIcon:
@@ -175,58 +186,63 @@ class _RegistrationFormState extends State<RegistrationForm> {
                         ),
                         validator: (value) {
                           if (value != null && value == "") {
-                            return "email error";
+                            return "Phone error";
                           }
                           return null;
                         },
                       ),
-                      const SizedBox(height: 20),
-                      TextFormField(
-                        controller: passController,
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.normal),
-                        autofocus: false,
-                        obscureText: true,
-                        obscuringCharacter: "*",
-                        decoration: const InputDecoration(
-                          errorBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.grey, width: 0.3)),
-                          focusedBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.grey, width: 0.3)),
-                          enabledBorder: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: Colors.grey, width: 0.3)),
-                          hintText: 'Password',
-                          labelText: 'Password',
-                          labelStyle:
-                              TextStyle(fontSize: 18, color: Colors.grey),
-                          prefixIcon:
-                              Icon(Icons.lock_open_rounded, color: Colors.grey),
+                      if (!ref.read(authViewModel).isMessageSent)
+                        const SizedBox(height: 20),
+                      if (!ref.read(authViewModel).isMessageSent)
+                        Container(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              const Text("Are you admin?"),
+                              Checkbox(
+                                value: ref.read(authViewModel).isAdmin,
+                                onChanged: (val) {
+                                  ref
+                                      .watch(authViewModel)
+                                      .setAdmin(val ?? false);
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                        validator: (value) {
-                          if (value != null && value == "") {
-                            return "pass error";
-                          }
-                          return null;
-                        },
-                      ),
-                      Container(
-                        padding: const EdgeInsets.only(left: 10),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const Text("Are you admin?"),
-                            Checkbox(
-                              value: ref.read(authViewModel).isAdmin,
-                              onChanged: (val) {
-                                ref.watch(authViewModel).setAdmin(val ?? false);
-                              },
-                            ),
-                          ],
+                      if (ref.read(authViewModel).isMessageSent)
+                        TextFormField(
+                          controller: otpController,
+                          keyboardType: TextInputType.number,
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.normal),
+                          autofocus: false,
+                          obscureText: true,
+                          decoration: const InputDecoration(
+                            errorBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey, width: 0.3)),
+                            focusedBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey, width: 0.3)),
+                            enabledBorder: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: Colors.grey, width: 0.3)),
+                            hintText: 'Otp Number',
+                            labelText: 'Otp',
+                            labelStyle:
+                                TextStyle(fontSize: 18, color: Colors.grey),
+                            prefixIcon: Icon(Icons.lock_open_rounded,
+                                color: Colors.grey),
+                          ),
+                          validator: (value) {
+                            if (value != null && value == "") {
+                              return "otp error";
+                            }
+                            return null;
+                          },
                         ),
-                      ),
                       const SizedBox(height: 50),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -240,44 +256,72 @@ class _RegistrationFormState extends State<RegistrationForm> {
                         onPressed: (ref.read(authViewModel).isLoading)
                             ? null
                             : () async {
-                                /*     FocusScope.of(context).unfocus();
-                                if (_formInfoKey.currentState == null) {
-                                  return;
-                                }
-                                if (_formInfoKey.currentState!.validate()) {
-                                  _formInfoKey.currentState!.save();
+                                FocusScope.of(context).unfocus();
 
-                                  final authVm = ref.read(authViewModel);
+                                final authVm = ref.read(authViewModel);
+                                if (!authVm.isMessageSent) {
+                                  if (_formInfoKey.currentState == null) {
+                                    return;
+                                  }
 
-                                  final didRegister = await authVm.signup(
-                                      emailController.text,
-                                      passController.text,
-                                      nameController.text,
-                                      authVm.storedImage,
-                                      authVm.isAdmin);
+                                  if (_formInfoKey.currentState!.validate()) {
+                                    _formInfoKey.currentState!.save();
+
+                                    authVm.signData = await authVm
+                                        .signin(mobileController.text);
+
+                                    print("data struct ${authVm.signData}");
+
+                                    if (authVm.signData.isNotEmpty) {
+                                      ref
+                                          .watch(authViewModel)
+                                          .setMessageSent(true);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text("Message Sent!")));
+
+                                      Navigator.of(context).maybePop();
+                                    } else {
+                                      ref
+                                          .watch(authViewModel)
+                                          .setMessageSent(false);
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(const SnackBar(
+                                              content: Text(
+                                                  "Message sent failed!")));
+                                    }
+                                  }
+                                } else {
+                                  final bool didRegister =
+                                      await authVm.verifySignIn(
+                                          authVm.signData,
+                                          otpController.text,
+                                          nameController.text,
+                                          authVm.storedImage,
+                                          authVm.isAdmin,
+                                          mobileController.text);
 
                                   if (didRegister) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
-                                            content:
-                                                Text("Registration Success!")));
-                                    Navigator.of(context).maybePop();
+                                            content: Text(
+                                                "Authentication Success!")));
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (ctx) => const NavPage()));
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
-                                            content:
-                                                Text("Registration failed!")));
+                                            content: Text(
+                                                "Authentication  failed!")));
                                   }
-                                  nameController.text = "";
-                                  emailController.text = "";
-                                  passController.text = "";
-                                  ref.watch(authViewModel).setStoreImage(null);
-                                  authVm.setAdmin(false);
-                                  
-                                } */
+                                  print("did pass $didRegister");
+                                }
                               },
-                        child: const Text(
-                          'Add Member',
+                        child: Text(
+                          (ref.read(authViewModel).isMessageSent)
+                              ? 'Login'
+                              : 'Request Otp',
                           style: TextStyle(fontSize: 25),
                         ),
                       ),

@@ -23,11 +23,11 @@ class CwlistTemplate extends ConsumerWidget {
     return ListTile(
       leading: CircleAvatar(
         backgroundImage:
-            (imageURL != null) ? NetworkImage(imageURL!) : AssetImage(""),
+            (imageURL != null) ? NetworkImage(imageURL!) : const AssetImage(""),
       ),
       title: Text(
         userName ?? "User",
-        style: TextStyle(fontWeight: FontWeight.normal),
+        style: const TextStyle(fontWeight: FontWeight.normal),
       ),
       /*   subtitle: Text(
               lastText,
@@ -39,13 +39,13 @@ class CwlistTemplate extends ConsumerWidget {
           icon: FittedBox(
             child: Row(
               children: [
-                if (isAdmin) Text("Admin"),
+                if (isAdmin) const Text("Admin"),
                 /* IconButton(
                   icon: Icon(Icons.edit),
                   onPressed: () {},
                 ), */
                 IconButton(
-                  icon: Icon(Icons.person_add),
+                  icon: const Icon(Icons.person_add),
                   onPressed: () async {
                     final mod = MessageModel(
                         createdAt: DateTime.now(),
@@ -61,14 +61,14 @@ class CwlistTemplate extends ConsumerWidget {
                           await ref.read(userViewModel).addFriend(mod, uid!);
                       if (didSuccess) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Employee Added!")));
+                            const SnackBar(content: Text("Employee Added!")));
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text("Employee Not Added!")));
+                            const SnackBar(content: Text("Employee Not Added!")));
                       }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("No User Found")));
+                          const SnackBar(content: Text("No User Found")));
                     }
                   },
                 ),
@@ -80,14 +80,14 @@ class CwlistTemplate extends ConsumerWidget {
                                 .watch(authViewModel)
                                 .deleteUser(token!, uid!);
                             ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("delete success")));
+                                const SnackBar(content: Text("delete success")));
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("not deleted")));
+                                const SnackBar(content: Text("not deleted")));
                           }
                         },
-                        icon: Icon(Icons.delete))
-                    : SizedBox.shrink()
+                        icon: const Icon(Icons.delete))
+                    : const SizedBox.shrink()
               ],
             ),
           )),

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/utils/constants/api_links.dart';
 import 'package:http/http.dart' as http;
-import 'package:szaman_chat/utils/constants/app_paths.dart';
 
 class InboxRepos {
   Future<bool> addMessage(

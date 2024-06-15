@@ -1,16 +1,12 @@
-import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/constants/app_colors.dart';
 import 'package:szaman_chat/utils/constants/app_paths.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
 import 'package:szaman_chat/view/pages/nav_page.dart';
-import 'package:szaman_chat/view/pages/navpages/chatlist_page.dart';
 
 class LoginForm extends StatefulWidget {
   final String? title;
@@ -50,14 +46,14 @@ class _LoginFormState extends State<LoginForm> {
             ),
       body: Center(
         child: Container(
-          margin: EdgeInsets.all(8),
+          margin: const EdgeInsets.all(8),
           color: Colors.white,
           padding: const EdgeInsets.all(20.0),
           child: SingleChildScrollView(
             child: Consumer(builder: (ctx, ref, _) {
               return Container(
                 //  height: AppVars.screenSize.height * 1,
-                padding: EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Form(
                   key: _formInfoKey,
                   child: Column(
@@ -109,7 +105,7 @@ class _LoginFormState extends State<LoginForm> {
                       TextFormField(
                         //focusNode: emailFocusNode,
                         controller: emailController,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.normal),
                         //autofocus: false,
                         enabled: true,
@@ -140,7 +136,7 @@ class _LoginFormState extends State<LoginForm> {
                       const SizedBox(height: 20),
                       TextFormField(
                         controller: passController,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.normal),
                         autofocus: false,
                         obscureText: true,
@@ -172,10 +168,10 @@ class _LoginFormState extends State<LoginForm> {
                       const SizedBox(height: 50),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 5),
-                            shape: RoundedRectangleBorder(
+                            padding: const EdgeInsets.symmetric(vertical: 5),
+                            shape: const RoundedRectangleBorder(
                               borderRadius:
-                                  const BorderRadius.all(Radius.circular(10)),
+                                  BorderRadius.all(Radius.circular(10)),
                             ),
                             backgroundColor: Appcolors.assignButtonColor,
                             foregroundColor: actionButtonFgColor),
@@ -199,10 +195,10 @@ class _LoginFormState extends State<LoginForm> {
                                   if (didRegister) {
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
-                                            builder: (ctx) => NavPage()));
+                                            builder: (ctx) => const NavPage()));
                                   } else {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(
+                                        const SnackBar(
                                             content: Text("Login failed!")));
                                   }
 
@@ -237,12 +233,12 @@ class _LoginFormState extends State<LoginForm> {
                         height: 20,
                       ),
                       (ref.watch(authViewModel).isLoading)
-                          ? Center(
+                          ? const Center(
                               child: CircularProgressIndicator(
                                   //  color: Appcolors.contentColorPurple,
                                   ),
                             )
-                          : SizedBox.shrink(),
+                          : const SizedBox.shrink(),
                     ],
                   ),
                 ),

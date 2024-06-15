@@ -8,12 +8,12 @@ class Blockpage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Szaman Chat"),
+        title: const Text("Szaman Chat"),
         automaticallyImplyLeading: false,
       ),
       body: SizedBox(
         height: AppVars.screenSize.height,
-        child: Center(
+        child: const Center(
           child: Text("You have been blocked!"),
         ),
       ),

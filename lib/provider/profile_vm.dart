@@ -5,7 +5,7 @@ import 'package:szaman_chat/data/models/profile_model.dart';
 import 'package:szaman_chat/data/repositories/profile_repos.dart';
 
 class ProfileVm with ChangeNotifier {
-  ProfileRepos _profileRepos = ProfileRepos();
+  final ProfileRepos _profileRepos = ProfileRepos();
   bool _isEditMode = false;
   bool _isLoading = false;
   File? _storedImage;

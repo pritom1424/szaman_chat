@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:szaman_chat/utils/constants/api_links.dart';
-import 'package:szaman_chat/utils/constants/app_paths.dart';
 
 class ProfileRepos {
   Future<Map<String, dynamic>> getProfileInfo(
@@ -16,10 +15,11 @@ class ProfileRepos {
     final url = Uri.https(ApiLinks.baseUrl, '/users/$uid.json', params);
 
     final response = await http.get(url);
-
+    print("Profile print ${json.decode(response.body)} ${token.toString()}");
     Map<String, dynamic> responseMap = {};
     if (response.statusCode == 200) {
       responseMap = json.decode(response.body) as Map<String, dynamic>;
+      print("Profile print");
     }
     return responseMap;
   }

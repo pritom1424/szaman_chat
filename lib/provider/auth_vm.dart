@@ -4,16 +4,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
 import 'package:szaman_chat/data/repositories/auth_repos.dart';
+import 'package:szaman_chat/main.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 
 class AuthVm with ChangeNotifier {
   bool _isLoading = false;
+
+  List<dynamic> signData = [];
+
+  bool _isMessageSent = false;
 
   File? _storedImage;
   bool _isAdmin = false;
 
   bool get isAdmin {
     return _isAdmin;
+  }
+
+  bool get isMessageSent {
+    return _isMessageSent;
   }
 
   File? get storedImage {
@@ -26,6 +35,11 @@ class AuthVm with ChangeNotifier {
 
   void setAdmin(bool didAdmin) {
     _isAdmin = didAdmin;
+    notifyListeners();
+  }
+
+  void setMessageSent(bool didSend) {
+    _isMessageSent = didSend;
     notifyListeners();
   }
 
@@ -67,7 +81,7 @@ class AuthVm with ChangeNotifier {
     return _refreshToken;
   }
 
-  Future<bool> signup(String email, String password, String name, File? file,
+  /* Future<bool> signup(String email, String password, String name, File? file,
       bool isAdmin) async {
     try {
       setIsLoading(true);
@@ -86,13 +100,13 @@ class AuthVm with ChangeNotifier {
       print(e);
       return false;
     }
-  }
+  } */
 
-  Future<bool> login(String email, String password) async {
+  Future<bool> login(String phoneNumber, String password) async {
     try {
       setIsLoading(true);
-      final authData =
-          await _authRepos.authenticate(email, password, 'signInWithPassword');
+      final authData = await _authRepos.authenticate(
+          phoneNumber, password, 'signInWithPassword');
 
       _token = authData['token'];
       _expiryDate = DateTime.parse(authData['expiryDate']);
@@ -106,6 +120,43 @@ class AuthVm with ChangeNotifier {
       setIsLoading(false);
       print(e);
       return false;
+    }
+  }
+
+  Future<bool> verifySignIn(List<dynamic> data, String otpCode, String userName,
+      File? imageFile, bool isAdmin, String phoneNumber) async {
+    try {
+      print("did pass VM UP");
+      if (data[0] != null && data[1] != null) {
+        print("did pass VM UPS");
+        await _authRepos.verifyOtp(data[0].toString(), otpCode, userName,
+            imageFile, isAdmin, phoneNumber);
+
+        print("user info ${auth.currentUser?.uid}");
+
+        Usercredential.id = auth.currentUser?.uid;
+        Usercredential.isAdmin = isAdmin;
+        Usercredential.name = auth.currentUser?.displayName;
+        Usercredential.token = await auth.currentUser?.getIdToken();
+        print("did pass VM");
+        return true;
+      }
+      print("did pass VM}");
+      return false;
+    } catch (e) {
+      print("did pass VM}");
+      return false;
+    }
+  }
+
+  Future<List<dynamic>> signin(String phoneNumber) async {
+    try {
+      final List<dynamic> data =
+          await _authRepos.signInWithPhoneNumber(phoneNumber);
+      print("vm test ${data.length}");
+      return data;
+    } catch (e) {
+      return [];
     }
   }
 

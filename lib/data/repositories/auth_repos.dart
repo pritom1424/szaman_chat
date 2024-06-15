@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:szaman_chat/main.dart';
 import 'package:szaman_chat/utils/constants/app_paths.dart';
 
 class AuthRepos {
@@ -39,8 +41,135 @@ class AuthRepos {
     return "";
   } */
 
+  /* Future<List<dynamic>> signInWithPhoneNumber(String phoneNumber) async {
+    String? verId;
+    int? resToken;
+    await auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      timeout: const Duration(seconds: 60),
+      verificationCompleted: (PhoneAuthCredential credential) async {
+/*         // await _storeUserData();
+        print("credVErComp ${credential.smsCode}");
+        final cred = await auth.signInWithCredential(credential); */
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        print(e.toString());
+        throw e;
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        verId = verificationId;
+        resToken = resendToken;
+        print("vm test rep $verificationId");
+
+        // Handle the code sent logic here (Save verificationId if needed)
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
+    );
+
+    if (verId != null) {
+      print("vm test repl $verId");
+      return [verId, resToken];
+    } else {
+      return [];
+    }
+  } */
+  Future<List<dynamic>> signInWithPhoneNumber(String phoneNumber) async {
+    String? verificationId;
+    int? resendToken;
+
+    // Initialize the completer to wait for the codeSent callback
+    final completer = Completer<List<dynamic>>();
+
+    await auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      timeout: const Duration(seconds: 60),
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        // Auto-retrieval or instant validation
+        try {
+          final userCredential = await auth.signInWithCredential(credential);
+          print("Verification completed: ${userCredential.user?.uid}");
+        } catch (e) {
+          print("Error in verificationCompleted: $e");
+        }
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        print("Verification failed: $e");
+        completer.completeError(e);
+      },
+      codeSent: (String verId, int? resToken) {
+        verificationId = verId;
+        resendToken = resToken;
+        print("Verification code sent: $verId");
+        // Complete the completer with verificationId and resendToken
+        completer.complete([verificationId.toString(), resendToken]);
+      },
+      codeAutoRetrievalTimeout: (String verId) {
+        verificationId = verId;
+        print("Code auto-retrieval timeout: $verId");
+      },
+    );
+
+    // Await the completer to return verificationId and resendToken
+    return completer.future;
+  }
+
+  Future<UserCredential?> verifyOtp(
+      String verificationId,
+      String otpCode,
+      String userName,
+      File? imageFile,
+      bool isAdmin,
+      String phoneNumber) async {
+    try {
+      final PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: otpCode,
+      );
+
+      final userInfo = await auth.signInWithCredential(credential);
+      if (userInfo.user != null) {
+        // Update display name
+        await userInfo.user!.updateDisplayName(userName);
+        await userInfo.user!
+            .reload(); // Reload the user to ensure the display name is updated
+        final token = await userInfo.user!.getIdToken();
+
+        final params = {"auth": token};
+        await _addInfoTOServer(userInfo.user!.displayName, userInfo.user!.uid,
+            imageFile, phoneNumber, isAdmin, token!, params);
+        _storeUserData();
+        print(
+            "Compare UserInfo ${userInfo.user!.displayName} <--> ${auth.currentUser?.displayName ?? "no name"}");
+        return userInfo;
+      }
+    } catch (e) {
+      print('Error in verifying OTP: $e');
+      return null;
+    }
+    return null;
+  }
+
+  Future<void> _storeUserData() async {
+    final User? user = auth.currentUser;
+    if (user != null) {
+      final idTokenResult = await user.getIdTokenResult();
+      final refreshToken = user.refreshToken;
+      final expiryDate = idTokenResult.expirationTime;
+
+      final prefs = await SharedPreferences.getInstance();
+
+      final data = {
+        'token': idTokenResult.token,
+        'expiryDate':
+            expiryDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
+        'refreshToken': refreshToken,
+      };
+      prefs.setString('userData', data.toString());
+    }
+  }
+
   Future<Map<String, dynamic>> authenticate(
-      String email, String password, String urlSegment,
+      String phoneNumber, String urlSegment,
       [String? name, File? imageFile, bool isAdmin = false]) async {
     final url = Uri.https(
       "identitytoolkit.googleapis.com",
@@ -53,9 +182,8 @@ class AuthRepos {
         url,
         body: json.encode(
           {
-            'email': email,
-            'password': password,
-            'returnSecureToken': true,
+            'phoeneNumber': phoneNumber,
+            'temporaryProof': true,
           },
         ),
       );
@@ -67,8 +195,8 @@ class AuthRepos {
 
       final params = {'auth': responseData['idToken']};
 
-      await _addInfoTOServer(name, responseData['localId'], imageFile, email,
-          isAdmin, responseData['idToken'], params);
+      await _addInfoTOServer(name, responseData['localId'], imageFile,
+          phoneNumber, isAdmin, responseData['idToken'], params);
 
       final prefs = await SharedPreferences.getInstance();
       final expiryDate = DateTime.now().add(
@@ -80,7 +208,6 @@ class AuthRepos {
         'expiryDate': expiryDate.toIso8601String(),
         'refreshToken': responseData['refreshToken'],
       };
-      _autoLogout(expiryDate);
       final userData = json.encode(data);
       prefs.setString('userData', userData);
       return data;
@@ -101,7 +228,7 @@ class AuthRepos {
       String? username,
       String userId,
       File? imageFile,
-      String email,
+      String phoneNumber,
       bool isAdmin,
       String token,
       Map<String, dynamic> params) async {
@@ -131,7 +258,7 @@ class AuthRepos {
       final response = await http.put(link,
           body: json.encode({
             "creatorId": DateTime.now().toIso8601String(),
-            "email": email,
+            "phone": phoneNumber,
             "imageUrl": durl,
             "isAdmin": isAdmin,
             "name": username,
@@ -163,17 +290,21 @@ class AuthRepos {
 
   Future<Map<String, dynamic>?> tryAutoLogin() async {
     final prefs = await SharedPreferences.getInstance();
+
     if (!prefs.containsKey("userData")) {
       return null;
     }
-    final extractedData =
-        json.decode(prefs.getString('userData')!) as Map<String, dynamic>;
-    final expiryDate = DateTime.parse(extractedData['expiryDate'] as String);
-    _refreshToken = extractedData['refreshToken'];
+    //print("extract data ${prefs.getString('userData')!}");
 
-    if (expiryDate.isBefore(DateTime.now())) {
+    final extractedData = json.decode(prefs.getString('userData')!);
+
+    print("extract data $extractedData");
+    final expiryDate = DateTime.parse(extractedData['expiryDate'] as String);
+    //_refreshToken = extractedData['refreshToken'];
+
+    /*  if (expiryDate.isBefore(DateTime.now())) {
       final data = await _refreshTokenIfNeeded();
-      final date = DateTime.parse(data['expiryDate']);
+      final date = DateTime.parse(data['expiryDate'].toString());
       final params = {'auth': extractedData['token']};
       await _addInfoTOServerUpdateToken(
           extractedData['token'], extractedData['userId'], params);
@@ -185,7 +316,8 @@ class AuthRepos {
           extractedData['token'], extractedData['userId'], params);
       _autoLogout(expiryDate);
       return extractedData;
-    }
+    } */
+    return extractedData;
 
 /*     UserCredential.token = _token;
     UserCredential.userId = _userId;

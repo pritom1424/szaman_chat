@@ -17,7 +17,7 @@ class ChatlistWidget extends ConsumerWidget {
                 ref.read(inboxpageViewModel).getFriendIDs(Usercredential.id!),
             builder: (ctx, snapId) {
               if (!snapId.hasData) {
-                return SizedBox.shrink();
+                return const SizedBox.shrink();
               }
               print("id print ${snapId.data!.length}");
               return ListView.builder(
@@ -29,7 +29,7 @@ class ChatlistWidget extends ConsumerWidget {
                       builder: (context, snapPhoto) {
                         if (!snapPhoto.hasData) {
                           print("photo print");
-                          return SizedBox.shrink();
+                          return const SizedBox.shrink();
                         }
                         print("photo print success");
                         return FutureBuilder(
@@ -39,7 +39,7 @@ class ChatlistWidget extends ConsumerWidget {
                                 snapId.data![ind]), //fID
                             builder: (context, snap) {
                               if (!snap.hasData) {
-                                return SizedBox.shrink();
+                                return const SizedBox.shrink();
                               }
                               print(
                                   "message print success  ${snap.data!.length}(${snapId.data![ind]})");
@@ -61,7 +61,7 @@ class ChatlistWidget extends ConsumerWidget {
           )
         : SizedBox(
             height: AppVars.screenSize.height,
-            child: Center(
+            child: const Center(
               child: Text("Unauthorized access!"),
             ),
           );

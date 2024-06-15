@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/view/pages/inbox_page.dart';
 
 class ChatListTemplet extends StatelessWidget {
@@ -13,8 +12,8 @@ class ChatListTemplet extends StatelessWidget {
   final bool isSeen;
   final bool isMe;
   final String friendName;
-  ChatListTemplet(this.userId, this.username, this.lastText, this.lastTextDate,
-      this.imageUrl, this.isSeen, this.isMe, this.friendName);
+  const ChatListTemplet(this.userId, this.username, this.lastText, this.lastTextDate,
+      this.imageUrl, this.isSeen, this.isMe, this.friendName, {super.key});
   @override
   Widget build(BuildContext context) {
     return Dismissible(

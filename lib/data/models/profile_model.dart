@@ -11,14 +11,14 @@ String profileModelToJson(ProfileModel data) => json.encode(data.toJson());
 
 class ProfileModel {
   DateTime creatorId;
-  String? email;
+  String? phone;
   String? imageUrl;
   bool? isAdmin;
   String? name;
 
   ProfileModel({
     required this.creatorId,
-    required this.email,
+    required this.phone,
     required this.imageUrl,
     required this.isAdmin,
     required this.name,
@@ -26,7 +26,7 @@ class ProfileModel {
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) => ProfileModel(
         creatorId: DateTime.parse(json["creatorId"]),
-        email: json["email"],
+        phone: json["phone"],
         imageUrl: json["imageUrl"],
         isAdmin: json["isAdmin"],
         name: json["name"],
@@ -34,7 +34,7 @@ class ProfileModel {
 
   Map<String, dynamic> toJson() => {
         "creatorId": creatorId.toIso8601String(),
-        "email": email,
+        "email": phone,
         "imageUrl": imageUrl,
         "isAdmin": isAdmin,
         "name": name,

@@ -14,7 +14,7 @@ class AppComponent {
     for (int i = 1; i < 10; i++) {
       strengths.add(0.1 * i);
     }
-    strengths.forEach((strength) {
+    for (var strength in strengths) {
       final double ds = 0.5 - strength;
       swatch[(strength * 1000).round()] = Color.fromRGBO(
         r + ((ds < 0 ? r : (255 - r)) * ds).round(),
@@ -22,7 +22,7 @@ class AppComponent {
         b + ((ds < 0 ? b : (255 - b)) * ds).round(),
         1,
       );
-    });
+    }
     return MaterialColor(color.value, swatch);
   }
 
@@ -46,7 +46,7 @@ class AppComponent {
         buttonColor: Color(0xFFEE7843),
         textTheme: ButtonTextTheme.primary,
       ),
-      dialogTheme: DialogTheme(backgroundColor: Colors.white),
+      dialogTheme: const DialogTheme(backgroundColor: Colors.white),
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: Color(0xFFEE7843),
       ),
@@ -60,7 +60,7 @@ class AppComponent {
         barrierDismissible: true,
         context: ctx,
         builder: (ctx) => AlertDialog(content: Builder(builder: (ctx) {
-              return Container(
+              return SizedBox(
                 width: ScrSize.width - 50,
                 height: ScrSize.height / 2,
                 child: Image.network(Url),
@@ -77,7 +77,7 @@ class AppComponent {
         color: Colors.grey.withOpacity(0.8),
         spreadRadius: 2,
         blurRadius: 10,
-        offset: Offset(0, 3),
+        offset: const Offset(0, 3),
       ),
     ],
   );
@@ -105,7 +105,7 @@ class AppComponent {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: Text("Ok")),
+                  child: const Text("Ok")),
             ],
           );
         });

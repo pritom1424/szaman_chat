@@ -16,7 +16,7 @@ class CoworkerlistPage extends ConsumerWidget {
     return Scaffold(
         appBar: (title != null)
             ? AppBar(
-                title: Text("Coworkers"),
+                title: const Text("Coworkers"),
               )
             : null,
         floatingActionButton: (Usercredential.token == null ||
@@ -29,24 +29,24 @@ class CoworkerlistPage extends ConsumerWidget {
                 builder: (ctx, snap) =>
                     (snap.connectionState == ConnectionState.waiting ||
                             !snap.hasData)
-                        ? SizedBox.shrink()
+                        ? const SizedBox.shrink()
                         : (snap.data!.isAdmin ?? false)
                             ? FloatingActionButton(
                                 onPressed: () async {
                                   await Navigator.of(context)
                                       .push(MaterialPageRoute(
-                                          builder: (ctx) => RegistrationForm(
+                                          builder: (ctx) => const RegistrationForm(
                                                 title: "Add Member",
                                               )));
                                 },
-                                child: Icon(Icons.person_add_alt),
+                                child: const Icon(Icons.person_add_alt),
                               )
-                            : SizedBox.shrink(),
+                            : const SizedBox.shrink(),
               ),
         body: (Usercredential.token == null)
             ? SizedBox(
                 height: AppVars.screenSize.height,
-                child: Center(
+                child: const Center(
                   child: Text("Unauthorized Access!"),
                 ),
               )
@@ -56,7 +56,7 @@ class CoworkerlistPage extends ConsumerWidget {
                   if (snap.connectionState == ConnectionState.waiting) {
                     return SizedBox(
                       height: AppVars.screenSize.height,
-                      child: Center(
+                      child: const Center(
                         child: CircularProgressIndicator(),
                       ),
                     );
@@ -64,7 +64,7 @@ class CoworkerlistPage extends ConsumerWidget {
                   if (!snap.hasData) {
                     return SizedBox(
                       height: AppVars.screenSize.height,
-                      child: Center(
+                      child: const Center(
                         child: Text("No User found!"),
                       ),
                     );

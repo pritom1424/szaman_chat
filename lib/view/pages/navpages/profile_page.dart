@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:szaman_chat/data/models/profile_model.dart';
 import 'package:szaman_chat/utils/components/app_component.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
@@ -40,7 +39,7 @@ class _ProfileFormState extends State<ProfileForm> {
     FocusScope.of(context).unfocus();
     ref.watch(profileViewModel).setIsLoading(true);
     print(
-        "profile:-> ${Usercredential.token}-${email}-${username}-${profileImage}  ");
+        "profile:-> ${Usercredential.token}-$email-$username-$profileImage  ");
     final message = await ref
         .read(authViewModel)
         .update(Usercredential.token!, email, username, profileImage);
@@ -68,7 +67,7 @@ class _ProfileFormState extends State<ProfileForm> {
   @override
   Widget build(BuildContext context) {
     return (Usercredential.id == null || Usercredential.token == null)
-        ? Center(
+        ? const Center(
             child: Text("Access Denied!"),
           )
         : Consumer(builder: (ctx, ref, _) {
@@ -81,15 +80,15 @@ class _ProfileFormState extends State<ProfileForm> {
                       Usercredential.token!, Usercredential.id!),
                   builder: (ctx, snap) {
                     if (snap.connectionState == ConnectionState.waiting) {
-                      return Container(
+                      return SizedBox(
                         height: AppVars.screenSize.height,
-                        child: Center(
+                        child: const Center(
                           child: CircularProgressIndicator(),
                         ),
                       );
                     }
                     if (!snap.hasData) {
-                      return Center(
+                      return const Center(
                         child: Text("no data found"),
                       );
                     }
@@ -129,11 +128,11 @@ class _ProfileFormState extends State<ProfileForm> {
                   bottom: 0,
                   right: 0,
                   child: IconButton(
-                    icon: Icon(Icons.camera_alt),
+                    icon: const Icon(Icons.camera_alt),
                     onPressed: () async {
                       File? selectedFile =
                           await AppComponent.selectpictureAlert(context);
-                      _emailController.text = profileModel?.email ?? "";
+                      _emailController.text = profileModel?.phone ?? "";
                       _usernameController.text = profileModel?.name ?? "";
                       ref.watch(profileViewModel).setStoreImage(selectedFile);
                       ref.read(profileViewModel).setEditBool(true);
@@ -143,11 +142,11 @@ class _ProfileFormState extends State<ProfileForm> {
               ],
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           (ref.read(profileViewModel).isEditMode)
               ? TextField(
                   controller: _usernameController,
-                  decoration: InputDecoration(labelText: 'Edit Name'),
+                  decoration: const InputDecoration(labelText: 'Edit Name'),
                 )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -155,34 +154,34 @@ class _ProfileFormState extends State<ProfileForm> {
                     Text(profileModel?.name ?? "no name"),
                     IconButton(
                         onPressed: () {
-                          _emailController.text = profileModel?.email ?? "";
+                          _emailController.text = profileModel?.phone ?? "";
                           _usernameController.text = profileModel?.name ?? "";
                           ref.watch(profileViewModel).setEditBool(true);
                         },
-                        icon: Icon(Icons.edit))
+                        icon: const Icon(Icons.edit))
                   ],
                 ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           (ref.read(profileViewModel).isEditMode)
               ? TextField(
                   controller: _emailController,
-                  decoration: InputDecoration(labelText: 'Email'),
+                  decoration: const InputDecoration(labelText: 'Email'),
                 )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(profileModel?.email ?? ""),
+                    Text(profileModel?.phone ?? ""),
                     IconButton(
                         onPressed: () {
-                          _emailController.text = profileModel?.email ?? "";
+                          _emailController.text = profileModel?.phone ?? "";
                           _usernameController.text = profileModel?.name ?? "";
 
                           ref.watch(profileViewModel).setEditBool(true);
                         },
-                        icon: Icon(Icons.edit))
+                        icon: const Icon(Icons.edit))
                   ],
                 ),
-          if (ref.read(profileViewModel).isEditMode) SizedBox(height: 16),
+          if (ref.read(profileViewModel).isEditMode) const SizedBox(height: 16),
           if (ref.read(profileViewModel).isEditMode)
             ElevatedButton(
               onPressed: (ref.read(profileViewModel).isLoading)
@@ -190,18 +189,18 @@ class _ProfileFormState extends State<ProfileForm> {
                   : () {
                       _saveProfile(ref);
                     },
-              child: Text('Save Changes'),
+              child: const Text('Save Changes'),
             ),
           const SizedBox(
             height: 20,
           ),
           (ref.read(profileViewModel).isLoading)
-              ? Center(
+              ? const Center(
                   child: CircularProgressIndicator(
                       //  color: Appcolors.contentColorPurple,
                       ),
                 )
-              : SizedBox.shrink()
+              : const SizedBox.shrink()
         ],
       ),
     );
