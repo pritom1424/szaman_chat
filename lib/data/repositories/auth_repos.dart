@@ -164,7 +164,7 @@ class AuthRepos {
             expiryDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
         'refreshToken': refreshToken,
       };
-      prefs.setString('userData', data.toString());
+      prefs.setString('userData', json.encode(data));
     }
   }
 
@@ -296,7 +296,8 @@ class AuthRepos {
     }
     //print("extract data ${prefs.getString('userData')!}");
 
-    final extractedData = json.decode(prefs.getString('userData')!);
+    final extractedData =
+        json.decode(prefs.getString('userData')!) as Map<String, dynamic>;
 
     print("extract data $extractedData");
     final expiryDate = DateTime.parse(extractedData['expiryDate'] as String);
@@ -373,7 +374,7 @@ class AuthRepos {
     _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
   }
 
-  Future<Map<String, dynamic>> updateAccount(String token, String newEmail,
+  Future<Map<String, dynamic>> updateAccount(String token, String phonenumber,
       String name, File? imageFile, bool isAdmin) async {
     final url = Uri.https(
       "identitytoolkit.googleapis.com",
@@ -383,7 +384,11 @@ class AuthRepos {
 
     Map<String, dynamic> data = {};
 
-    data = {'idToken': token, 'email': newEmail, 'returnSecureToken': true};
+    data = {
+      'idToken': token,
+      'phoneNumber': phonenumber,
+      'returnSecureToken': true
+    };
 
     try {
       final response = await http.post(
@@ -398,14 +403,14 @@ class AuthRepos {
 
       final params = {'auth': responseData['idToken']};
 
-      await _addInfoTOServer(name, responseData['localId'], imageFile, newEmail,
-          isAdmin, token, params);
+      await _addInfoTOServer(name, auth.currentUser!.uid, imageFile,
+          phonenumber, isAdmin, token, params);
 
       // Update the email in the Realtime Database if necessary
       final prefs = await SharedPreferences.getInstance();
       final userData =
           json.decode(prefs.getString('userData')!) as Map<String, dynamic>;
-      userData['email'] = newEmail;
+      userData['phone'] = phonenumber;
       prefs.setString('userData', json.encode(userData));
 
       return responseData;

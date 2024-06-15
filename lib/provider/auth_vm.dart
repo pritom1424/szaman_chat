@@ -196,9 +196,10 @@ class AuthVm with ChangeNotifier {
   Future<bool> tryAutoLogin() async {
     final authData = await _authRepos.tryAutoLogin();
     if (authData != null) {
+      print("authentic data $authData");
       _token = authData['token']!;
-      _userId = authData['userId']!;
-      _refreshToken = authData['refreshToken']!;
+      _userId = auth.currentUser!.uid;
+      //_refreshToken = authData['refreshToken']!;
       _expiryDate = DateTime.parse(authData['expiryDate']);
 
       Usercredential.id = userId;
