@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -27,7 +30,8 @@ class InputInboxWidget extends StatefulWidget {
 
 class _InputInboxWidgetState extends State<InputInboxWidget> {
   final _controller = TextEditingController();
-  bool didImageExist = true;
+
+  String? url;
   @override
   void dispose() {
     _controller.dispose();
@@ -64,51 +68,59 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
           );
         });
   } */
-/*  void clickOrGetPhoto(ImageSource imgSrc) async {
-    final imPicker = ImagePicker();
+  Future<String?> clickOrGetPhoto(ImageSource imgSrc, BuildContext ctx) async {
+/*     final imPicker = ImagePicker();
     final imageFile = await imPicker.pickImage(
-        source: imgSrc, imageQuality: 75, maxHeight: 700, maxWidth: 700);
+        source: imgSrc, imageQuality: 75, maxHeight: 700, maxWidth: 700); */
 
-    if (imageFile == null) {
-      return;
+    final imageFile = await AppComponent.clickOrGetPhoto(imgSrc, ctx);
+
+    if (imageFile == null || Usercredential.id == null) {
+      return null;
     }
 
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('chat_images')
-        .child(imageFile.name);
+    final ref =
+        FirebaseStorage.instanceFor(bucket: "gs://szaman-chat.appspot.com")
+            .ref()
+            .child('chat_images')
+            .child(Usercredential.id!)
+            .child(imageFile.path.split('/').last);
 
     await ref.putFile(File(imageFile.path));
 
-    url = await ref.getDownloadURL();
+    final String url = await ref.getDownloadURL();
     print('urlis: $url');
 
-    setState(() {
-      didImageExist = true;
-    });
-
-    print('didImageExist: $didImageExist');
-  } */
+    return url;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (ctx, ref, _) {
-      print("url len code:${widget.userUrl}");
-      void sendMessages() {
+      void sendMessages() async {
+        var rp = ref.read(inboxpageViewModel);
+        if (rp.IsImageExist == null || url == null || url!.isEmpty) {
+          print("eneteredd");
+          rp.setImageExist(false);
+        }
+        print("enetered1 ${rp.IsImageExist}");
         final resultModel = MessageModel(
             createdAt: DateTime.now(),
-            message: _controller.text,
+            message: rp.IsImageExist! ? url : _controller.text,
             imageUrl: widget.userUrl,
-            isImageExist: false,
+            isImageExist: rp.IsImageExist ?? false,
             isDeleted: false,
-            name: Usercredential.name,
-            friendName: widget.fName,
+            senderID: Usercredential.id!,
+            /*   name: Usercredential.name,
+            friendName: widget.fName, */
             isME: true);
-        ref.watch(inboxpageViewModel).addMessage(
-            Usercredential.token!, resultModel, Usercredential.id!, widget.fId);
-        FocusScope.of(context).unfocus();
         ref.read(inboxpageViewModel).setInputText("");
         _controller.clear();
+        rp.setImageExist(false);
+        url = null;
+        await ref.watch(inboxpageViewModel).addMessage(
+            Usercredential.token!, resultModel, Usercredential.id!, widget.fId);
+        FocusScope.of(context).unfocus();
       }
 
       return Container(
@@ -139,9 +151,10 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
             IconButton(
               color: Theme.of(context).primaryColor,
               onPressed: () async {
-                final fl =
-                    await AppComponent.clickOrGetPhoto(ImageSource.camera, ctx);
-                (fl == null) ? didImageExist = true : didImageExist = false;
+                url = await clickOrGetPhoto(ImageSource.camera, ctx);
+                (url == null)
+                    ? ref.read(inboxpageViewModel).setImageExist(false)
+                    : ref.read(inboxpageViewModel).setImageExist(true);
                 // clickOrGetPhoto(ImageSource.camera);
               },
               icon: const Icon(Icons.camera_alt_rounded),
@@ -149,9 +162,10 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
             IconButton(
               color: Theme.of(context).primaryColor,
               onPressed: () async {
-                final fl = await AppComponent.clickOrGetPhoto(
-                    ImageSource.gallery, ctx);
-                (fl == null) ? didImageExist = false : didImageExist = true;
+                url = await clickOrGetPhoto(ImageSource.gallery, ctx);
+                (url == null)
+                    ? ref.read(inboxpageViewModel).setImageExist(false)
+                    : ref.read(inboxpageViewModel).setImageExist(true);
                 // clickOrGetPhoto(ImageSource.gallery);
               },
               icon: const Icon(Icons.photo),
@@ -159,8 +173,11 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
             IconButton(
               color: Theme.of(context).primaryColor,
               onPressed: ((ref.watch(inboxpageViewModel).inputText.isNotEmpty &&
-                      ref.watch(inboxpageViewModel).inputText !=
-                          "") /* ||
+                          ref.watch(inboxpageViewModel).inputText != "" ||
+                      (ref.read(inboxpageViewModel).IsImageExist != null &&
+                          ref
+                              .read(inboxpageViewModel)
+                              .IsImageExist!)) /* ||
                       didImageExist */
                   )
                   ? sendMessages

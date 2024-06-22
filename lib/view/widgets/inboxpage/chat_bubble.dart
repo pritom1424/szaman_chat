@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:szaman_chat/utils/components/app_component.dart';
+import 'package:szaman_chat/utils/components/app_vars.dart';
 
 class ChatBubble extends StatelessWidget {
   final String message;
@@ -20,12 +21,20 @@ class ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool didshowDate = true;
-    return Row(
-      mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-      children: [
-        // if (!isMe) CircleAvatar(backgroundImage: NetworkImage(userimage)),
-        Expanded(
-          child: Container(
+    if (didImageExist) {
+      print("message inbox: $message");
+    }
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5),
+      child: Row(
+        mainAxisAlignment:
+            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        children: [
+          if (!isMe) CircleAvatar(backgroundImage: NetworkImage(userimage)),
+          Container(
+            width: (didImageExist)
+                ? AppVars.screenSize.width * 0.4
+                : AppVars.screenSize.width * 0.6,
             decoration: BoxDecoration(
                 color: isMe
                     ? Colors.grey[300]
@@ -74,7 +83,7 @@ class ChatBubble extends StatelessWidget {
                   if (!didImageExist)
                     Text(
                       message,
-                      maxLines: 10,
+                      maxLines: 50,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           color: isMe
@@ -92,9 +101,9 @@ class ChatBubble extends StatelessWidget {
               ),
             ),
           ),
-        ),
-        if (isMe) CircleAvatar(backgroundImage: NetworkImage(userimage)),
-      ],
+          if (isMe) CircleAvatar(backgroundImage: NetworkImage(userimage)),
+        ],
+      ),
     );
   }
 }

@@ -5,7 +5,8 @@ import 'package:szaman_chat/view/widgets/inboxpage/chat_bubble.dart';
 
 class InboxMessagesWidget extends StatelessWidget {
   final List<MessageModel> messages;
-  const InboxMessagesWidget({super.key, required this.messages});
+  final String? fName;
+  const InboxMessagesWidget({super.key, required this.messages, this.fName});
 
   @override
   Widget build(BuildContext context) {
@@ -51,16 +52,19 @@ class InboxMessagesWidget extends StatelessWidget {
             "hi there! how are you im jack and you and what is your purpose 3"
       }
     ]; */
-    print("imageLength: ${messages.length}");
-    return ListView.builder(
-        itemCount: messages.length,
-        reverse: true,
-        itemBuilder: (ctx, ind) => ChatBubble(
-            date: AppMethods().dateFormatter(messages[ind].createdAt),
-            isMe: messages[ind].isME,
-            username: messages[ind].name ?? "User",
-            message: messages[ind].message ?? "",
-            userimage: messages[ind].imageUrl ?? "",
-            didImageExist: messages[ind].isImageExist ?? true));
+    print("friend name : $fName");
+    final messageList = messages.reversed.toList();
+    return Expanded(
+      child: ListView.builder(
+          itemCount: messageList.length,
+          reverse: true,
+          itemBuilder: (ctx, ind) => ChatBubble(
+              date: AppMethods().dateFormatter(messageList[ind].createdAt),
+              isMe: messageList[ind].isME,
+              username: (messageList[ind].isME) ? "You" : fName!,
+              message: messageList[ind].message ?? "",
+              userimage: messageList[ind].imageUrl ?? "",
+              didImageExist: messageList[ind].isImageExist ?? false)),
+    );
   }
 }

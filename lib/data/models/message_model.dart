@@ -22,8 +22,9 @@ class MessageModel {
   final String? imageUrl;
   final bool? isImageExist;
   final bool? isDeleted;
-  final String? name;
-  final String? friendName;
+  final String? senderID;
+  // final String? name;
+  //final String? friendName;
   final bool isME;
 
   factory MessageModel.fromJson(Map<String, dynamic> json) => MessageModel(
@@ -32,8 +33,7 @@ class MessageModel {
       imageUrl: json["imageUrl"],
       isImageExist: json["isImageExist"],
       isDeleted: json["isDeleted"],
-      name: json["name"],
-      friendName: json['friendName'],
+      senderID: json["senderID"],
       isME: json['isME']);
 
   MessageModel(
@@ -42,8 +42,7 @@ class MessageModel {
       required this.imageUrl,
       required this.isImageExist,
       required this.isDeleted,
-      required this.name,
-      required this.friendName,
+      required this.senderID,
       required this.isME});
 
   Map<String, dynamic> toJson() => {
@@ -52,8 +51,7 @@ class MessageModel {
         "imageUrl": imageUrl,
         "isImageExist": isImageExist,
         "isDeleted": isDeleted,
-        "name": name,
-        "friendName": friendName,
+        "senderID": senderID,
         "isME": isME
       };
 }

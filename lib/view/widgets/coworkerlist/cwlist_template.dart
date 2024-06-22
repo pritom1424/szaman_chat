@@ -53,18 +53,22 @@ class CwlistTemplate extends ConsumerWidget {
                         imageUrl: imageURL,
                         isImageExist: false,
                         isDeleted: false,
-                        name: meName,
-                        friendName: userName,
+                        senderID: Usercredential.id,
+                        /* name: meName,
+                        friendName: userName, */
                         isME: true);
                     if (uid != null) {
                       final didSuccess =
                           await ref.read(userViewModel).addFriend(mod, uid!);
+
+                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
                       if (didSuccess) {
                         ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text("Employee Added!")));
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Employee Not Added!")));
+                            const SnackBar(
+                                content: Text("Employee Not Added!")));
                       }
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -80,7 +84,8 @@ class CwlistTemplate extends ConsumerWidget {
                                 .watch(authViewModel)
                                 .deleteUser(token!, uid!);
                             ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("delete success")));
+                                const SnackBar(
+                                    content: Text("delete success")));
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text("not deleted")));

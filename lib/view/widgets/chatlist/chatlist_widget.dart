@@ -42,19 +42,34 @@ class ChatlistWidget extends ConsumerWidget {
                                 return const SizedBox.shrink();
                               }
                               print(
-                                  "message print success  ${snap.data!.length}(${snapId.data![ind]})");
-                              return ChatListTemplet(
-                                  snapId.data![ind],
-                                  snap.data![0].name ?? "user",
-                                  snap.data![0].message ?? "message",
-                                  AppMethods()
-                                      .dateFormatter(snap.data![0].createdAt),
-                                  snapPhoto.data!.imageUrl!,
-                                  false,
-                                  snap.data![0].isME,
-                                  snap.data![0].friendName ?? "friend"
-                                  // data[ind]["isSeen"]
-                                  );
+                                  "message print success  ${Usercredential.token!})");
+
+                              return FutureBuilder(
+                                  future: ref
+                                      .read(userViewModel)
+                                      .getInfo(Usercredential.token!),
+                                  builder: (ctx, snapUsers) {
+                                    if (!snapUsers.hasData) {
+                                      return const SizedBox.shrink();
+                                    }
+                                    return ChatListTemplet(
+                                        snapId.data![ind],
+                                        snapUsers.data![Usercredential.id]
+                                                ?.name ??
+                                            "user",
+                                        /*     /* snap.data![0].name ??  */ "user", */
+                                        snap.data!.last.message ?? "message",
+                                        AppMethods().dateFormatter(
+                                            snap.data!.last.createdAt),
+                                        snapPhoto.data!.imageUrl!,
+                                        false,
+                                        snap.data!.last.isME,
+                                        snapUsers.data![snapId.data![ind]]
+                                                ?.name ??
+                                            "friends"
+                                        // data[ind]["isSeen"]
+                                        );
+                                  });
                             });
                       }));
             },

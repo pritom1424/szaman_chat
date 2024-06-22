@@ -8,8 +8,19 @@ class InboxPageVm with ChangeNotifier {
 
   final _inboxRepos = InboxRepos();
 
+  bool? _isImageExist;
+
   String get inputText {
     return _inputText;
+  }
+
+  bool? get IsImageExist {
+    return _isImageExist;
+  }
+
+  void setImageExist(bool? isExist) {
+    _isImageExist = isExist;
+    notifyListeners();
   }
 
   void setInputText(String str) {

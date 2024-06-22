@@ -33,6 +33,13 @@ class AuthVm with ChangeNotifier {
     return _isLoading;
   }
 
+  void resetAuthForm() {
+    _isMessageSent = false;
+    _storedImage = null;
+    _isLoading = false;
+    notifyListeners();
+  }
+
   void setAdmin(bool didAdmin) {
     _isAdmin = didAdmin;
     notifyListeners();
@@ -127,6 +134,8 @@ class AuthVm with ChangeNotifier {
       File? imageFile, bool isAdmin, String phoneNumber) async {
     try {
       print("did pass VM UP");
+      print(
+          "evrydata: $data otp $otpCode username $userName File $imageFile bool $isAdmin Phone $phoneNumber");
       if (data[0] != null && data[1] != null) {
         print("did pass VM UPS");
         await _authRepos.verifyOtp(data[0].toString(), otpCode, userName,
@@ -182,6 +191,12 @@ class AuthVm with ChangeNotifier {
     _userId = "";
     _expiryDate = DateTime(0);
     _refreshToken = "";
+
+    _isLoading = false;
+    _isMessageSent = false;
+    _isAdmin = false;
+    _storedImage = null;
+    await auth.currentUser?.delete();
 
     if (_authTimer != Timer(Duration.zero, () {})) {
       _authTimer.cancel();

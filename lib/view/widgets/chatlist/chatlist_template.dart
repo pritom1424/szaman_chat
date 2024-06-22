@@ -12,8 +12,9 @@ class ChatListTemplet extends StatelessWidget {
   final bool isSeen;
   final bool isMe;
   final String friendName;
-  const ChatListTemplet(this.userId, this.username, this.lastText, this.lastTextDate,
-      this.imageUrl, this.isSeen, this.isMe, this.friendName, {super.key});
+  const ChatListTemplet(this.userId, this.username, this.lastText,
+      this.lastTextDate, this.imageUrl, this.isSeen, this.isMe, this.friendName,
+      {super.key});
   @override
   Widget build(BuildContext context) {
     return Dismissible(
@@ -63,19 +64,23 @@ class ChatListTemplet extends StatelessWidget {
             ),
             title: Text(
               friendName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                   fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
             ),
             subtitle: Text(
               lastText ?? "sent a photo",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                   fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
             ),
             trailing: Text(lastTextDate),
             onTap: () {
               Navigator.of(context).push(MaterialPageRoute(
-                  builder: (ctx) => InboxPage(
-                      userId, (isMe) ? friendName : username, imageUrl))); //fID
+                  builder: (ctx) =>
+                      InboxPage(userId, friendName, imageUrl))); //fID
             }),
       ),
     );

@@ -76,38 +76,39 @@ class InboxPage extends ConsumerWidget {
         color: const Color.fromARGB(255, 226, 204, 195),
         child: (Usercredential.id == null || Usercredential.token == null)
             ? const Text("no data found")
-            : Column(
-                children: [
-                  StreamBuilder(
-                      stream: ref.read(inboxpageViewModel).getAllMessagesStream(
-                          Usercredential.token!, Usercredential.id!, fId),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return SizedBox(
-                            height: AppVars.screenSize.height,
-                            child: const Center(
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        }
+            : StreamBuilder(
+                stream: ref.read(inboxpageViewModel).getAllMessagesStream(
+                    Usercredential.token!, Usercredential.id!, fId),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return SizedBox(
+                      height: AppVars.screenSize.height,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
 
-                        if (!snapshot.hasData) {
-                          return const SizedBox.shrink();
-                        }
+                  if (!snapshot.hasData) {
+                    return const SizedBox.shrink();
+                  }
 
-                        return Expanded(
-                            child: InboxMessagesWidget(
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: InboxMessagesWidget(
                           messages: snapshot.data!,
-                        ));
-                      }),
-                  InputInboxWidget(
-                    fId: fId,
-                    fName: fName,
-                    userUrl: userimageUrl,
-                  )
-                ],
-              ),
+                          fName: fName,
+                        ),
+                      ),
+                      InputInboxWidget(
+                        fId: fId,
+                        fName: fName,
+                        userUrl: userimageUrl,
+                      )
+                    ],
+                  );
+                }),
       ),
     );
   }

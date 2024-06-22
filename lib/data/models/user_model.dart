@@ -13,24 +13,25 @@ String userModelToJson(Map<String, UserModel> data) => json.encode(
 
 class UserModel {
   DateTime creatorId;
-  String? email;
+
   String? imageUrl;
   bool? isAdmin;
   String? name;
+  String? phone;
   String? token;
 
   UserModel({
     required this.creatorId,
-    required this.email,
     required this.imageUrl,
     required this.isAdmin,
     required this.name,
+    required this.phone,
     required this.token,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
         creatorId: DateTime.parse(json["creatorId"]),
-        email: json["email"],
+        phone: json["phone"],
         imageUrl: json["imageUrl"],
         isAdmin: json["isAdmin"],
         name: json["name"],
@@ -39,7 +40,7 @@ class UserModel {
 
   Map<String, dynamic> toJson() => {
         "creatorId": creatorId.toIso8601String(),
-        "email": email,
+        "phone": phone,
         "imageUrl": imageUrl,
         "isAdmin": isAdmin,
         "name": name,

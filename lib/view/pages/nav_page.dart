@@ -4,7 +4,7 @@ import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/constants/data.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
-import 'package:szaman_chat/view/pages/auth/login_page.dart';
+import 'package:szaman_chat/view/pages/auth/login_page_phone.dart';
 import 'package:szaman_chat/view/pages/blockpage.dart';
 import 'package:szaman_chat/view/pages/navpages/chatlist_page.dart';
 import 'package:szaman_chat/view/pages/navpages/coworkerlist_page.dart';
@@ -92,8 +92,8 @@ class NavPage extends ConsumerWidget {
           TextButton.icon(
               onPressed: () async {
                 await ref.read(authViewModel).logout();
-                Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (ctx) => const LoginForm()));
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (ctx) => const LoginPhoneForm()));
               },
               icon: const Icon(
                 Icons.power_settings_new,

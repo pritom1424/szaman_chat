@@ -20,8 +20,7 @@ class InboxRepos {
           imageUrl: mModel.imageUrl,
           isImageExist: mModel.isImageExist,
           isDeleted: mModel.isDeleted,
-          name: mModel.name,
-          friendName: mModel.friendName,
+          senderID: uid,
           isME: false);
       final bodyDataFriend = messageModelToJson(friendModel);
       final urlfriend =

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:szaman_chat/provider/auth_vm.dart';
+import 'package:szaman_chat/main.dart';
 import 'package:szaman_chat/utils/components/app_component.dart';
 
 import 'package:szaman_chat/utils/components/app_vars.dart';
@@ -271,8 +271,12 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                                         .signin(mobileController.text);
 
                                     print("data struct ${authVm.signData}");
+                                    ref
+                                        .read(authViewModel)
+                                        .setMessageSent(false);
 
                                     if (authVm.signData.isNotEmpty) {
+                                      otpController.text = "";
                                       ref
                                           .watch(authViewModel)
                                           .setMessageSent(true);
@@ -292,20 +296,27 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                                     }
                                   }
                                 } else {
-                                  final bool didRegister =
-                                      await authVm.verifySignIn(
-                                          authVm.signData,
-                                          otpController.text,
-                                          nameController.text,
-                                          authVm.storedImage,
-                                          authVm.isAdmin,
-                                          mobileController.text);
+                                  bool didRegister = await authVm.verifySignIn(
+                                      authVm.signData,
+                                      otpController.text,
+                                      nameController.text,
+                                      authVm.storedImage,
+                                      authVm.isAdmin,
+                                      mobileController.text);
 
                                   if (didRegister) {
+                                    authVm.resetAuthForm();
+                                    didRegister = false;
+                                    otpController.text = "";
+                                    mobileController.text = "";
+                                    nameController.text = "";
+
+                                    print("auth su");
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
                                             content: Text(
                                                 "Authentication Success!")));
+
                                     Navigator.of(context).push(
                                         MaterialPageRoute(
                                             builder: (ctx) => const NavPage()));
@@ -322,7 +333,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                           (ref.read(authViewModel).isMessageSent)
                               ? 'Login'
                               : 'Request Otp',
-                          style: TextStyle(fontSize: 25),
+                          style: const TextStyle(fontSize: 25),
                         ),
                       ),
                       const SizedBox(

@@ -1,4 +1,3 @@
-
 import 'package:http/http.dart' as http;
 import 'package:szaman_chat/data/models/user_model.dart';
 import 'package:szaman_chat/utils/constants/api_links.dart';
@@ -36,8 +35,7 @@ class CoworkerRepos {
           imageUrl: model.imageUrl,
           isImageExist: model.isImageExist,
           isDeleted: model.isDeleted,
-          name: model.name,
-          friendName: model.friendName,
+          senderID: userId,
           isME: false);
       final bodyDataFriend = messageModelToJson(friendModel);
       final urlfriend = Uri.https(

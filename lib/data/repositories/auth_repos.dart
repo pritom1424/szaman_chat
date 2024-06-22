@@ -13,7 +13,7 @@ import 'package:szaman_chat/main.dart';
 import 'package:szaman_chat/utils/constants/app_paths.dart';
 
 class AuthRepos {
-  String _refreshToken = "";
+  final String _refreshToken = "";
   Timer _authTimer = Timer(Duration.zero, () {});
   final _params = {
     'key': 'AIzaSyA1Hortv46XM9Nc8QummVhoqa3JWBycHJY',
@@ -133,10 +133,16 @@ class AuthRepos {
         await userInfo.user!
             .reload(); // Reload the user to ensure the display name is updated
         final token = await userInfo.user!.getIdToken();
-
+        print("userinfo updated");
         final params = {"auth": token};
-        await _addInfoTOServer(userInfo.user!.displayName, userInfo.user!.uid,
-            imageFile, phoneNumber, isAdmin, token!, params);
+        await _addInfoTOServer(
+            auth.currentUser?.displayName,
+            userInfo.user!.uid,
+            imageFile,
+            phoneNumber,
+            isAdmin,
+            token!,
+            params);
         _storeUserData();
         print(
             "Compare UserInfo ${userInfo.user!.displayName} <--> ${auth.currentUser?.displayName ?? "no name"}");
@@ -188,6 +194,7 @@ class AuthRepos {
         ),
       );
       final responseData = jsonDecode(response.body);
+      print("responseData: $responseData");
 
       if (responseData['error'] != null) {
         throw Exception(responseData['error']['message']);
@@ -235,7 +242,7 @@ class AuthRepos {
     if (username != null) {
       final link = Uri.https('szaman-chat-default-rtdb.firebaseio.com',
           '/users/$userId.json', params);
-
+      print("user ID Login $userId");
       final ref =
           FirebaseStorage.instanceFor(bucket: "gs://szaman-chat.appspot.com")
               .ref()
