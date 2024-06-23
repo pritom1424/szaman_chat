@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -94,6 +95,20 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
     return url;
   }
 
+  Future<String?> getFileUrl() async {
+    try {
+      var file = await AppComponent.pickFile();
+      if (file != null) {
+        return await AppComponent.uploadFile(file);
+      } else {
+        return null;
+      }
+    } on Exception catch (e) {
+      // TODO
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer(builder: (ctx, ref, _) {
@@ -106,7 +121,7 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
         print("enetered1 ${rp.IsImageExist}");
         final resultModel = MessageModel(
             createdAt: DateTime.now(),
-            message: rp.IsImageExist! ? url : _controller.text,
+            message: (rp.IsImageExist!) ? url : _controller.text,
             imageUrl: widget.userUrl,
             isImageExist: rp.IsImageExist ?? false,
             isDeleted: false,
@@ -117,6 +132,7 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
         ref.read(inboxpageViewModel).setInputText("");
         _controller.clear();
         rp.setImageExist(false);
+
         url = null;
         await ref.watch(inboxpageViewModel).addMessage(
             Usercredential.token!, resultModel, Usercredential.id!, widget.fId);
@@ -152,6 +168,17 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
               color: Theme.of(context).primaryColor,
               onPressed: () async {
                 url = await clickOrGetPhoto(ImageSource.camera, ctx);
+                (url == null)
+                    ? ref.read(inboxpageViewModel).setImageExist(false)
+                    : ref.read(inboxpageViewModel).setImageExist(true);
+                // clickOrGetPhoto(ImageSource.camera);
+              },
+              icon: const Icon(Icons.attach_file),
+            ),
+            IconButton(
+              color: Theme.of(context).primaryColor,
+              onPressed: () async {
+                url = await getFileUrl();
                 (url == null)
                     ? ref.read(inboxpageViewModel).setImageExist(false)
                     : ref.read(inboxpageViewModel).setImageExist(true);

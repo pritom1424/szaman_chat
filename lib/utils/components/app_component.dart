@@ -1,8 +1,11 @@
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:szaman_chat/utils/constants/app_colors.dart';
+import 'package:szaman_chat/utils/credential/UserCredential.dart';
 
 class AppComponent {
   /// Utility function to create a MaterialColor from a single Color
@@ -123,6 +126,41 @@ class AppComponent {
     }
 
     return File(imageFile.path);
+  }
+
+  static Future<PlatformFile?> pickFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      PlatformFile file = result.files.first;
+      return file;
+    }
+    return null;
+  }
+
+  static Future<String?> uploadFile(PlatformFile file) async {
+    try {
+      if (file.path == null) {
+        return null;
+      }
+      File fileToUpload = File(file.path!);
+      FirebaseStorage storage =
+          FirebaseStorage.instanceFor(bucket: "gs://szaman-chat.appspot.com");
+      Reference ref = storage
+          .ref()
+          .child('chat_files')
+          .child(Usercredential.id!)
+          .child(file.path!.split('/').last);
+      UploadTask uploadTask = ref.putFile(fileToUpload);
+
+      await uploadTask.whenComplete(() async {
+        String downloadURL = await ref.getDownloadURL();
+        print("File uploaded successfully. Download URL: $downloadURL");
+        return downloadURL;
+      });
+    } catch (e) {
+      print("Failed to upload file: $e");
+      return null;
+    }
   }
 
   static Future<File?> selectpictureAlert(BuildContext context) async {

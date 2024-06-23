@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:szaman_chat/main.dart';
 import 'package:szaman_chat/utils/components/app_component.dart';
 
 import 'package:szaman_chat/utils/components/app_vars.dart';

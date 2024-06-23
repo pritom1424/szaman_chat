@@ -20,6 +20,26 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    bool isImageFormat(String url) {
+      // List of common image file formats
+      List<String> imageFileFormats = [
+        'jpeg',
+        'jpg',
+        'png',
+        'gif',
+        'bmp',
+        'tiff',
+        'tif',
+        'webp',
+        'heif',
+        'heic',
+        'svg'
+      ];
+
+      // Check if the file format is in the list of image file formats
+      return imageFileFormats.contains(AppVars().getFileFormatFromUrl(url));
+    }
+
     bool didshowDate = true;
     if (didImageExist) {
       print("message inbox: $message");
@@ -69,17 +89,26 @@ class ChatBubble extends StatelessWidget {
                         fontWeight: FontWeight.bold),
                   ),
                   if (didImageExist)
-                    InkWell(
-                      onTap: () {
-                        AppComponent.ZoomImage(context, message);
-                      },
-                      child: Image.network(
-                        message,
-                        width: 150,
-                        height: 100,
-                        fit: BoxFit.cover,
-                      ),
-                    ),
+                    (isImageFormat(message))
+                        ? InkWell(
+                            onTap: () {
+                              AppComponent.ZoomImage(context, message);
+                            },
+                            child: Image.network(
+                              message,
+                              width: 150,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : Container(
+                            child: Column(
+                              children: [
+                                Icon(Icons.attach_file),
+                                Text(AppVars().getFileNameFromUrl(message))
+                              ],
+                            ),
+                          ),
                   if (!didImageExist)
                     Text(
                       message,

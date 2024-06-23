@@ -16,6 +16,14 @@ class ChatlistWidget extends ConsumerWidget {
             future:
                 ref.read(inboxpageViewModel).getFriendIDs(Usercredential.id!),
             builder: (ctx, snapId) {
+              if (snapId.connectionState == ConnectionState.waiting) {
+                return Container(
+                  height: AppVars.screenSize.height,
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                );
+              }
               if (!snapId.hasData) {
                 return const SizedBox.shrink();
               }
@@ -38,6 +46,16 @@ class ChatlistWidget extends ConsumerWidget {
                                 Usercredential.id!,
                                 snapId.data![ind]), //fID
                             builder: (context, snap) {
+                              if (snap.connectionState ==
+                                      ConnectionState.waiting &&
+                                  ind == 1) {
+                                return Container(
+                                  height: AppVars.screenSize.height * 0.8,
+                                  child: Center(
+                                    child: Text("Loading..."),
+                                  ),
+                                );
+                              }
                               if (!snap.hasData) {
                                 return const SizedBox.shrink();
                               }

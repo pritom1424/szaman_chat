@@ -26,22 +26,22 @@ class CoworkerlistPage extends ConsumerWidget {
                 future: ref
                     .read(profileViewModel)
                     .getInfo(Usercredential.token!, Usercredential.id!),
-                builder: (ctx, snap) =>
-                    (snap.connectionState == ConnectionState.waiting ||
-                            !snap.hasData)
-                        ? const SizedBox.shrink()
-                        : (snap.data!.isAdmin ?? false)
-                            ? FloatingActionButton(
-                                onPressed: () async {
-                                  await Navigator.of(context)
-                                      .push(MaterialPageRoute(
-                                          builder: (ctx) => const RegistrationForm(
-                                                title: "Add Member",
-                                              )));
-                                },
-                                child: const Icon(Icons.person_add_alt),
-                              )
-                            : const SizedBox.shrink(),
+                builder: (ctx, snap) => (snap.connectionState ==
+                            ConnectionState.waiting ||
+                        !snap.hasData)
+                    ? const SizedBox.shrink()
+                    : (snap.data!.isAdmin ?? false)
+                        ? FloatingActionButton(
+                            onPressed: () async {
+                              await Navigator.of(context)
+                                  .push(MaterialPageRoute(
+                                      builder: (ctx) => const RegistrationForm(
+                                            title: "Add Member",
+                                          )));
+                            },
+                            child: const Icon(Icons.person_add_alt),
+                          )
+                        : const SizedBox.shrink(),
               ),
         body: (Usercredential.token == null)
             ? SizedBox(
@@ -51,25 +51,34 @@ class CoworkerlistPage extends ConsumerWidget {
                 ),
               )
             : FutureBuilder(
-                future: ref.read(userViewModel).getInfo(Usercredential.token!),
-                builder: (ctx, snap) {
-                  if (snap.connectionState == ConnectionState.waiting) {
-                    return SizedBox(
-                      height: AppVars.screenSize.height,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
-                  if (!snap.hasData) {
-                    return SizedBox(
-                      height: AppVars.screenSize.height,
-                      child: const Center(
-                        child: Text("No User found!"),
-                      ),
-                    );
-                  }
-                  return CwlistWidget(uModel: snap.data!);
-                }));
+                future: ref
+                    .read(inboxpageViewModel)
+                    .getFriendIDs(Usercredential.id!),
+                builder: (ctx, snapFid) => FutureBuilder(
+                    future:
+                        ref.read(userViewModel).getInfo(Usercredential.token!),
+                    builder: (ctx, snap) {
+                      if (snap.connectionState == ConnectionState.waiting) {
+                        return SizedBox(
+                          height: AppVars.screenSize.height,
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        );
+                      }
+                      if (!snap.hasData) {
+                        return SizedBox(
+                          height: AppVars.screenSize.height,
+                          child: const Center(
+                            child: Text("No User found!"),
+                          ),
+                        );
+                      }
+                      return CwlistWidget(
+                        uModel: snap.data!,
+                        fid: snapFid.data,
+                      );
+                    }),
+              ));
   }
 }
