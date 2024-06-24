@@ -19,9 +19,9 @@ class LoginPhoneForm extends StatefulWidget {
 }
 
 class _RegistrationFormState extends State<LoginPhoneForm> {
-  TextEditingController mobileController = TextEditingController();
+/*   TextEditingController mobileController = TextEditingController();
   TextEditingController nameController = TextEditingController();
-  TextEditingController otpController = TextEditingController();
+  TextEditingController otpController = TextEditingController(); */
   Color actionButtonBgColor = const Color.fromARGB(255, 68, 156, 204);
   Color actionButtonFgColor = Colors.white;
   final _formInfoKey = GlobalKey<FormState>();
@@ -34,9 +34,10 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
   @override
   void dispose() {
     super.dispose();
+    /*  
     mobileController.dispose();
     nameController.dispose();
-    otpController.dispose();
+    otpController.dispose(); */
   }
 
   @override
@@ -126,7 +127,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                             ? true
                             : false,
                         //focusNode: emailFocusNode,
-                        controller: nameController,
+                        controller: ref.read(authViewModel).nameController,
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.normal),
                         //autofocus: false,
@@ -160,7 +161,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                             ? true
                             : false,
                         //focusNode: emailFocusNode,
-                        controller: mobileController,
+                        controller: ref.read(authViewModel).mobileController,
                         keyboardType: TextInputType.phone,
                         style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.normal),
@@ -181,7 +182,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                           labelStyle:
                               TextStyle(fontSize: 18, color: Colors.grey),
                           prefixIcon:
-                              Icon(Icons.email_outlined, color: Colors.grey),
+                              Icon(Icons.phone_android, color: Colors.grey),
                         ),
                         validator: (value) {
                           if (value != null && value == "") {
@@ -190,7 +191,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                           return null;
                         },
                       ),
-                      if (!ref.read(authViewModel).isMessageSent)
+                      /*  if (!ref.read(authViewModel).isMessageSent)
                         const SizedBox(height: 20),
                       if (!ref.read(authViewModel).isMessageSent)
                         Container(
@@ -209,10 +210,10 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                               ),
                             ],
                           ),
-                        ),
+                        ), */
                       if (ref.read(authViewModel).isMessageSent)
                         TextFormField(
-                          controller: otpController,
+                          controller: ref.read(authViewModel).optController,
                           keyboardType: TextInputType.number,
                           style: const TextStyle(
                               fontSize: 18, fontWeight: FontWeight.normal),
@@ -267,7 +268,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                                     _formInfoKey.currentState!.save();
 
                                     authVm.signData = await authVm
-                                        .signin(mobileController.text);
+                                        .signin(authVm.mobileController.text);
 
                                     print("data struct ${authVm.signData}");
                                     ref
@@ -275,7 +276,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                                         .setMessageSent(false);
 
                                     if (authVm.signData.isNotEmpty) {
-                                      otpController.text = "";
+                                      authVm.optController.text = "";
                                       ref
                                           .watch(authViewModel)
                                           .setMessageSent(true);
@@ -295,20 +296,21 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                                     }
                                   }
                                 } else {
-                                  bool didRegister = await authVm.verifySignIn(
+                                  // otpController.text = "";
+                                  bool didRegister = false;
+                                  didRegister = await authVm.verifySignIn(
                                       authVm.signData,
-                                      otpController.text,
-                                      nameController.text,
+                                      authVm.optController.text,
+                                      authVm.nameController.text,
                                       authVm.storedImage,
                                       authVm.isAdmin,
-                                      mobileController.text);
+                                      authVm.mobileController.text);
 
                                   if (didRegister) {
                                     authVm.resetAuthForm();
                                     didRegister = false;
-                                    otpController.text = "";
-                                    mobileController.text = "";
-                                    nameController.text = "";
+                                    print("is come this section");
+                                    // otpController.text = "";
 
                                     print("auth su");
                                     ScaffoldMessenger.of(context).showSnackBar(

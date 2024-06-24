@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:szaman_chat/main.dart';
 import 'package:szaman_chat/utils/constants/app_paths.dart';
+import 'package:szaman_chat/utils/credential/UserCredential.dart';
 
 class AuthRepos {
   final String _refreshToken = "";
@@ -73,6 +74,7 @@ class AuthRepos {
       return [];
     }
   } */
+  //this
   Future<List<dynamic>> signInWithPhoneNumber(String phoneNumber) async {
     String? verificationId;
     int? resendToken;
@@ -113,6 +115,7 @@ class AuthRepos {
     return completer.future;
   }
 
+//this
   Future<UserCredential?> verifyOtp(
       String verificationId,
       String otpCode,
@@ -144,6 +147,7 @@ class AuthRepos {
             token!,
             params);
         _storeUserData();
+
         print(
             "Compare UserInfo ${userInfo.user!.displayName} <--> ${auth.currentUser?.displayName ?? "no name"}");
         return userInfo;
@@ -155,6 +159,7 @@ class AuthRepos {
     return null;
   }
 
+// will store to shared preferences
   Future<void> _storeUserData() async {
     final User? user = auth.currentUser;
     if (user != null) {
@@ -165,6 +170,7 @@ class AuthRepos {
       final prefs = await SharedPreferences.getInstance();
 
       final data = {
+        'id': user.uid,
         'token': idTokenResult.token,
         'expiryDate':
             expiryDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
@@ -174,7 +180,7 @@ class AuthRepos {
     }
   }
 
-  Future<Map<String, dynamic>> authenticate(
+  /* Future<Map<String, dynamic>> authenticate(
       String phoneNumber, String urlSegment,
       [String? name, File? imageFile, bool isAdmin = false]) async {
     final url = Uri.https(
@@ -221,13 +227,14 @@ class AuthRepos {
     } catch (error) {
       rethrow;
     }
-  }
+  } */
 
   Future<void> _addInfoTOServerUpdateToken(
       String idToken, String userId, Map<String, dynamic> params) async {
+    print("before update token");
     final link = Uri.https('szaman-chat-default-rtdb.firebaseio.com',
         '/users/$userId.json', params);
-
+    print("before patch");
     await http.patch(link, body: json.encode({"token": idToken}));
   }
 
@@ -309,23 +316,27 @@ class AuthRepos {
     print("extract data $extractedData");
     final expiryDate = DateTime.parse(extractedData['expiryDate'] as String);
     //_refreshToken = extractedData['refreshToken'];
-
-    /*  if (expiryDate.isBefore(DateTime.now())) {
+    print("isexpired:${expiryDate.isBefore(DateTime.now())}");
+    if (expiryDate.isBefore(DateTime.now())) {
       final data = await _refreshTokenIfNeeded();
+
       final date = DateTime.parse(data['expiryDate'].toString());
       final params = {'auth': extractedData['token']};
       await _addInfoTOServerUpdateToken(
           extractedData['token'], extractedData['userId'], params);
-      _autoLogout(date);
+      //_autoLogout(date);
       return data;
     } else {
       final params = {'auth': extractedData['token']};
+
+      print("before update token" + extractedData.toString());
       await _addInfoTOServerUpdateToken(
-          extractedData['token'], extractedData['userId'], params);
-      _autoLogout(expiryDate);
+          extractedData['token'], extractedData['id'], params);
+      print("before update token");
+      // _autoLogout(expiryDate);
       return extractedData;
-    } */
-    return extractedData;
+    }
+    //  return extractedData;
 
 /*     UserCredential.token = _token;
     UserCredential.userId = _userId;
@@ -359,7 +370,7 @@ class AuthRepos {
       final prefs = await SharedPreferences.getInstance();
       final data = {
         'token': responseData['idToken'],
-        'userId': responseData['localId'],
+        'id': responseData['localId'],
         'expiryDate': DateTime.now()
             .add(Duration(seconds: int.parse(responseData['expiresIn'])))
             .toIso8601String(),
@@ -369,6 +380,7 @@ class AuthRepos {
       prefs.setString('userData', userData);
       return data;
     } catch (error) {
+      print("refresh token ${error}");
       rethrow;
     }
   }
@@ -381,24 +393,24 @@ class AuthRepos {
     _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
   }
 
-  Future<Map<String, dynamic>> updateAccount(String token, String phonenumber,
-      String name, File? imageFile, bool isAdmin) async {
-    final url = Uri.https(
+  Future<bool?> updateAccount(String token, String phonenumber, String name,
+      File? imageFile, bool isAdmin) async {
+    /*  final url = Uri.https(
       "identitytoolkit.googleapis.com",
       "/v1/accounts:update",
       {'auth': token, 'key': 'AIzaSyA1Hortv46XM9Nc8QummVhoqa3JWBycHJY'},
-    );
-
+    ); */
+/* 
     Map<String, dynamic> data = {};
-
-    data = {
+ */
+    /*  data = {
       'idToken': token,
       'phoneNumber': phonenumber,
       'returnSecureToken': true
-    };
+    }; */
 
     try {
-      final response = await http.post(
+      /* final response = await http.post(
         url,
         body: json.encode(data),
       );
@@ -408,19 +420,21 @@ class AuthRepos {
         throw Exception(responseData['error']['message']);
       }
 
-      final params = {'auth': responseData['idToken']};
+      print("update response profile ${responseData}"); */
+
+      final params = {'auth': token}; //
 
       await _addInfoTOServer(name, auth.currentUser!.uid, imageFile,
           phonenumber, isAdmin, token, params);
 
       // Update the email in the Realtime Database if necessary
-      final prefs = await SharedPreferences.getInstance();
+      /* final prefs = await SharedPreferences.getInstance();
       final userData =
           json.decode(prefs.getString('userData')!) as Map<String, dynamic>;
       userData['phone'] = phonenumber;
-      prefs.setString('userData', json.encode(userData));
+      prefs.setString('userData', json.encode(userData)); */
 
-      return responseData;
+      return true;
     } catch (error) {
       rethrow;
     }

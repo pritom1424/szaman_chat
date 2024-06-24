@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:agora_uikit/agora_uikit.dart';
-import 'package:szaman_chat/utils/components/app_vars.dart';
-import 'package:szaman_chat/utils/constants/app_paths.dart';
 
 class CallScreen extends StatefulWidget {
-  const CallScreen({Key? key}) : super(key: key);
+  const CallScreen({super.key});
 
   @override
   _CallScreenState createState() => _CallScreenState();

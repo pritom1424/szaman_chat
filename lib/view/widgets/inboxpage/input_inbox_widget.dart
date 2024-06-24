@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -103,7 +102,7 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
       } else {
         return null;
       }
-    } on Exception catch (e) {
+    } on Exception {
       // TODO
       return null;
     }
@@ -124,7 +123,8 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
             message: (rp.IsImageExist!) ? url : _controller.text,
             imageUrl: widget.userUrl,
             isImageExist: rp.IsImageExist ?? false,
-            isDeleted: false,
+            isCalling: false,
+            isCallExit: false,
             senderID: Usercredential.id!,
             /*   name: Usercredential.name,
             friendName: widget.fName, */
@@ -167,7 +167,7 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
             IconButton(
               color: Theme.of(context).primaryColor,
               onPressed: () async {
-                url = await clickOrGetPhoto(ImageSource.camera, ctx);
+                url = await getFileUrl();
                 (url == null)
                     ? ref.read(inboxpageViewModel).setImageExist(false)
                     : ref.read(inboxpageViewModel).setImageExist(true);
@@ -178,7 +178,7 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
             IconButton(
               color: Theme.of(context).primaryColor,
               onPressed: () async {
-                url = await getFileUrl();
+                url = await clickOrGetPhoto(ImageSource.camera, ctx);
                 (url == null)
                     ? ref.read(inboxpageViewModel).setImageExist(false)
                     : ref.read(inboxpageViewModel).setImageExist(true);

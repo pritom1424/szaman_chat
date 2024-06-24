@@ -150,13 +150,9 @@ class AppComponent {
           .child('chat_files')
           .child(Usercredential.id!)
           .child(file.path!.split('/').last);
-      UploadTask uploadTask = ref.putFile(fileToUpload);
-
-      await uploadTask.whenComplete(() async {
-        String downloadURL = await ref.getDownloadURL();
-        print("File uploaded successfully. Download URL: $downloadURL");
-        return downloadURL;
-      });
+      await ref.putFile(fileToUpload);
+      String downloadURL = await ref.getDownloadURL();
+      return downloadURL;
     } catch (e) {
       print("Failed to upload file: $e");
       return null;

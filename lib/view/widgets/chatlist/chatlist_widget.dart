@@ -17,15 +17,20 @@ class ChatlistWidget extends ConsumerWidget {
                 ref.read(inboxpageViewModel).getFriendIDs(Usercredential.id!),
             builder: (ctx, snapId) {
               if (snapId.connectionState == ConnectionState.waiting) {
-                return Container(
+                return SizedBox(
                   height: AppVars.screenSize.height,
-                  child: Center(
+                  child: const Center(
                     child: CircularProgressIndicator(),
                   ),
                 );
               }
               if (!snapId.hasData) {
-                return const SizedBox.shrink();
+                return const Center(
+                  child: Text(
+                    "No contacts added till now!\n Add some!",
+                    textAlign: TextAlign.center,
+                  ),
+                );
               }
               print("id print ${snapId.data!.length}");
               return ListView.builder(
@@ -48,10 +53,10 @@ class ChatlistWidget extends ConsumerWidget {
                             builder: (context, snap) {
                               if (snap.connectionState ==
                                       ConnectionState.waiting &&
-                                  ind == 1) {
-                                return Container(
+                                  ind == 0) {
+                                return SizedBox(
                                   height: AppVars.screenSize.height * 0.8,
-                                  child: Center(
+                                  child: const Center(
                                     child: Text("Loading..."),
                                   ),
                                 );

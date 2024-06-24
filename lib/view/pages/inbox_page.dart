@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:szaman_chat/audiocall.dart';
+import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
@@ -15,6 +16,25 @@ class InboxPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     const widthSize = 0.5;
+    bool didCall = false;
+    Future<void> sendCallMessages(
+        String callString, bool isCalling, bool endCalling) async {
+      final resultModel = MessageModel(
+          createdAt: DateTime.now(),
+          message: callString,
+          imageUrl: userimageUrl,
+          isImageExist: false,
+          isCalling: isCalling,
+          isCallExit: endCalling,
+          senderID: Usercredential.id!,
+          /*   name: Usercredential.name,
+            friendName: widget.fName, */
+          isME: true);
+
+      await ref.watch(inboxpageViewModel).addMessage(
+          Usercredential.token!, resultModel, Usercredential.id!, fId);
+    }
+
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
@@ -73,11 +93,13 @@ class InboxPage extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-              onPressed: () {
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (ctx) => CallScreen()));
+              onPressed: () async {
+                await sendCallMessages("Call Started!", true, false);
+                await Navigator.of(context).push(
+                    MaterialPageRoute(builder: (ctx) => const CallScreen()));
+                await sendCallMessages("Call Ended!", false, true);
               },
-              icon: Icon(Icons.phone))
+              icon: const Icon(Icons.phone))
         ],
       ),
       body: Container(
@@ -102,21 +124,51 @@ class InboxPage extends ConsumerWidget {
                     return const SizedBox.shrink();
                   }
 
-                  return Column(
-                    children: [
-                      Expanded(
-                        child: InboxMessagesWidget(
-                          messages: snapshot.data!,
-                          fName: fName,
-                        ),
-                      ),
-                      InputInboxWidget(
-                        fId: fId,
-                        fName: fName,
-                        userUrl: userimageUrl,
-                      )
-                    ],
-                  );
+                  didCall = (snapshot.data!.last.isCalling == true &&
+                      snapshot.data!.last.isCallExit == false);
+                  return (didCall)
+                      ? Container(
+                          height: AppVars.screenSize.height * 0.8,
+                          child: Center(
+                              child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              ElevatedButton(
+                                  onPressed: () async {
+                                    await sendCallMessages(
+                                        "Call Started!", true, false);
+                                    await Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (ctx) =>
+                                                const CallScreen()));
+                                    await sendCallMessages(
+                                        "Call Ended!", false, true);
+                                  },
+                                  child: Text("Join")),
+                              ElevatedButton(
+                                  onPressed: () async {
+                                    await sendCallMessages(
+                                        "Call Ended!", false, true);
+                                  },
+                                  child: Text("Cancel")),
+                            ],
+                          )),
+                        )
+                      : Column(
+                          children: [
+                            Expanded(
+                              child: InboxMessagesWidget(
+                                messages: snapshot.data!,
+                                fName: fName,
+                              ),
+                            ),
+                            InputInboxWidget(
+                              fId: fId,
+                              fName: fName,
+                              userUrl: userimageUrl,
+                            )
+                          ],
+                        );
                 }),
       ),
     );

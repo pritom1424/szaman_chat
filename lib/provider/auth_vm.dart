@@ -1,5 +1,8 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
@@ -8,6 +11,27 @@ import 'package:szaman_chat/main.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 
 class AuthVm with ChangeNotifier {
+  TextEditingController? _nametextEditingController;
+
+  TextEditingController get nameController {
+    _nametextEditingController ??= TextEditingController();
+    return _nametextEditingController!;
+  }
+
+  TextEditingController? _mobiletextEditingController;
+
+  TextEditingController get mobileController {
+    _mobiletextEditingController ??= TextEditingController();
+    return _mobiletextEditingController!;
+  }
+
+  TextEditingController? _otptextEditingController;
+
+  TextEditingController get optController {
+    _otptextEditingController ??= TextEditingController();
+    return _otptextEditingController!;
+  }
+
   bool _isLoading = false;
 
   List<dynamic> signData = [];
@@ -37,6 +61,9 @@ class AuthVm with ChangeNotifier {
     _isMessageSent = false;
     _storedImage = null;
     _isLoading = false;
+    _otptextEditingController?.clear();
+    _nametextEditingController?.clear();
+    _mobiletextEditingController?.clear();
     notifyListeners();
   }
 
@@ -109,7 +136,7 @@ class AuthVm with ChangeNotifier {
     }
   } */
 
-  Future<bool> login(String phoneNumber, String password) async {
+  /* Future<bool> login(String phoneNumber, String password) async {
     try {
       setIsLoading(true);
       final authData = await _authRepos.authenticate(
@@ -128,8 +155,9 @@ class AuthVm with ChangeNotifier {
       print(e);
       return false;
     }
-  }
+  } */
 
+//this
   Future<bool> verifySignIn(List<dynamic> data, String otpCode, String userName,
       File? imageFile, bool isAdmin, String phoneNumber) async {
     try {
@@ -158,6 +186,7 @@ class AuthVm with ChangeNotifier {
     }
   }
 
+//this
   Future<List<dynamic>> signin(String phoneNumber) async {
     try {
       final List<dynamic> data =
@@ -174,15 +203,13 @@ class AuthVm with ChangeNotifier {
     try {
       final authData = await _authRepos.updateAccount(
           token, email, name, imageFile, isAdmin);
-
-      if (authData.isEmpty) {
-        return "no data found";
+      if (authData == null || authData == false) {
+        return "info update failed!";
       }
+      return "info updated successfully!";
     } catch (err) {
       return err.toString();
     }
-
-    return "info updated successfully";
   }
 
   Future<void> logout() async {
@@ -196,7 +223,7 @@ class AuthVm with ChangeNotifier {
     _isMessageSent = false;
     _isAdmin = false;
     _storedImage = null;
-    await auth.currentUser?.delete();
+    await auth.signOut();
 
     if (_authTimer != Timer(Duration.zero, () {})) {
       _authTimer.cancel();
@@ -210,10 +237,11 @@ class AuthVm with ChangeNotifier {
 
   Future<bool> tryAutoLogin() async {
     final authData = await _authRepos.tryAutoLogin();
+    print("auth data $authData");
     if (authData != null) {
       print("authentic data $authData");
       _token = authData['token']!;
-      _userId = auth.currentUser!.uid;
+      _userId = authData['id'];
       //_refreshToken = authData['refreshToken']!;
       _expiryDate = DateTime.parse(authData['expiryDate']);
 
@@ -222,6 +250,8 @@ class AuthVm with ChangeNotifier {
       notifyListeners();
       return true;
     } else {
+      print("auth data ${auth.currentUser?.uid ?? "null"}");
+
       notifyListeners();
       return false;
     }

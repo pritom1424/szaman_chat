@@ -18,7 +18,7 @@ class ProfileForm extends StatefulWidget {
 class _ProfileFormState extends State<ProfileForm> {
   bool isInit = false;
   final _usernameController = TextEditingController();
-  final _emailController = TextEditingController();
+  String phoneNumber = "";
 
   ProfileModel? profileModel;
 
@@ -34,15 +34,15 @@ class _ProfileFormState extends State<ProfileForm> {
   void _saveProfile(WidgetRef ref) async {
     // Save profile changes (you caan replace this with actual saving logic)
     final username = _usernameController.text;
-    final email = _emailController.text;
+    //final phone = _emailController.text;
+    final phone = phoneNumber;
     final profileImage = ref.read(profileViewModel).storedImage;
     FocusScope.of(context).unfocus();
     ref.watch(profileViewModel).setIsLoading(true);
-    print(
-        "profile:-> ${Usercredential.token}-$email-$username-$profileImage  ");
+
     final message = await ref
         .read(authViewModel)
-        .update(Usercredential.token!, email, username, profileImage);
+        .update(Usercredential.token!, phone, username, profileImage);
 
     // Show a success message
     ref.read(profileViewModel).setIsLoading(false);
@@ -58,7 +58,6 @@ class _ProfileFormState extends State<ProfileForm> {
   @override
   void dispose() {
     _usernameController.dispose();
-    _emailController.dispose();
 
     // TODO: implement dispose
     super.dispose();
@@ -132,7 +131,7 @@ class _ProfileFormState extends State<ProfileForm> {
                     onPressed: () async {
                       File? selectedFile =
                           await AppComponent.selectpictureAlert(context);
-                      _emailController.text = profileModel?.phone ?? "";
+                      phoneNumber = profileModel?.phone ?? "";
                       _usernameController.text = profileModel?.name ?? "";
                       ref.watch(profileViewModel).setStoreImage(selectedFile);
                       ref.read(profileViewModel).setEditBool(true);
@@ -142,6 +141,8 @@ class _ProfileFormState extends State<ProfileForm> {
               ],
             ),
           ),
+          const SizedBox(height: 16),
+          Text("phone:${profileModel?.phone ?? ""}"),
           const SizedBox(height: 16),
           (ref.read(profileViewModel).isEditMode)
               ? TextField(
@@ -154,33 +155,34 @@ class _ProfileFormState extends State<ProfileForm> {
                     Text(profileModel?.name ?? "no name"),
                     IconButton(
                         onPressed: () {
-                          _emailController.text = profileModel?.phone ?? "";
+                          phoneNumber = profileModel?.phone ?? "";
                           _usernameController.text = profileModel?.name ?? "";
                           ref.watch(profileViewModel).setEditBool(true);
                         },
                         icon: const Icon(Icons.edit))
                   ],
                 ),
-          const SizedBox(height: 16),
-          (ref.read(profileViewModel).isEditMode)
-              ? TextField(
+
+          /* (ref.read(profileViewModel).isEditMode)
+              ? Text(
+                  phoneNumber) /* TextField(
                   controller: _emailController,
                   decoration: const InputDecoration(labelText: 'Email'),
-                )
+                ) */
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(profileModel?.phone ?? ""),
                     IconButton(
                         onPressed: () {
-                          _emailController.text = profileModel?.phone ?? "";
+                          phoneNumber = profileModel?.phone ?? "";
                           _usernameController.text = profileModel?.name ?? "";
 
                           ref.watch(profileViewModel).setEditBool(true);
                         },
                         icon: const Icon(Icons.edit))
                   ],
-                ),
+                ), */
           if (ref.read(profileViewModel).isEditMode) const SizedBox(height: 16),
           if (ref.read(profileViewModel).isEditMode)
             ElevatedButton(

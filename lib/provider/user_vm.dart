@@ -6,6 +6,7 @@ import 'package:szaman_chat/utils/credential/UserCredential.dart';
 
 class UserViewModel with ChangeNotifier {
   final _cwRepos = CoworkerRepos();
+
   Future<Map<String, UserModel>?> getInfo(String token) async {
     final cwRepos = await _cwRepos.getUsersInfo(token);
 

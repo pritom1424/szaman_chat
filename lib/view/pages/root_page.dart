@@ -24,7 +24,7 @@ class RootPage extends ConsumerWidget {
             );
           }
 
-          return (snap.data == true)
+          return (snap.data != null && snap.data!)
               ? const NavPage()
               : const LoginPhoneForm(); //const LoginForm();
         });

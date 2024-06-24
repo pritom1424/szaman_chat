@@ -4,7 +4,7 @@ import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
 
-class CwlistTemplate extends ConsumerWidget {
+class CwlistTemplate extends StatefulWidget {
   final String? imageURL, userName, uid;
   final bool isAdmin;
   final String? token;
@@ -19,87 +19,118 @@ class CwlistTemplate extends ConsumerWidget {
       required this.isAdmin});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return ListTile(
-      leading: CircleAvatar(
-        backgroundImage:
-            (imageURL != null) ? NetworkImage(imageURL!) : const AssetImage(""),
-      ),
-      title: Text(
-        userName ?? "User",
-        style: const TextStyle(fontWeight: FontWeight.normal),
-      ),
-      /*   subtitle: Text(
-              lastText,
-              style: TextStyle(
-                  fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
-            ), */
-      trailing: IconButton(
-          onPressed: () {},
-          icon: FittedBox(
-            child: Row(
-              children: [
-                if (isAdmin) const Text("Admin"),
-                /* IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () {},
-                ), */
-                IconButton(
-                  icon: const Icon(Icons.person_add),
-                  onPressed: () async {
-                    final mod = MessageModel(
-                        createdAt: DateTime.now(),
-                        message: "Welcome",
-                        imageUrl: imageURL,
-                        isImageExist: false,
-                        isDeleted: false,
-                        senderID: Usercredential.id,
-                        /* name: meName,
-                        friendName: userName, */
-                        isME: true);
-                    if (uid != null) {
-                      final didSuccess =
-                          await ref.read(userViewModel).addFriend(mod, uid!);
+  State<CwlistTemplate> createState() => _CwlistTemplateState();
+}
 
-                      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-                      if (didSuccess) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text("Employee Added!")));
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("Employee Not Added!")));
-                      }
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text("No User Found")));
-                    }
-                  },
-                ),
-                (Usercredential.isAdmin ?? false)
-                    ? IconButton(
-                        onPressed: () async {
-                          if (token != null && uid != null) {
-                            await ref
-                                .watch(authViewModel)
-                                .deleteUser(token!, uid!);
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content: Text("delete success")));
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text("not deleted")));
-                          }
-                        },
-                        icon: const Icon(Icons.delete))
-                    : const SizedBox.shrink()
-              ],
-            ),
-          )),
-      onTap: () {
-        /*   Navigator.of(context)
-            .push(MaterialPageRoute(builder: (ctx) => InboxPage())); */
-      },
+class _CwlistTemplateState extends State<CwlistTemplate> {
+  late bool isAdded;
+  @override
+  void initState() {
+    isAdded = false;
+    // TODO: implement initState
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print("added $isAdded");
+    return Consumer(
+      builder: (ctx, ref, _) => ListTile(
+        leading: CircleAvatar(
+          backgroundImage: (widget.imageURL != null)
+              ? NetworkImage(widget.imageURL!)
+              : const AssetImage(""),
+        ),
+        title: Text(
+          widget.userName ?? "User",
+          style: const TextStyle(fontWeight: FontWeight.normal),
+        ),
+        /*   subtitle: Text(
+                lastText,
+                style: TextStyle(
+                    fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
+              ), */
+        trailing: IconButton(
+            onPressed: () {},
+            icon: FittedBox(
+              child: Row(
+                children: [
+                  if (widget.isAdmin) const Text("Admin"),
+                  /* IconButton(
+                    icon: Icon(Icons.edit),
+                    onPressed: () {},
+                  ), */
+                  IconButton(
+                    icon: (isAdded)
+                        ? Icon(
+                            Icons.person,
+                            color: Colors.blueAccent,
+                          )
+                        : Icon(Icons.person_add),
+                    onPressed: (isAdded)
+                        ? null
+                        : () async {
+                            final mod = MessageModel(
+                                isCallExit: false,
+                                createdAt: DateTime.now(),
+                                message: "Welcome",
+                                imageUrl: widget.imageURL,
+                                isImageExist: false,
+                                isCalling: false,
+                                senderID: Usercredential.id,
+                                /* name: meName,
+                          friendName: userName, */
+                                isME: true);
+                            if (widget.uid != null) {
+                              isAdded = true;
+                              final didSuccess = await ref
+                                  .watch(userViewModel)
+                                  .addFriend(mod, widget.uid!);
+                              setState(() {});
+
+                              ScaffoldMessenger.of(context)
+                                  .hideCurrentSnackBar();
+                              if (didSuccess) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text("Employee Added!")));
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                        content: Text("Employee Not Added!")));
+                              }
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text("No User Found")));
+                            }
+                          },
+                  ),
+                  (Usercredential.isAdmin ?? false)
+                      ? IconButton(
+                          onPressed: () async {
+                            if (widget.token != null && widget.uid != null) {
+                              await ref
+                                  .watch(authViewModel)
+                                  .deleteUser(widget.token!, widget.uid!);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text("delete success")));
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("not deleted")));
+                            }
+                          },
+                          icon: const Icon(Icons.delete))
+                      : const SizedBox.shrink()
+                ],
+              ),
+            )),
+        onTap: () {
+          /*   Navigator.of(context)
+              .push(MaterialPageRoute(builder: (ctx) => InboxPage())); */
+        },
+      ),
     );
   }
 }

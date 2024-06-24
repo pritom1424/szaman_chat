@@ -15,11 +15,12 @@ class InboxRepos {
 
       final bodyData = messageModelToJson(mModel);
       final friendModel = MessageModel(
+          isCallExit: true,
           createdAt: mModel.createdAt,
           message: mModel.message,
           imageUrl: mModel.imageUrl,
           isImageExist: mModel.isImageExist,
-          isDeleted: mModel.isDeleted,
+          isCalling: mModel.isCalling,
           senderID: uid,
           isME: false);
       final bodyDataFriend = messageModelToJson(friendModel);

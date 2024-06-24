@@ -30,11 +30,12 @@ class CoworkerRepos {
           ApiLinks.baseUrl, '/messages/$userId/$friendId.json', params);
       final bodyData = messageModelToJson(model);
       final friendModel = MessageModel(
+          isCallExit: true,
           createdAt: model.createdAt,
           message: model.message,
           imageUrl: model.imageUrl,
           isImageExist: model.isImageExist,
-          isDeleted: model.isDeleted,
+          isCalling: model.isCalling,
           senderID: userId,
           isME: false);
       final bodyDataFriend = messageModelToJson(friendModel);

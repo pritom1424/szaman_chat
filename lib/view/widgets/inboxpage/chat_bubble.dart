@@ -1,6 +1,13 @@
+import 'dart:io';
+
+import 'package:agora_uikit/agora_uikit.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:szaman_chat/utils/components/app_component.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart' as path;
+import 'package:permission_handler/permission_handler.dart';
 
 class ChatBubble extends StatelessWidget {
   final String message;
@@ -20,6 +27,80 @@ class ChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Future<Directory?> getDownloadsDirectory() async {
+      if (Platform.isAndroid) {
+        return Directory('/storage/emulated/0/Download');
+      } else {
+        return await getApplicationDocumentsDirectory();
+      }
+    }
+
+    Future<void> downloadFile(String url, String fileName) async {
+      final directory = await getDownloadsDirectory();
+      if (directory != null) {
+        String filePath = '${directory.path}/${fileName}';
+
+        // Create HttpClient to download the file
+        var response = await http.get(Uri.parse(url));
+        var bytes = response.bodyBytes;
+
+        // Write the file
+        File file = File(filePath);
+        try {
+          await file.writeAsBytes(bytes);
+          print('download success File downloaded to: $filePath');
+          ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text("File downloaded to  $filePath")));
+        } catch (e) {
+          print("download $e");
+        }
+      }
+      /*  try {
+        /*  final permissionStatus = await Permission.storage.status;
+        if (permissionStatus.isDenied) {
+          // Here just ask for the permission for the first time
+          await Permission.storage.request();
+
+          // I noticed that sometimes popup won't show after user press deny
+          // so I do the check once again but now go straight to appSettings
+          if (permissionStatus.isDenied) {
+            await openAppSettings();
+          }
+        } else if (permissionStatus.isPermanentlyDenied) {
+          // Here open app settings for user to manually enable permission in case
+          // where permission was permanently denied
+          await openAppSettings();
+        } else {
+          // Do stuff that require permission here
+        } */
+        // Request storage permission
+        if (await Permission.storage.request().isGranted) {
+          // Get the directory for the external storage
+          final directory = await path.getDownloadsDirectory();
+          if (directory != null) {
+            String filePath = '${directory.path}/$fileName';
+
+            // Create HttpClient to download the file
+            var response = await http.get(Uri.parse(url));
+            var bytes = response.bodyBytes;
+
+            // Write the file
+            File file = File(filePath);
+            await file.writeAsBytes(bytes);
+
+            print('File downloaded to: $filePath');
+          } else {
+            print('Could not get the downloads directory');
+          }
+        } else {
+          print('Permission denied');
+        }
+      } catch (e) {
+        print('Failed to download file: $e');
+      } */
+    }
+
     bool isImageFormat(String url) {
       // List of common image file formats
       List<String> imageFileFormats = [
@@ -104,8 +185,24 @@ class ChatBubble extends StatelessWidget {
                         : Container(
                             child: Column(
                               children: [
-                                Icon(Icons.attach_file),
-                                Text(AppVars().getFileNameFromUrl(message))
+                                const Icon(Icons.attach_file),
+                                Text(AppVars().getFileNameFromUrl(message)),
+                                TextButton(
+                                    onPressed: () async {
+                                      await downloadFile(
+                                          message,
+                                          AppVars()
+                                                  .getFileNameFromUrl(message) +
+                                              AppVars().getFileFormatFromUrl(
+                                                  message));
+                                    },
+                                    child: Text(
+                                      "download",
+                                      style: TextStyle(
+                                          color: (isMe)
+                                              ? Colors.blueAccent
+                                              : Colors.white),
+                                    ))
                               ],
                             ),
                           ),

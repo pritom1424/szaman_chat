@@ -21,7 +21,8 @@ class MessageModel {
   final String? message;
   final String? imageUrl;
   final bool? isImageExist;
-  final bool? isDeleted;
+  final bool? isCalling;
+  final bool? isCallExit;
   final String? senderID;
   // final String? name;
   //final String? friendName;
@@ -32,16 +33,18 @@ class MessageModel {
       message: json["message"],
       imageUrl: json["imageUrl"],
       isImageExist: json["isImageExist"],
-      isDeleted: json["isDeleted"],
+      isCalling: json["isCalling"],
       senderID: json["senderID"],
+      isCallExit: json["isCallExit"],
       isME: json['isME']);
 
   MessageModel(
-      {required this.createdAt,
+      {required this.isCallExit,
+      required this.createdAt,
       required this.message,
       required this.imageUrl,
       required this.isImageExist,
-      required this.isDeleted,
+      required this.isCalling,
       required this.senderID,
       required this.isME});
 
@@ -50,8 +53,9 @@ class MessageModel {
         "message": message,
         "imageUrl": imageUrl,
         "isImageExist": isImageExist,
-        "isDeleted": isDeleted,
+        "isCalling": isCalling,
         "senderID": senderID,
+        "isCallExit": isCallExit,
         "isME": isME
       };
 }

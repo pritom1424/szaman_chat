@@ -40,7 +40,7 @@ class CwlistWidget extends StatelessWidget {
     final meNameMod = uModel[Usercredential.id];
 
     return (uModel.length - 1 == friendListID.length)
-        ? Center(
+        ? const Center(
             child: Text("No employee is remained to add!"),
           )
         : ListView.builder(
