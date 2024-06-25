@@ -1,22 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:szaman_chat/view/pages/group_inbox/group_inbox_page.dart';
+import 'package:szaman_chat/view/pages/inbox_page.dart';
 
 class GroupListTemplet extends StatelessWidget {
   // const ChatTemplet({super.key});
 
-  final String userId;
-  final String username;
-  final String lastText;
+  final String groupID;
+  final String groupName;
+  final String? lastText;
   final String lastTextDate;
-  final String imageUrl;
-  final bool isSeen;
 
-  const GroupListTemplet(this.userId, this.username, this.lastText,
-      this.lastTextDate, this.imageUrl, this.isSeen,
-      {super.key});
+  final bool isSeen;
+  final bool isMe;
+
+  final String userimageUrl;
+  const GroupListTemplet(this.groupID, this.groupName, this.lastText,
+      this.lastTextDate, this.isSeen, this.isMe,
+      {super.key, required this.userimageUrl});
   @override
   Widget build(BuildContext context) {
+    print("grouup Name temp ${groupName}");
     return Dismissible(
-      key: ValueKey(userId),
+      key: ValueKey(groupID),
       direction: DismissDirection.endToStart,
       background: Container(
         color: Theme.of(context).primaryColor,
@@ -58,22 +63,27 @@ class GroupListTemplet extends StatelessWidget {
         elevation: 0,
         child: ListTile(
             leading: CircleAvatar(
-              backgroundImage: NetworkImage(imageUrl),
+              child: Icon(Icons.person_3),
             ),
             title: Text(
-              username,
+              groupName,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                   fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
             ),
             subtitle: Text(
-              lastText,
+              lastText ?? "sent a photo",
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
               style: TextStyle(
                   fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
             ),
             trailing: Text(lastTextDate),
             onTap: () {
-              /*     Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (ctx) => InboxPage())); */
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (ctx) =>
+                      GroupInboxPage(groupID, groupName, userimageUrl))); //fID
             }),
       ),
     );

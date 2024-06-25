@@ -9,30 +9,31 @@ import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/utils/components/app_component.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
+import 'package:szaman_chat/view/widgets/inboxpage/input_inbox_widget.dart';
 
-class InputInboxWidget extends StatefulWidget {
-  final String fId;
-  final String fName;
+class GroupInputInboxWidget extends StatefulWidget {
+  final String gid;
+  final String gName;
   final String userUrl;
   final String? folderName;
-  final String? imageFolderName;
-  const InputInboxWidget(
-      {super.key,
-      required this.fId,
-      required this.fName,
-      required this.userUrl,
-      this.folderName,
-      this.imageFolderName});
+
+  const GroupInputInboxWidget({
+    super.key,
+    required this.gid,
+    required this.gName,
+    required this.userUrl,
+    this.folderName,
+  });
   static TextStyle customHintTextStyle = TextStyle(
     color: Colors.grey.withOpacity(0.5),
     fontSize: 15, /* fontFamily: AppStrings.currentFontFamily */
   );
 
   @override
-  State<InputInboxWidget> createState() => _InputInboxWidgetState();
+  State<GroupInputInboxWidget> createState() => _GroupInputInboxWidget();
 }
 
-class _InputInboxWidgetState extends State<InputInboxWidget> {
+class _GroupInputInboxWidget extends State<GroupInputInboxWidget> {
   final _controller = TextEditingController();
 
   String? url;
@@ -86,7 +87,7 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
     final ref =
         FirebaseStorage.instanceFor(bucket: "gs://szaman-chat.appspot.com")
             .ref()
-            .child(widget.imageFolderName ?? 'chat_images')
+            .child('group_images')
             .child(Usercredential.id!)
             .child(imageFile.path.split('/').last);
 
@@ -116,12 +117,11 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
   Widget build(BuildContext context) {
     return Consumer(builder: (ctx, ref, _) {
       void sendMessages() async {
-        var rp = ref.read(inboxpageViewModel);
+        var rp = ref.read(inboxpageGroupViewModel);
         if (rp.IsImageExist == null || url == null || url!.isEmpty) {
-          print("eneteredd");
           rp.setImageExist(false);
         }
-        print("enetered1 ${rp.IsImageExist}");
+
         final resultModel = MessageModel(
             createdAt: DateTime.now(),
             message: (rp.IsImageExist!) ? url : _controller.text,
@@ -133,13 +133,13 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
             /*   name: Usercredential.name,
             friendName: widget.fName, */
             isME: true);
-        ref.read(inboxpageViewModel).setInputText("");
+        ref.read(inboxpageGroupViewModel).setInputText("");
         _controller.clear();
         rp.setImageExist(false);
 
         url = null;
-        await ref.watch(inboxpageViewModel).addMessage(
-            Usercredential.token!, resultModel, Usercredential.id!, widget.fId);
+        await ref.watch(inboxpageGroupViewModel).addMessage(
+            Usercredential.token!, resultModel, Usercredential.id!, widget.gid);
         FocusScope.of(context).unfocus();
       }
 
@@ -173,8 +173,8 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
               onPressed: () async {
                 url = await getFileUrl();
                 (url == null)
-                    ? ref.read(inboxpageViewModel).setImageExist(false)
-                    : ref.read(inboxpageViewModel).setImageExist(true);
+                    ? ref.read(inboxpageGroupViewModel).setImageExist(false)
+                    : ref.read(inboxpageGroupViewModel).setImageExist(true);
                 // clickOrGetPhoto(ImageSource.camera);
               },
               icon: const Icon(Icons.attach_file),
@@ -184,8 +184,8 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
               onPressed: () async {
                 url = await clickOrGetPhoto(ImageSource.camera, ctx);
                 (url == null)
-                    ? ref.read(inboxpageViewModel).setImageExist(false)
-                    : ref.read(inboxpageViewModel).setImageExist(true);
+                    ? ref.read(inboxpageGroupViewModel).setImageExist(false)
+                    : ref.read(inboxpageGroupViewModel).setImageExist(true);
                 // clickOrGetPhoto(ImageSource.camera);
               },
               icon: const Icon(Icons.camera_alt_rounded),
@@ -195,19 +195,22 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
               onPressed: () async {
                 url = await clickOrGetPhoto(ImageSource.gallery, ctx);
                 (url == null)
-                    ? ref.read(inboxpageViewModel).setImageExist(false)
-                    : ref.read(inboxpageViewModel).setImageExist(true);
+                    ? ref.read(inboxpageGroupViewModel).setImageExist(false)
+                    : ref.read(inboxpageGroupViewModel).setImageExist(true);
                 // clickOrGetPhoto(ImageSource.gallery);
               },
               icon: const Icon(Icons.photo),
             ),
             IconButton(
               color: Theme.of(context).primaryColor,
-              onPressed: ((ref.watch(inboxpageViewModel).inputText.isNotEmpty &&
-                          ref.watch(inboxpageViewModel).inputText != "" ||
-                      (ref.read(inboxpageViewModel).IsImageExist != null &&
+              onPressed: ((ref
+                              .watch(inboxpageGroupViewModel)
+                              .inputText
+                              .isNotEmpty &&
+                          ref.watch(inboxpageGroupViewModel).inputText != "" ||
+                      (ref.read(inboxpageGroupViewModel).IsImageExist != null &&
                           ref
-                              .read(inboxpageViewModel)
+                              .read(inboxpageGroupViewModel)
                               .IsImageExist!)) /* ||
                       didImageExist */
                   )

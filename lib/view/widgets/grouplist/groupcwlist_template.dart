@@ -1,28 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:szaman_chat/data/models/message_model.dart';
+import 'package:szaman_chat/provider/inbox_page_vm_group.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
 
-class CwlistTemplate extends StatefulWidget {
-  final String? imageURL, userName, uid;
+class GroupCwlistTemplate extends StatefulWidget {
+  final String? imageURL, userName, userID;
+  final String? mainGroupName;
   final bool isAdmin;
   final String? token;
   final String meName;
-  const CwlistTemplate(
+  final String? gId;
+  const GroupCwlistTemplate(
       {super.key,
       this.token,
       this.imageURL,
       required this.meName,
       this.userName,
-      this.uid,
-      required this.isAdmin});
+      this.userID,
+      required this.isAdmin,
+      this.mainGroupName,
+      this.gId});
 
   @override
-  State<CwlistTemplate> createState() => _CwlistTemplateState();
+  State<GroupCwlistTemplate> createState() => _CwlistTemplateState();
 }
 
-class _CwlistTemplateState extends State<CwlistTemplate> {
+class _CwlistTemplateState extends State<GroupCwlistTemplate> {
   late bool isAdded;
   @override
   void initState() {
@@ -37,12 +42,10 @@ class _CwlistTemplateState extends State<CwlistTemplate> {
     return Consumer(
       builder: (ctx, ref, _) => ListTile(
         leading: CircleAvatar(
-          backgroundImage: (widget.imageURL != null)
-              ? NetworkImage(widget.imageURL!)
-              : const AssetImage(""),
+          child: Icon(Icons.person_3),
         ),
         title: Text(
-          widget.userName ?? "User",
+          widget.userName ?? "Group",
           style: const TextStyle(fontWeight: FontWeight.normal),
         ),
         /*   subtitle: Text(
@@ -70,36 +73,32 @@ class _CwlistTemplateState extends State<CwlistTemplate> {
                     onPressed: (isAdded)
                         ? null
                         : () async {
-                            final mod = MessageModel(
-                                isCallExit: false,
-                                createdAt: DateTime.now(),
-                                message: "Welcome",
-                                imageUrl: widget.imageURL,
-                                isImageExist: false,
-                                isCalling: false,
-                                senderID: Usercredential.id,
-                                /* name: meName,
-                          friendName: userName, */
-                                isME: true);
-                            if (widget.uid != null) {
+                            if (widget.userID != null) {
                               isAdded = true;
+                              print(
+                                  "before added memb  ${widget.mainGroupName!}");
                               final didSuccess = await ref
-                                  .watch(userViewModel)
-                                  .addFriend(mod, widget.uid!);
-                              setState(() {});
+                                  .watch(inboxpageGroupViewModel)
+                                  .addMember(
+                                      widget.gId!, widget.mainGroupName!);
+                              print("after added memb");
 
                               ScaffoldMessenger.of(context)
                                   .hideCurrentSnackBar();
                               if (didSuccess) {
+                                print("added memb");
+                                setState(() {});
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                        content: Text("Employee Added!")));
+                                        content: Text("Member Added!")));
                               } else {
+                                print("not added memb");
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                        content: Text("Employee Not Added!")));
+                                        content: Text("Member Not Added!")));
                               }
                             } else {
+                              print("no user memb");
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text("No User Found")));
@@ -109,10 +108,10 @@ class _CwlistTemplateState extends State<CwlistTemplate> {
                   (Usercredential.isAdmin ?? false)
                       ? IconButton(
                           onPressed: () async {
-                            if (widget.token != null && widget.uid != null) {
+                            if (widget.token != null && widget.userID != null) {
                               await ref
                                   .watch(authViewModel)
-                                  .deleteUser(widget.token!, widget.uid!);
+                                  .deleteUser(widget.token!, widget.userID!);
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text("delete success")));

@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:szaman_chat/audiocall.dart';
-import 'package:szaman_chat/data/models/message_model.dart';
+
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
+import 'package:szaman_chat/view/pages/group_inbox/group_coworkerlist_page.dart';
 import 'package:szaman_chat/view/widgets/inboxpage/inbox_messages_widget.dart';
 import 'package:szaman_chat/view/widgets/inboxpage/input_inbox_widget.dart';
+import 'package:szaman_chat/view/widgets/inboxpage_group/group_inbox_messages_widget.dart';
+import 'package:szaman_chat/view/widgets/inboxpage_group/group_input_inbox_widget.dart';
 
-class InboxPage extends ConsumerWidget {
-  final String fId, fName;
+class GroupInboxPage extends ConsumerWidget {
+  final String gid, gName;
   final String userimageUrl;
-  const InboxPage(this.fId, this.fName, this.userimageUrl, {super.key});
+  const GroupInboxPage(this.gid, this.gName, this.userimageUrl, {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     const widthSize = 0.5;
-    bool didCall = false;
-    Future<void> sendCallMessages(
+
+    /*  Future<void> sendCallMessages(
         String callString, bool isCalling, bool endCalling) async {
       final resultModel = MessageModel(
           createdAt: DateTime.now(),
@@ -33,7 +35,7 @@ class InboxPage extends ConsumerWidget {
 
       await ref.watch(inboxpageViewModel).addMessage(
           Usercredential.token!, resultModel, Usercredential.id!, fId);
-    }
+    } */
 
     return Scaffold(
       appBar: AppBar(
@@ -94,12 +96,15 @@ class InboxPage extends ConsumerWidget {
         actions: [
           IconButton(
               onPressed: () async {
-                await sendCallMessages("Call Started!", true, false);
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (ctx) => GroupCoworkerlistPage(
+                        title: "Add member", gName, gid)));
+                /*          await sendCallMessages("Call Started!", true, false);
                 await Navigator.of(context).push(
                     MaterialPageRoute(builder: (ctx) => const CallScreen()));
-                await sendCallMessages("Call Ended!", false, true);
+                await sendCallMessages("Call Ended!", false, true); */
               },
-              icon: const Icon(Icons.phone))
+              icon: const Icon(Icons.people))
         ],
       ),
       body: Container(
@@ -108,8 +113,9 @@ class InboxPage extends ConsumerWidget {
         child: (Usercredential.id == null || Usercredential.token == null)
             ? const Text("no data found")
             : StreamBuilder(
-                stream: ref.read(inboxpageViewModel).getAllMessagesStream(
-                    Usercredential.token!, Usercredential.id!, fId),
+                stream: ref
+                    .read(inboxpageGroupViewModel)
+                    .getAllMessagesStream(Usercredential.token!, gid),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return SizedBox(
@@ -124,51 +130,22 @@ class InboxPage extends ConsumerWidget {
                     return const SizedBox.shrink();
                   }
 
-                  didCall = (snapshot.data!.last.isCalling == true &&
-                      snapshot.data!.last.isCallExit == false);
-                  return (didCall)
-                      ? SizedBox(
-                          height: AppVars.screenSize.height * 0.8,
-                          child: Center(
-                              child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ElevatedButton(
-                                  onPressed: () async {
-                                    await sendCallMessages(
-                                        "Call Started!", true, false);
-                                    await Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (ctx) =>
-                                                const CallScreen()));
-                                    await sendCallMessages(
-                                        "Call Ended!", false, true);
-                                  },
-                                  child: const Text("Join")),
-                              ElevatedButton(
-                                  onPressed: () async {
-                                    await sendCallMessages(
-                                        "Call Ended!", false, true);
-                                  },
-                                  child: const Text("Cancel")),
-                            ],
-                          )),
-                        )
-                      : Column(
-                          children: [
-                            Expanded(
-                              child: InboxMessagesWidget(
-                                messages: snapshot.data!,
-                                fName: fName,
-                              ),
-                            ),
-                            InputInboxWidget(
-                              fId: fId,
-                              fName: fName,
-                              userUrl: userimageUrl,
-                            )
-                          ],
-                        );
+                  return Column(
+                    children: [
+                      Expanded(
+                        child: GroupInboxMessagesWidget(
+                          messages: snapshot.data!,
+                          gName: gName,
+                        ),
+                      ),
+                      GroupInputInboxWidget(
+                        gid: gid,
+                        gName: gName,
+                        userUrl: userimageUrl,
+                        folderName: "groupchat_files",
+                      )
+                    ],
+                  );
                 }),
       ),
     );

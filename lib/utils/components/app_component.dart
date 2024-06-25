@@ -137,7 +137,8 @@ class AppComponent {
     return null;
   }
 
-  static Future<String?> uploadFile(PlatformFile file) async {
+  static Future<String?> uploadFile(
+      PlatformFile file, String? folderName) async {
     try {
       if (file.path == null) {
         return null;
@@ -147,7 +148,7 @@ class AppComponent {
           FirebaseStorage.instanceFor(bucket: "gs://szaman-chat.appspot.com");
       Reference ref = storage
           .ref()
-          .child('chat_files')
+          .child(folderName ?? 'chat_files')
           .child(Usercredential.id!)
           .child(file.path!.split('/').last);
       await ref.putFile(fileToUpload);

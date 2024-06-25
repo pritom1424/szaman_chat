@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:szaman_chat/testScr.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/constants/data.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
@@ -89,6 +90,16 @@ class NavPage extends ConsumerWidget {
           ),
         ),
         actions: [
+          TextButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                    MaterialPageRoute(builder: (ctx) => const TestScript()));
+              },
+              label: const Text(
+                "Test",
+                style:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              )),
           TextButton.icon(
               onPressed: () async {
                 await ref.read(authViewModel).logout();

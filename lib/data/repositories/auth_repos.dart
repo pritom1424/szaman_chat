@@ -11,7 +11,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:szaman_chat/main.dart';
 import 'package:szaman_chat/utils/constants/app_paths.dart';
-import 'package:szaman_chat/utils/credential/UserCredential.dart';
 
 class AuthRepos {
   final String _refreshToken = "";
@@ -329,7 +328,7 @@ class AuthRepos {
     } else {
       final params = {'auth': extractedData['token']};
 
-      print("before update token" + extractedData.toString());
+      print("before update token$extractedData");
       await _addInfoTOServerUpdateToken(
           extractedData['token'], extractedData['id'], params);
       print("before update token");
@@ -380,7 +379,7 @@ class AuthRepos {
       prefs.setString('userData', userData);
       return data;
     } catch (error) {
-      print("refresh token ${error}");
+      print("refresh token $error");
       rethrow;
     }
   }

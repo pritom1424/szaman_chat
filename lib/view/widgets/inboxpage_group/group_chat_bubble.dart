@@ -6,14 +6,14 @@ import 'package:szaman_chat/utils/components/app_component.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:http/http.dart' as http;
 
-class ChatBubble extends StatelessWidget {
+class GroupChatBubble extends StatelessWidget {
   final String message;
   final String date;
   final bool isMe;
   final String username, userimage;
 
   final bool didImageExist;
-  const ChatBubble(
+  const GroupChatBubble(
       {super.key,
       required this.message,
       required this.date,
