@@ -5,14 +5,17 @@ import 'package:path_provider/path_provider.dart';
 import 'package:szaman_chat/utils/components/app_component.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:http/http.dart' as http;
+import 'package:szaman_chat/utils/credential/UserCredential.dart';
 
 class GroupChatBubble extends StatelessWidget {
   final String message;
   final String date;
   final bool isMe;
   final String username, userimage;
+  final String senderID;
 
   final bool didImageExist;
+
   const GroupChatBubble(
       {super.key,
       required this.message,
@@ -20,10 +23,13 @@ class GroupChatBubble extends StatelessWidget {
       required this.isMe,
       required this.username,
       required this.userimage,
-      required this.didImageExist});
+      required this.didImageExist,
+      required this.senderID});
 
   @override
   Widget build(BuildContext context) {
+    print("sender ID $senderID");
+    bool isMyself = (senderID == Usercredential.id) ? true : false;
     Future<Directory?> getDownloadsDirectory() async {
       if (Platform.isAndroid) {
         return Directory('/storage/emulated/0/Download');
@@ -126,24 +132,24 @@ class GroupChatBubble extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: Row(
         mainAxisAlignment:
-            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+            isMyself ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          if (!isMe) CircleAvatar(backgroundImage: NetworkImage(userimage)),
+          if (!isMyself) CircleAvatar(backgroundImage: NetworkImage(userimage)),
           Container(
             width: (didImageExist)
                 ? AppVars.screenSize.width * 0.4
                 : AppVars.screenSize.width * 0.6,
             decoration: BoxDecoration(
-                color: isMe
+                color: isMyself
                     ? Colors.grey[300]
                     : Theme.of(context).colorScheme.secondary,
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(12),
                   topRight: const Radius.circular(12),
-                  bottomLeft: !isMe
+                  bottomLeft: !isMyself
                       ? const Radius.circular(0)
                       : const Radius.circular(12),
-                  bottomRight: isMe
+                  bottomRight: isMyself
                       ? const Radius.circular(0)
                       : const Radius.circular(12),
                 )),
@@ -155,13 +161,14 @@ class GroupChatBubble extends StatelessWidget {
                 // setState(() {}); need handle with state manager
               },
               child: Column(
-                crossAxisAlignment:
-                    isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                crossAxisAlignment: isMyself
+                    ? CrossAxisAlignment.end
+                    : CrossAxisAlignment.start,
                 children: [
                   Text(
                     username,
                     style: TextStyle(
-                        color: isMe
+                        color: isMyself
                             ? Colors.black
                             : Theme.of(context).colorScheme.onSecondary,
                         fontWeight: FontWeight.bold),
@@ -209,7 +216,7 @@ class GroupChatBubble extends StatelessWidget {
                       maxLines: 50,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
-                          color: isMe
+                          color: isMyself
                               ? Colors.black
                               : Theme.of(context).colorScheme.onSecondary),
                     ),
@@ -217,14 +224,14 @@ class GroupChatBubble extends StatelessWidget {
                     Text(date,
                         style: TextStyle(
                             fontSize: 10,
-                            color: isMe
+                            color: isMyself
                                 ? Colors.black
                                 : Theme.of(context).colorScheme.onSecondary))
                 ],
               ),
             ),
           ),
-          if (isMe) CircleAvatar(backgroundImage: NetworkImage(userimage)),
+          if (isMyself) CircleAvatar(backgroundImage: NetworkImage(userimage)),
         ],
       ),
     );

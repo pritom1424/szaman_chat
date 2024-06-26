@@ -9,6 +9,7 @@ class CwlistTemplate extends StatefulWidget {
   final bool isAdmin;
   final String? token;
   final String meName;
+  final String? fImageUrl;
   const CwlistTemplate(
       {super.key,
       this.token,
@@ -16,7 +17,8 @@ class CwlistTemplate extends StatefulWidget {
       required this.meName,
       this.userName,
       this.uid,
-      required this.isAdmin});
+      required this.isAdmin,
+      required this.fImageUrl});
 
   @override
   State<CwlistTemplate> createState() => _CwlistTemplateState();
@@ -37,8 +39,8 @@ class _CwlistTemplateState extends State<CwlistTemplate> {
     return Consumer(
       builder: (ctx, ref, _) => ListTile(
         leading: CircleAvatar(
-          backgroundImage: (widget.imageURL != null)
-              ? NetworkImage(widget.imageURL!)
+          backgroundImage: (widget.fImageUrl != null)
+              ? NetworkImage(widget.fImageUrl!)
               : const AssetImage(""),
         ),
         title: Text(

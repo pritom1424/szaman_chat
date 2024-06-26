@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:szaman_chat/data/models/message_model.dart';
-import 'package:szaman_chat/provider/inbox_page_vm_group.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
 
@@ -41,7 +39,7 @@ class _CwlistTemplateState extends State<GroupCwlistTemplate> {
     print("added $isAdded");
     return Consumer(
       builder: (ctx, ref, _) => ListTile(
-        leading: CircleAvatar(
+        leading: const CircleAvatar(
           child: Icon(Icons.person_3),
         ),
         title: Text(
@@ -79,8 +77,8 @@ class _CwlistTemplateState extends State<GroupCwlistTemplate> {
                                   "before added memb  ${widget.mainGroupName!}");
                               final didSuccess = await ref
                                   .watch(inboxpageGroupViewModel)
-                                  .addMember(
-                                      widget.gId!, widget.mainGroupName!);
+                                  .addMember(widget.gId!, widget.mainGroupName!,
+                                      widget.userID!);
                               print("after added memb");
 
                               ScaffoldMessenger.of(context)

@@ -90,7 +90,15 @@ class ChatlistWidget extends ConsumerWidget {
                                             if (!snapUsers.hasData) {
                                               return const SizedBox.shrink();
                                             }
-                                            return ChatListTemplet(
+                                            print(
+                                                "before is seen ${snapId.data![ind]}");
+                                            return FutureBuilder(
+                                              future: ref
+                                                  .read(inboxpageViewModel)
+                                                  .islastMessageSeen(
+                                                      snapId.data![ind]),
+                                              builder: (ctx, snapIsSeen) =>
+                                                  ChatListTemplet(
                                                 imageUrl: snapUserProf
                                                     .data!.imageUrl!,
                                                 snapId.data![ind],
@@ -105,15 +113,17 @@ class ChatlistWidget extends ConsumerWidget {
                                                 AppMethods().dateFormatter(
                                                     snap.data!.last.createdAt),
                                                 snapPhoto.data!.imageUrl!,
-                                                false,
+                                                snapIsSeen.data ?? true,
                                                 snap.data!.last.isME,
                                                 snapUsers
                                                         .data![
                                                             snapId.data![ind]]
                                                         ?.name ??
-                                                    "friends"
+                                                    "friends",
+                                                ref: ref,
                                                 // data[ind]["isSeen"]
-                                                );
+                                              ),
+                                            );
                                           });
                                     });
                               }));

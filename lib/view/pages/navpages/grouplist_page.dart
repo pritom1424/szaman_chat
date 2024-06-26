@@ -36,10 +36,10 @@ class _GroupListPageState extends State<GroupListPage> {
             showDialog(
                 context: context,
                 builder: (ctx) => AlertDialog(
-                      title: Text("Create Group"),
+                      title: const Text("Create Group"),
                       content: TextField(
                         controller: tcontroller,
-                        decoration: InputDecoration(label: Text("Group Name")),
+                        decoration: const InputDecoration(label: Text("Group Name")),
                       ),
                       actions: [
                         ElevatedButton(
@@ -62,7 +62,7 @@ class _GroupListPageState extends State<GroupListPage> {
                               }
                               Navigator.of(context).pop();
                             },
-                            child: Text("Create"))
+                            child: const Text("Create"))
                       ],
                     ));
             /* await Navigator.of(context)

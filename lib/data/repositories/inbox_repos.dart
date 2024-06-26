@@ -31,6 +31,8 @@ class InboxRepos {
       final response = await http.post(url, body: bodyData);
 
       if (response.statusCode == 200 && responseFriend.statusCode == 200) {
+        await lastMessageUpdate(uid, token, fid, true);
+        await lastMessageUpdate(fid, token, uid, false);
         return true;
       } else {
         return false;
@@ -70,6 +72,32 @@ class InboxRepos {
       print("Error occured!: ${e.toString()}");
       rethrow;
     }
+  }
+
+  Future<void> lastMessageUpdate(
+      String uid, String token, String fid, bool isSeen) async {
+    var params = {'auth': token};
+    final url = Uri.https(
+      ApiLinks.baseUrl,
+      '/last_messages/$uid/$fid.json',
+      params,
+    );
+    final body = {"communicate": isSeen};
+    final responseFriend = await http.put(url, body: jsonEncode(body));
+  }
+
+  Future<bool> isLastMessageSeen(String uid, String fid, String token) async {
+    var params = {'auth': token};
+
+    final url = Uri.https(
+      ApiLinks.baseUrl,
+      '/last_messages/$uid/$fid.json',
+      params,
+    );
+
+    final response = await http.get(url);
+    print("is seen repos ${json.decode(response.body)}");
+    return json.decode(response.body)['communicate'];
   }
 
   Future<Map<String, dynamic>> getFriendIds(String userId, String token) async {

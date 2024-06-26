@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:szaman_chat/data/models/message_model.dart';
+import 'package:szaman_chat/data/models/user_model.dart';
 import 'package:szaman_chat/utils/constants/app_methods.dart';
-import 'package:szaman_chat/view/widgets/inboxpage/chat_bubble.dart';
+import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/view/widgets/inboxpage_group/group_chat_bubble.dart';
 
 class GroupInboxMessagesWidget extends StatelessWidget {
   final List<MessageModel> messages;
   final String? gName;
+  final Map<String, UserModel?> userData;
   const GroupInboxMessagesWidget(
-      {super.key, required this.messages, this.gName});
+      {super.key, required this.messages, this.gName, required this.userData});
 
   @override
   Widget build(BuildContext context) {
@@ -61,12 +63,16 @@ class GroupInboxMessagesWidget extends StatelessWidget {
           itemCount: messageList.length,
           reverse: true,
           itemBuilder: (ctx, ind) => GroupChatBubble(
-              date: AppMethods().dateFormatter(messageList[ind].createdAt),
-              isMe: messageList[ind].isME,
-              username: (messageList[ind].isME) ? "You" : gName!,
-              message: messageList[ind].message ?? "",
-              userimage: messageList[ind].imageUrl ?? "",
-              didImageExist: messageList[ind].isImageExist ?? false)),
+                date: AppMethods().dateFormatter(messageList[ind].createdAt),
+                isMe: messageList[ind].isME,
+                username: (messageList[ind].senderID == Usercredential.id)
+                    ? "You"
+                    : userData[messageList[ind].senderID]!.name ?? "name",
+                message: messageList[ind].message ?? "",
+                userimage: messageList[ind].imageUrl ?? "",
+                didImageExist: messageList[ind].isImageExist ?? false,
+                senderID: messageList[ind].senderID ?? "",
+              )),
     );
   }
 }

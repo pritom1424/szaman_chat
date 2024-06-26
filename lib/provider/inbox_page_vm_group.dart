@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:szaman_chat/data/models/message_model.dart';
-import 'package:szaman_chat/data/repositories/inbox_repos.dart';
 import 'package:szaman_chat/data/repositories/inbox_repos_group.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 
@@ -43,13 +42,14 @@ class InboxPageVmGroup with ChangeNotifier {
     }
   }
 
-  Future<bool> addMember(String gID, String gName) async {
+  Future<bool> addMember(String gID, String gName, String fID) async {
     print("gidREsult $gID");
     try {
       print("gidREsult $gID, name $gName");
+
       if (Usercredential.id != null || Usercredential.token != null) {
         final didSuccess = await _inboxRepos.addToGroup(
-            Usercredential.token!, gID, Usercredential.id!, gName);
+            Usercredential.token!, gID, fID, gName);
         if (didSuccess) {
           return true;
         }
@@ -80,7 +80,7 @@ class InboxPageVmGroup with ChangeNotifier {
   }
 
   Stream<List<MessageModel>> getAllMessagesStream(String token, String gid) {
-    return Stream.periodic(const Duration(seconds: 2)).asyncMap((_) async {
+    return Stream.periodic(const Duration(seconds: 1)).asyncMap((_) async {
       try {
         final data = await _inboxRepos.getMessages(token, gid);
         List<MessageModel> messages = [];
@@ -97,13 +97,34 @@ class InboxPageVmGroup with ChangeNotifier {
     });
   }
 
+  Future<bool> islastMessageSeen(
+    String gid,
+  ) async {
+    if (Usercredential.id == null || Usercredential.token == null) {
+      return false;
+    }
+    final res = await _inboxRepos.isLastMessageSeen(
+        Usercredential.id!, gid, Usercredential.token!);
+
+    print("is seen vm $res");
+    return res;
+  }
+
+  Future<void> lastMessageUpdate(String gid, bool isSeen) async {
+    if (Usercredential.id == null || Usercredential.token == null) {
+      return;
+    }
+    await _inboxRepos.lastMessageUpdate(
+        Usercredential.id!, Usercredential.token!, gid, isSeen);
+  }
+
   Future<List<String>> getGroupIDs(String uid) async {
     if (Usercredential.token == null) {
       return [];
     }
     final mapData = await _inboxRepos.getGroupIds(
         Usercredential.token!, uid); //getFriendIds(uid, Usercredential.token!);
-    print("friend ids ${mapData}");
+    print("friend ids $mapData");
 
     return mapData;
   }
@@ -114,7 +135,7 @@ class InboxPageVmGroup with ChangeNotifier {
     }
     final mapData = await _inboxRepos.getGroupMembers(
         Usercredential.token!, gid); //getFriendIds(uid, Usercredential.token!);
-    print("friend ids ${mapData}");
+    print("friend ids $mapData");
 
     return mapData;
   }
@@ -125,7 +146,7 @@ class InboxPageVmGroup with ChangeNotifier {
     }
     final gName = await _inboxRepos.getGroupNameBYID(gid, Usercredential.token!,
         Usercredential.id!); //getFriendIds(uid, Usercredential.token!);
-    print("groupName ${gName}");
+    print("groupName $gName");
 
     return gName;
   }

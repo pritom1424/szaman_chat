@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/data/repositories/inbox_repos.dart';
@@ -60,6 +62,14 @@ class InboxPageVm with ChangeNotifier {
     }
   }
 
+  Future<void> lastMessageUpdate(String fid, bool isSeen) async {
+    if (Usercredential.id == null || Usercredential.token == null) {
+      return;
+    }
+    await _inboxRepos.lastMessageUpdate(
+        Usercredential.id!, Usercredential.token!, fid, isSeen);
+  }
+
   Stream<List<MessageModel>> getAllMessagesStream(
       String token, String uid, String fid) {
     return Stream.periodic(const Duration(seconds: 2)).asyncMap((_) async {
@@ -77,6 +87,57 @@ class InboxPageVm with ChangeNotifier {
         return [];
       }
     });
+  }
+
+  Stream<List<String>> getFriendIDsStream(String uid) {
+    StreamController<List<String>> controller = StreamController();
+    Timer? timer;
+
+    controller = StreamController<List<String>>.broadcast(
+      onListen: () {
+        if (Usercredential.token == null) {
+          controller.add([]);
+          return;
+        }
+
+        List<String> lastFriendIDs = [];
+
+        timer = Timer.periodic(Duration(seconds: 2), (Timer t) async {
+          try {
+            final mapData =
+                await _inboxRepos.getFriendIds(uid, Usercredential.token!);
+            List<String> currentFriendIDs = mapData.keys.toList();
+
+            if (currentFriendIDs != lastFriendIDs) {
+              lastFriendIDs = currentFriendIDs;
+              controller.add(currentFriendIDs);
+            }
+          } catch (e) {
+            print("Error occurred: ${e.toString()}");
+            controller.addError(e);
+          }
+        });
+      },
+      onCancel: () {
+        timer?.cancel();
+        controller.close();
+      },
+    );
+
+    return controller.stream;
+  }
+
+  Future<bool> islastMessageSeen(
+    String fid,
+  ) async {
+    if (Usercredential.id == null || Usercredential.token == null) {
+      return false;
+    }
+    final res = await _inboxRepos.isLastMessageSeen(
+        Usercredential.id!, fid, Usercredential.token!);
+
+    print("is seen vm $res");
+    return res;
   }
 
   Future<List<String>> getFriendIDs(String uid) async {

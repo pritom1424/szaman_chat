@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:szaman_chat/main.dart';
 import 'package:szaman_chat/utils/constants/api_links.dart';
-import 'package:szaman_chat/utils/credential/UserCredential.dart';
 
 class TestScript extends StatelessWidget {
   const TestScript({super.key});
@@ -22,12 +21,12 @@ class TestScript extends StatelessWidget {
                 // AuthRepos().signInWithPhoneNumber("+16505551234");
                 final token = await auth.currentUser!.getIdToken();
                 var params = {'auth': token};
-                print("params" + params.toString());
+                print("params$params");
                 final url = Uri.https(ApiLinks.baseUrl, '/test.json', params);
                 final response = await http.post(url,
                     body: jsonEncode({"admin": auth.currentUser!.uid}));
 
-                print("Checking test:" + json.decode(response.body).toString());
+                print("Checking test:${json.decode(response.body)}");
               },
               child: const Text("Api Test")),
           ElevatedButton(

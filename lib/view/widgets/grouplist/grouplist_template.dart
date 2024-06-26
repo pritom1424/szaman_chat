@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:szaman_chat/data/models/user_model.dart';
 import 'package:szaman_chat/view/pages/group_inbox/group_inbox_page.dart';
-import 'package:szaman_chat/view/pages/inbox_page.dart';
 
 class GroupListTemplet extends StatelessWidget {
   // const ChatTemplet({super.key});
@@ -14,12 +14,14 @@ class GroupListTemplet extends StatelessWidget {
   final bool isMe;
 
   final String userimageUrl;
+  final Map<String, UserModel?> userModel;
   const GroupListTemplet(this.groupID, this.groupName, this.lastText,
       this.lastTextDate, this.isSeen, this.isMe,
-      {super.key, required this.userimageUrl});
+      {super.key, required this.userimageUrl, required this.userModel});
+
   @override
   Widget build(BuildContext context) {
-    print("grouup Name temp ${groupName}");
+    print("grouup Name temp $groupName");
     return Dismissible(
       key: ValueKey(groupID),
       direction: DismissDirection.endToStart,
@@ -62,7 +64,7 @@ class GroupListTemplet extends StatelessWidget {
         color: Colors.white, //Theme.of(context).primaryColor,
         elevation: 0,
         child: ListTile(
-            leading: CircleAvatar(
+            leading: const CircleAvatar(
               child: Icon(Icons.person_3),
             ),
             title: Text(
@@ -80,10 +82,12 @@ class GroupListTemplet extends StatelessWidget {
                   fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
             ),
             trailing: Text(lastTextDate),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (ctx) =>
-                      GroupInboxPage(groupID, groupName, userimageUrl))); //fID
+            onTap: () async {
+              await Navigator.of(context).push(MaterialPageRoute(
+                  builder: (ctx) => GroupInboxPage(
+                      groupID, groupName, userimageUrl, userModel)));
+
+              //fID
             }),
       ),
     );

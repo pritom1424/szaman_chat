@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:szaman_chat/data/models/user_model.dart';
 
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
 import 'package:szaman_chat/view/pages/group_inbox/group_coworkerlist_page.dart';
-import 'package:szaman_chat/view/widgets/inboxpage/inbox_messages_widget.dart';
-import 'package:szaman_chat/view/widgets/inboxpage/input_inbox_widget.dart';
 import 'package:szaman_chat/view/widgets/inboxpage_group/group_inbox_messages_widget.dart';
 import 'package:szaman_chat/view/widgets/inboxpage_group/group_input_inbox_widget.dart';
 
 class GroupInboxPage extends ConsumerWidget {
   final String gid, gName;
   final String userimageUrl;
-  const GroupInboxPage(this.gid, this.gName, this.userimageUrl, {super.key});
+  final Map<String, UserModel?> users;
+  const GroupInboxPage(this.gid, this.gName, this.userimageUrl, this.users,
+      {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -112,40 +113,51 @@ class GroupInboxPage extends ConsumerWidget {
         color: const Color.fromARGB(255, 226, 204, 195),
         child: (Usercredential.id == null || Usercredential.token == null)
             ? const Text("no data found")
-            : StreamBuilder(
-                stream: ref
+            : FutureBuilder(
+                future: ref
                     .read(inboxpageGroupViewModel)
-                    .getAllMessagesStream(Usercredential.token!, gid),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return SizedBox(
-                      height: AppVars.screenSize.height,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
+                    .lastMessageUpdate(gid, true),
+                builder: (context, snapIsSeen) {
+                  if (snapIsSeen.connectionState == ConnectionState.waiting) {
+                    return SizedBox.shrink();
                   }
+                  return StreamBuilder(
+                      stream: ref
+                          .read(inboxpageGroupViewModel)
+                          .getAllMessagesStream(Usercredential.token!, gid),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return SizedBox(
+                            height: AppVars.screenSize.height,
+                            child: const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          );
+                        }
 
-                  if (!snapshot.hasData) {
-                    return const SizedBox.shrink();
-                  }
-
-                  return Column(
-                    children: [
-                      Expanded(
-                        child: GroupInboxMessagesWidget(
-                          messages: snapshot.data!,
-                          gName: gName,
-                        ),
-                      ),
-                      GroupInputInboxWidget(
-                        gid: gid,
-                        gName: gName,
-                        userUrl: userimageUrl,
-                        folderName: "groupchat_files",
-                      )
-                    ],
-                  );
+                        if (!snapshot.hasData) {
+                          return const SizedBox.shrink();
+                        }
+                        print("groud identity numb ${snapshot.data!}");
+                        return Column(
+                          children: [
+                            Expanded(
+                              child: GroupInboxMessagesWidget(
+                                messages: snapshot.data!,
+                                gName: gName,
+                                userData: users,
+                              ),
+                            ),
+                            GroupInputInboxWidget(
+                              gid: gid,
+                              gName: gName,
+                              userUrl: userimageUrl,
+                              folderName: "groupchat_files",
+                            )
+                          ],
+                        );
+                      });
                 }),
       ),
     );

@@ -16,6 +16,7 @@ class InboxPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     const widthSize = 0.5;
+
     bool didCall = false;
     Future<void> sendCallMessages(
         String callString, bool isCalling, bool endCalling) async {
@@ -107,69 +108,80 @@ class InboxPage extends ConsumerWidget {
         color: const Color.fromARGB(255, 226, 204, 195),
         child: (Usercredential.id == null || Usercredential.token == null)
             ? const Text("no data found")
-            : StreamBuilder(
-                stream: ref.read(inboxpageViewModel).getAllMessagesStream(
-                    Usercredential.token!, Usercredential.id!, fId),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return SizedBox(
-                      height: AppVars.screenSize.height,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  }
-
-                  if (!snapshot.hasData) {
-                    return const SizedBox.shrink();
-                  }
-
-                  didCall = (snapshot.data!.last.isCalling == true &&
-                      snapshot.data!.last.isCallExit == false);
-                  return (didCall)
-                      ? SizedBox(
-                          height: AppVars.screenSize.height * 0.8,
-                          child: Center(
-                              child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              ElevatedButton(
-                                  onPressed: () async {
-                                    await sendCallMessages(
-                                        "Call Started!", true, false);
-                                    await Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (ctx) =>
-                                                const CallScreen()));
-                                    await sendCallMessages(
-                                        "Call Ended!", false, true);
-                                  },
-                                  child: const Text("Join")),
-                              ElevatedButton(
-                                  onPressed: () async {
-                                    await sendCallMessages(
-                                        "Call Ended!", false, true);
-                                  },
-                                  child: const Text("Cancel")),
-                            ],
-                          )),
-                        )
-                      : Column(
-                          children: [
-                            Expanded(
-                              child: InboxMessagesWidget(
-                                messages: snapshot.data!,
-                                fName: fName,
+            : FutureBuilder(
+                future:
+                    ref.read(inboxpageViewModel).lastMessageUpdate(fId, true),
+                builder: (ctx, snapLastMessage) => (snapLastMessage
+                            .connectionState ==
+                        ConnectionState.waiting)
+                    ? SizedBox.shrink()
+                    : StreamBuilder(
+                        stream: ref
+                            .read(inboxpageViewModel)
+                            .getAllMessagesStream(
+                                Usercredential.token!, Usercredential.id!, fId),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return SizedBox(
+                              height: AppVars.screenSize.height,
+                              child: const Center(
+                                child: CircularProgressIndicator(),
                               ),
-                            ),
-                            InputInboxWidget(
-                              fId: fId,
-                              fName: fName,
-                              userUrl: userimageUrl,
-                            )
-                          ],
-                        );
-                }),
+                            );
+                          }
+
+                          if (!snapshot.hasData) {
+                            return const SizedBox.shrink();
+                          }
+
+                          didCall = (snapshot.data!.last.isCalling == true &&
+                              snapshot.data!.last.isCallExit == false);
+                          return (didCall)
+                              ? SizedBox(
+                                  height: AppVars.screenSize.height * 0.8,
+                                  child: Center(
+                                      child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      ElevatedButton(
+                                          onPressed: () async {
+                                            await sendCallMessages(
+                                                "Call Started!", true, false);
+                                            await Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (ctx) =>
+                                                        const CallScreen()));
+                                            await sendCallMessages(
+                                                "Call Ended!", false, true);
+                                          },
+                                          child: const Text("Join")),
+                                      ElevatedButton(
+                                          onPressed: () async {
+                                            await sendCallMessages(
+                                                "Call Ended!", false, true);
+                                          },
+                                          child: const Text("Cancel")),
+                                    ],
+                                  )),
+                                )
+                              : Column(
+                                  children: [
+                                    Expanded(
+                                      child: InboxMessagesWidget(
+                                        messages: snapshot.data!,
+                                        fName: fName,
+                                      ),
+                                    ),
+                                    InputInboxWidget(
+                                      fId: fId,
+                                      fName: fName,
+                                      userUrl: userimageUrl,
+                                    )
+                                  ],
+                                );
+                        }),
+              ),
       ),
     );
   }

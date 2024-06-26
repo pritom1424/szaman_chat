@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:szaman_chat/data/models/user_model.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
-import 'package:szaman_chat/view/widgets/coworkerlist/cwlist_template.dart';
 import 'package:szaman_chat/view/widgets/grouplist/groupcwlist_template.dart';
 
 class GroupCwlistWidget extends StatelessWidget {

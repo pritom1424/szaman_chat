@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:szaman_chat/utils/view_models/view_models.dart';
 import 'package:szaman_chat/view/pages/inbox_page.dart';
 
 class ChatListTemplet extends StatelessWidget {
@@ -13,6 +15,7 @@ class ChatListTemplet extends StatelessWidget {
   final bool isMe;
   final String friendName;
   final String imageUrl;
+  final WidgetRef ref;
   const ChatListTemplet(
       this.userId,
       this.username,
@@ -23,7 +26,8 @@ class ChatListTemplet extends StatelessWidget {
       this.isMe,
       this.friendName,
       {super.key,
-      required this.imageUrl});
+      required this.imageUrl,
+      required this.ref});
   @override
   Widget build(BuildContext context) {
     return Dismissible(
@@ -86,10 +90,11 @@ class ChatListTemplet extends StatelessWidget {
                   fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
             ),
             trailing: Text(lastTextDate),
-            onTap: () {
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (ctx) =>
-                      InboxPage(userId, friendName, imageUrl))); //fID
+            onTap: () async {
+              await Navigator.of(context).push(MaterialPageRoute(
+                  builder: (ctx) => InboxPage(userId, friendName, imageUrl)));
+
+              //fID
             }),
       ),
     );

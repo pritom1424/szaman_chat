@@ -3,9 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
-import 'package:szaman_chat/view/pages/auth/registration_page.dart';
 
-import 'package:szaman_chat/view/widgets/coworkerlist/cwlist_widget.dart';
 import 'package:szaman_chat/view/widgets/grouplist/groupcwlist_widget.dart';
 
 class GroupCoworkerlistPage extends ConsumerWidget {
@@ -35,9 +33,7 @@ class GroupCoworkerlistPage extends ConsumerWidget {
                 ),
               )
             : FutureBuilder(
-                future: ref
-                    .read(inboxpageGroupViewModel)
-                    .getGroupMembers(Usercredential.id!),
+                future: ref.read(inboxpageGroupViewModel).getGroupMembers(gID!),
                 builder: (ctx, snapFid) => FutureBuilder(
                     future:
                         ref.read(userViewModel).getInfo(Usercredential.token!),

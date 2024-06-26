@@ -160,7 +160,7 @@ class _GroupInputInboxWidget extends State<GroupInputInboxWidget> {
                   hintText: 'Enter message',
                 ),
                 onChanged: (value) {
-                  ref.read(inboxpageViewModel).setInputText(value);
+                  ref.read(inboxpageGroupViewModel).setInputText(value);
                   /*  setState(() {
                                     _enteredMessages = value;
                                     //   value = "";

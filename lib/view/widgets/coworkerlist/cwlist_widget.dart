@@ -52,11 +52,12 @@ class CwlistWidget extends StatelessWidget {
                 : CwlistTemplate(
                     token: uModel.entries.toList()[ind].value.token,
                     uid: uModel.keys.toList()[ind],
-                    imageURL: uModel.entries.toList()[ind].value.imageUrl,
+                    imageURL: meNameMod?.imageUrl,
                     userName: uModel.entries.toList()[ind].value.name,
                     isAdmin:
                         uModel.entries.toList()[ind].value.isAdmin ?? false,
                     meName: meNameMod?.name ?? "Me",
+                    fImageUrl: uModel.entries.toList()[ind].value.imageUrl,
                   ));
   }
 }
