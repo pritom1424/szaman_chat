@@ -15,6 +15,8 @@ class GroupListPage extends StatefulWidget {
 
 class _GroupListPageState extends State<GroupListPage> {
   final tcontroller = TextEditingController();
+  bool isLoading = false;
+
   @override
   void dispose() {
     tcontroller.dispose();
@@ -33,18 +35,21 @@ class _GroupListPageState extends State<GroupListPage> {
             : null,
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            showDialog(
+            await showDialog(
                 context: context,
                 builder: (ctx) => AlertDialog(
                       title: const Text("Create Group"),
                       content: TextField(
                         controller: tcontroller,
-                        decoration: const InputDecoration(label: Text("Group Name")),
+                        decoration:
+                            const InputDecoration(label: Text("Group Name")),
                       ),
                       actions: [
                         ElevatedButton(
                             onPressed: () async {
                               if (tcontroller.text.isNotEmpty) {
+                                Navigator.of(context).pop();
+
                                 final mod = MessageModel(
                                     isCallExit: false,
                                     createdAt: DateTime.now(),
@@ -56,27 +61,44 @@ class _GroupListPageState extends State<GroupListPage> {
                                     /* name: meName,
                           friendName: userName, */
                                     isME: true);
+                                setState(() {
+                                  isLoading = true;
+                                });
                                 await ref
                                     .watch(inboxpageGroupViewModel)
                                     .createGroup(tcontroller.text, mod);
+                                setState(() {
+                                  isLoading = false;
+
+                                  tcontroller.clear();
+                                });
                               }
-                              Navigator.of(context).pop();
                             },
                             child: const Text("Create"))
                       ],
                     ));
+            print("dialog off");
+
+            setState(() {});
+            print("dialog on");
             /* await Navigator.of(context)
                                     .push(MaterialPageRoute(
                                         builder: (ctx) => const RegistrationForm(
                                               title: "Add Member",
                                             ))); */
           },
-          child: const Icon(
-            Icons.person_add,
-            color: Colors.black,
-          ),
+          child: isLoading
+              ? const CircularProgressIndicator(
+                  color: Colors.white,
+                )
+              : const Icon(
+                  Icons.person_add,
+                  color: Colors.black,
+                ),
         ),
-        body: const GrouplistWidget(),
+        body: GrouplistWidget(
+          isLoaded: isLoading,
+        ),
       ),
     );
   }

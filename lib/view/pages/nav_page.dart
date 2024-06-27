@@ -90,7 +90,7 @@ class NavPage extends ConsumerWidget {
           ),
         ),
         actions: [
-          TextButton.icon(
+          /*  TextButton.icon(
               onPressed: () {
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (ctx) => const TestScript()));
@@ -99,7 +99,7 @@ class NavPage extends ConsumerWidget {
                 "Test",
                 style:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-              )),
+              )), */
           TextButton.icon(
               onPressed: () async {
                 await ref.read(authViewModel).logout();

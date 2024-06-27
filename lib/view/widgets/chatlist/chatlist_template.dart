@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:szaman_chat/utils/view_models/view_models.dart';
 import 'package:szaman_chat/view/pages/inbox_page.dart';
 
 class ChatListTemplet extends StatelessWidget {
@@ -92,7 +91,8 @@ class ChatListTemplet extends StatelessWidget {
             trailing: Text(lastTextDate),
             onTap: () async {
               await Navigator.of(context).push(MaterialPageRoute(
-                  builder: (ctx) => InboxPage(userId, friendName, imageUrl)));
+                  builder: (ctx) =>
+                      InboxPage(userId, friendName, imageUrl, fimageUrl)));
 
               //fID
             }),

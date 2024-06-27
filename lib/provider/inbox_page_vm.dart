@@ -8,6 +8,9 @@ import 'package:szaman_chat/utils/credential/UserCredential.dart';
 class InboxPageVm with ChangeNotifier {
   String _inputText = "";
 
+  bool _isDocUploading = false;
+  bool _isImagePicking = false;
+
   final _inboxRepos = InboxRepos();
 
   bool? _isImageExist;
@@ -16,8 +19,26 @@ class InboxPageVm with ChangeNotifier {
     return _inputText;
   }
 
+  bool get isImagePicking {
+    return _isImagePicking;
+  }
+
   bool? get IsImageExist {
     return _isImageExist;
+  }
+
+  bool get isDocUploading {
+    return _isDocUploading;
+  }
+
+  void setIsDocLoading(bool isLoad) {
+    _isDocUploading = isLoad;
+    notifyListeners();
+  }
+
+  void setImagePicking(bool pickImage) {
+    _isImagePicking = pickImage;
+    notifyListeners();
   }
 
   void setImageExist(bool? isExist) {
@@ -72,7 +93,8 @@ class InboxPageVm with ChangeNotifier {
 
   Stream<List<MessageModel>> getAllMessagesStream(
       String token, String uid, String fid) {
-    return Stream.periodic(const Duration(seconds: 2)).asyncMap((_) async {
+    return Stream.periodic(const Duration(milliseconds: 100))
+        .asyncMap((_) async {
       try {
         final data = await _inboxRepos.getMessages(token, uid, fid);
         List<MessageModel> messages = [];
@@ -102,7 +124,7 @@ class InboxPageVm with ChangeNotifier {
 
         List<String> lastFriendIDs = [];
 
-        timer = Timer.periodic(Duration(seconds: 2), (Timer t) async {
+        timer = Timer.periodic(const Duration(seconds: 2), (Timer t) async {
           try {
             final mapData =
                 await _inboxRepos.getFriendIds(uid, Usercredential.token!);

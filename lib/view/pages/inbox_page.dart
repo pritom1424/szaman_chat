@@ -11,7 +11,9 @@ import 'package:szaman_chat/view/widgets/inboxpage/input_inbox_widget.dart';
 class InboxPage extends ConsumerWidget {
   final String fId, fName;
   final String userimageUrl;
-  const InboxPage(this.fId, this.fName, this.userimageUrl, {super.key});
+  final String fImageUrl;
+  const InboxPage(this.fId, this.fName, this.userimageUrl, this.fImageUrl,
+      {super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -95,9 +97,18 @@ class InboxPage extends ConsumerWidget {
         actions: [
           IconButton(
               onPressed: () async {
+                if (Usercredential.id == null) {
+                  return;
+                }
                 await sendCallMessages("Call Started!", true, false);
-                await Navigator.of(context).push(
-                    MaterialPageRoute(builder: (ctx) => const CallScreen()));
+
+                await Navigator.of(context).push(MaterialPageRoute(
+                    builder: (ctx) => CallScreen(
+                          fid: fId,
+                          channelName: Usercredential.id!,
+                          imageURL: fImageUrl,
+                        )));
+
                 await sendCallMessages("Call Ended!", false, true);
               },
               icon: const Icon(Icons.phone))
@@ -114,7 +125,7 @@ class InboxPage extends ConsumerWidget {
                 builder: (ctx, snapLastMessage) => (snapLastMessage
                             .connectionState ==
                         ConnectionState.waiting)
-                    ? SizedBox.shrink()
+                    ? const SizedBox.shrink()
                     : StreamBuilder(
                         stream: ref
                             .read(inboxpageViewModel)
@@ -137,33 +148,76 @@ class InboxPage extends ConsumerWidget {
 
                           didCall = (snapshot.data!.last.isCalling == true &&
                               snapshot.data!.last.isCallExit == false);
+                          print("didCall: $didCall");
                           return (didCall)
                               ? SizedBox(
                                   height: AppVars.screenSize.height * 0.8,
-                                  child: Center(
-                                      child: Row(
+                                  child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      ElevatedButton(
-                                          onPressed: () async {
-                                            await sendCallMessages(
-                                                "Call Started!", true, false);
-                                            await Navigator.of(context).push(
-                                                MaterialPageRoute(
-                                                    builder: (ctx) =>
-                                                        const CallScreen()));
-                                            await sendCallMessages(
-                                                "Call Ended!", false, true);
-                                          },
-                                          child: const Text("Join")),
-                                      ElevatedButton(
-                                          onPressed: () async {
-                                            await sendCallMessages(
-                                                "Call Ended!", false, true);
-                                          },
-                                          child: const Text("Cancel")),
+                                      CircleAvatar(
+                                        radius: 20,
+                                        child: Icon(
+                                          Icons.call,
+                                          color: Colors.blue,
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        height: 20,
+                                      ),
+                                      Text("Ringing..."),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      const Color.fromARGB(
+                                                          255, 52, 128, 54),
+                                                  foregroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10))),
+                                              onPressed: () async {
+                                                await sendCallMessages(
+                                                    "Call Started!",
+                                                    true,
+                                                    false);
+                                                await Navigator.of(context)
+                                                    .push(MaterialPageRoute(
+                                                        builder: (ctx) =>
+                                                            CallScreen(
+                                                              fid: fId,
+                                                              channelName: fId,
+                                                              imageURL:
+                                                                  fImageUrl,
+                                                            )));
+                                                await sendCallMessages(
+                                                    "Call Ended!", false, true);
+                                              },
+                                              child: const Text("Receive")),
+                                          SizedBox(
+                                            width: 20,
+                                          ),
+                                          ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.red,
+                                                  foregroundColor: Colors.white,
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10))),
+                                              onPressed: () async {
+                                                await sendCallMessages(
+                                                    "Call Ended!", false, true);
+                                              },
+                                              child: const Text("Cancel")),
+                                        ],
+                                      ),
                                     ],
-                                  )),
+                                  ),
                                 )
                               : Column(
                                   children: [
@@ -173,6 +227,20 @@ class InboxPage extends ConsumerWidget {
                                         fName: fName,
                                       ),
                                     ),
+                                    ref.read(inboxpageViewModel).isDocUploading
+                                        ? Container(
+                                            height: AppVars.screenSize.height *
+                                                0.05,
+                                            width:
+                                                AppVars.screenSize.width * 0.1,
+                                            padding: const EdgeInsets.all(5),
+                                            child:
+                                                const CircularProgressIndicator(
+                                              color: Colors.blueAccent,
+                                              strokeWidth: 8,
+                                            ),
+                                          )
+                                        : const SizedBox.shrink(),
                                     InputInboxWidget(
                                       fId: fId,
                                       fName: fName,

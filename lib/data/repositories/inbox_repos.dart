@@ -15,7 +15,7 @@ class InboxRepos {
 
       final bodyData = messageModelToJson(mModel);
       final friendModel = MessageModel(
-          isCallExit: true,
+          isCallExit: mModel.isCallExit,
           createdAt: mModel.createdAt,
           message: mModel.message,
           imageUrl: mModel.imageUrl,

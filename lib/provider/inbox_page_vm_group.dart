@@ -9,6 +9,15 @@ class InboxPageVmGroup with ChangeNotifier {
   final _inboxRepos = InboxReposGroup();
 
   bool? _isImageExist;
+  bool _isDocUploading = false;
+  bool _isImagePicking = false;
+  bool get isImagePicking {
+    return _isImagePicking;
+  }
+
+  bool get isDocUploading {
+    return _isDocUploading;
+  }
 
   String get inputText {
     return _inputText;
@@ -16,6 +25,16 @@ class InboxPageVmGroup with ChangeNotifier {
 
   bool? get IsImageExist {
     return _isImageExist;
+  }
+
+  void setIsDocLoading(bool isLoad) {
+    _isDocUploading = isLoad;
+    notifyListeners();
+  }
+
+  void setImagePicking(bool pickImage) {
+    _isImagePicking = pickImage;
+    notifyListeners();
   }
 
   void setImageExist(bool? isExist) {
@@ -80,7 +99,8 @@ class InboxPageVmGroup with ChangeNotifier {
   }
 
   Stream<List<MessageModel>> getAllMessagesStream(String token, String gid) {
-    return Stream.periodic(const Duration(seconds: 1)).asyncMap((_) async {
+    return Stream.periodic(const Duration(milliseconds: 100))
+        .asyncMap((_) async {
       try {
         final data = await _inboxRepos.getMessages(token, gid);
         List<MessageModel> messages = [];

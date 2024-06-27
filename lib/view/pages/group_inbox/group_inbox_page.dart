@@ -119,7 +119,7 @@ class GroupInboxPage extends ConsumerWidget {
                     .lastMessageUpdate(gid, true),
                 builder: (context, snapIsSeen) {
                   if (snapIsSeen.connectionState == ConnectionState.waiting) {
-                    return SizedBox.shrink();
+                    return const SizedBox.shrink();
                   }
                   return StreamBuilder(
                       stream: ref
@@ -149,6 +149,17 @@ class GroupInboxPage extends ConsumerWidget {
                                 userData: users,
                               ),
                             ),
+                            ref.read(inboxpageGroupViewModel).isDocUploading
+                                ? Container(
+                                    height: AppVars.screenSize.height * 0.05,
+                                    width: AppVars.screenSize.width * 0.1,
+                                    padding: const EdgeInsets.all(5),
+                                    child: const CircularProgressIndicator(
+                                      color: Colors.blueAccent,
+                                      strokeWidth: 8,
+                                    ),
+                                  )
+                                : const SizedBox.shrink(),
                             GroupInputInboxWidget(
                               gid: gid,
                               gName: gName,

@@ -116,10 +116,14 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
   Widget build(BuildContext context) {
     return Consumer(builder: (ctx, ref, _) {
       void sendMessages() async {
+        FocusScope.of(context).unfocus();
         var rp = ref.read(inboxpageViewModel);
         if (rp.IsImageExist == null || url == null || url!.isEmpty) {
           print("eneteredd");
           rp.setImageExist(false);
+        }
+        if (rp.IsImageExist ?? false) {
+          ref.read(inboxpageViewModel).setIsDocLoading(true);
         }
         print("enetered1 ${rp.IsImageExist}");
         final resultModel = MessageModel(
@@ -140,7 +144,7 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
         url = null;
         await ref.watch(inboxpageViewModel).addMessage(
             Usercredential.token!, resultModel, Usercredential.id!, widget.fId);
-        FocusScope.of(context).unfocus();
+        ref.read(inboxpageViewModel).setIsDocLoading(false);
       }
 
       return Container(
@@ -171,10 +175,12 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
             IconButton(
               color: Theme.of(context).primaryColor,
               onPressed: () async {
+                ref.read(inboxpageViewModel).setImagePicking(true);
                 url = await getFileUrl();
                 (url == null)
                     ? ref.read(inboxpageViewModel).setImageExist(false)
                     : ref.read(inboxpageViewModel).setImageExist(true);
+                ref.read(inboxpageViewModel).setImagePicking(false);
                 // clickOrGetPhoto(ImageSource.camera);
               },
               icon: const Icon(Icons.attach_file),
@@ -182,10 +188,12 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
             IconButton(
               color: Theme.of(context).primaryColor,
               onPressed: () async {
+                ref.read(inboxpageViewModel).setImagePicking(true);
                 url = await clickOrGetPhoto(ImageSource.camera, ctx);
                 (url == null)
                     ? ref.read(inboxpageViewModel).setImageExist(false)
                     : ref.read(inboxpageViewModel).setImageExist(true);
+                ref.read(inboxpageViewModel).setImagePicking(false);
                 // clickOrGetPhoto(ImageSource.camera);
               },
               icon: const Icon(Icons.camera_alt_rounded),
@@ -193,10 +201,12 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
             IconButton(
               color: Theme.of(context).primaryColor,
               onPressed: () async {
+                ref.read(inboxpageViewModel).setImagePicking(true);
                 url = await clickOrGetPhoto(ImageSource.gallery, ctx);
                 (url == null)
                     ? ref.read(inboxpageViewModel).setImageExist(false)
                     : ref.read(inboxpageViewModel).setImageExist(true);
+                ref.read(inboxpageViewModel).setImagePicking(false);
                 // clickOrGetPhoto(ImageSource.gallery);
               },
               icon: const Icon(Icons.photo),
@@ -213,7 +223,18 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
                   )
                   ? sendMessages
                   : null,
-              icon: const Icon(Icons.send),
+              icon: (ref.read(inboxpageViewModel).isImagePicking)
+                  ? const CircleAvatar(
+                      radius: 8,
+                      backgroundColor: Colors.transparent,
+                      child: FittedBox(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.grey,
+                        ),
+                      ),
+                    )
+                  : const Icon(Icons.send),
             )
           ],
         ),
