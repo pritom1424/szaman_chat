@@ -259,6 +259,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                                 FocusScope.of(context).unfocus();
 
                                 final authVm = ref.read(authViewModel);
+                                authVm.setIsLoading(true);
                                 if (!authVm.isMessageSent) {
                                   if (_formInfoKey.currentState == null) {
                                     return;
@@ -274,7 +275,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                                     ref
                                         .read(authViewModel)
                                         .setMessageSent(false);
-
+                                    authVm.setIsLoading(false);
                                     if (authVm.signData.isNotEmpty) {
                                       authVm.optController.text = "";
                                       ref
@@ -289,6 +290,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                                       ref
                                           .watch(authViewModel)
                                           .setMessageSent(false);
+                                      authVm.setIsLoading(false);
                                       ScaffoldMessenger.of(context)
                                           .showSnackBar(const SnackBar(
                                               content: Text(

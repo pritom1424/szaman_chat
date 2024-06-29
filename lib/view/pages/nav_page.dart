@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:szaman_chat/testScr.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/constants/data.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';

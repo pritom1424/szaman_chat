@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:agora_uikit/agora_uikit.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -45,7 +44,9 @@ class _CallScreenState extends State<CallScreen> {
 
   Future<void> _initializeAgora() async {
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      customTimer.incrementTime();
+      if (client.users.length > 0) {
+        customTimer.incrementTime();
+      }
     });
 
     client = AgoraClient(
@@ -56,6 +57,7 @@ class _CallScreenState extends State<CallScreen> {
     );
     await client.initialize();
     client.engine.disableVideo();
+//client.users.length
 
     client.engine.enableAudio();
   }
@@ -114,7 +116,9 @@ class _CallScreenState extends State<CallScreen> {
                           height: 10,
                         ),
                         Text(
-                          customTimer.formattedTime(),
+                          (client.users.length == 0)
+                              ? "Ringing..."
+                              : customTimer.formattedTime(),
                           textAlign: TextAlign.center,
                         )
                       ],
