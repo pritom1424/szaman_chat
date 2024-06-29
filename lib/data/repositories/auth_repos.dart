@@ -10,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:szaman_chat/main.dart';
+import 'package:szaman_chat/utils/components/app_vars.dart';
+import 'package:szaman_chat/utils/constants/api_links.dart';
 import 'package:szaman_chat/utils/constants/app_paths.dart';
 
 class AuthRepos {
@@ -231,8 +233,7 @@ class AuthRepos {
   Future<void> _addInfoTOServerUpdateToken(
       String idToken, String userId, Map<String, dynamic> params) async {
     print("before update token");
-    final link = Uri.https('szaman-chat-default-rtdb.firebaseio.com',
-        '/users/$userId.json', params);
+    final link = Uri.https(ApiLinks.baseUrl, '/users/$userId.json', params);
     print("before patch");
     await http.patch(link, body: json.encode({"token": idToken}));
   }
@@ -246,26 +247,33 @@ class AuthRepos {
       String token,
       Map<String, dynamic> params) async {
     if (username != null) {
-      final link = Uri.https('szaman-chat-default-rtdb.firebaseio.com',
-          '/users/$userId.json', params);
+      final link = Uri.https(ApiLinks.baseUrl, '/users/$userId.json', params);
       print("user ID Login $userId");
-      final ref =
-          FirebaseStorage.instanceFor(bucket: "gs://szaman-chat.appspot.com")
+
+      final ref = FirebaseStorage.instanceFor(bucket: ApiLinks.baseCloudURl)
               .ref()
               .child('profile_images')
               .child(userId) //responseData['localId']
           ;
-      // await ref.putFile(imageFile);
-      if (imageFile != null) {
-        await ref.putFile(imageFile);
-      } else {
-        final ByteData byteData =
-            await rootBundle.load(AppPaths.charplaceholderPath);
-        final Uint8List imageData = byteData.buffer.asUint8List();
-
-        await ref.putData(imageData);
+      String? durl;
+      try {
+        durl = await ref.getDownloadURL();
+      } catch (e) {
+        durl = null;
       }
-      final durl = await ref.getDownloadURL();
+      // await ref.putFile(imageFile);
+      if (durl == null) {
+        if (imageFile != null) {
+          await ref.putFile(imageFile);
+        } else {
+          final ByteData byteData =
+              await rootBundle.load(AppPaths.charplaceholderPath);
+          final Uint8List imageData = byteData.buffer.asUint8List();
+
+          await ref.putData(imageData);
+        }
+        durl = await ref.getDownloadURL();
+      }
 
       print("profile name update: $username");
       final response = await http.put(link,
@@ -279,11 +287,46 @@ class AuthRepos {
           }));
       print(
           "profile name update: ${response.statusCode}: ${json.decode(response.body)}");
-    } else {
-      if (token.isNotEmpty && userId.isNotEmpty) {
-        final params = {'auth': token};
-        await _addInfoTOServerUpdateToken(token, userId, params);
+    }
+  }
+
+  Future<void> _updateInfoTOServer(String? username, String userId,
+      File? imageFile, bool isAdmin, Map<String, dynamic> params) async {
+    if (username != null) {
+      final link = Uri.https(ApiLinks.baseUrl, '/users/$userId.json', params);
+      print("user ID Login $userId");
+      final ref = FirebaseStorage.instanceFor(bucket: ApiLinks.baseCloudURl)
+              .ref()
+              .child('profile_images')
+              .child(userId) //responseData['localId']
+          ;
+      // await ref.putFile(imageFile);
+
+      String? durl = await ref.getDownloadURL();
+
+      if (imageFile != null) {
+        await ref.putFile(imageFile);
+        durl = await ref.getDownloadURL();
+      } else {
+        if (durl.isEmpty) {
+          final ByteData byteData =
+              await rootBundle.load(AppPaths.charplaceholderPath);
+          final Uint8List imageData = byteData.buffer.asUint8List();
+
+          await ref.putData(imageData);
+          durl = await ref.getDownloadURL();
+        }
       }
+
+      print("profile name update: $username");
+      final response = await http.patch(link,
+          body: json.encode({
+            "imageUrl": durl,
+            "isAdmin": isAdmin,
+            "name": username,
+          }));
+      print(
+          "profile name update: ${response.statusCode}: ${json.decode(response.body)}");
     }
   }
 
@@ -302,6 +345,7 @@ class AuthRepos {
   }
 
   Future<Map<String, dynamic>?> tryAutoLogin() async {
+    _storeUserData();
     final prefs = await SharedPreferences.getInstance();
 
     if (!prefs.containsKey("userData")) {
@@ -312,7 +356,9 @@ class AuthRepos {
     final extractedData =
         json.decode(prefs.getString('userData')!) as Map<String, dynamic>;
 
-    print("extract data $extractedData");
+    return extractedData;
+
+    /* print("extract data $extractedData");
     final expiryDate = DateTime.parse(extractedData['expiryDate'] as String);
     //_refreshToken = extractedData['refreshToken'];
     print("isexpired:${expiryDate.isBefore(DateTime.now())}");
@@ -334,7 +380,7 @@ class AuthRepos {
       print("before update token");
       // _autoLogout(expiryDate);
       return extractedData;
-    }
+    } */
     //  return extractedData;
 
 /*     UserCredential.token = _token;
@@ -343,7 +389,7 @@ class AuthRepos {
     UserCredential.expiryDate = _expiryDate; */
   }
 
-  Future<Map<String, dynamic>> _refreshTokenIfNeeded() async {
+  /* Future<Map<String, dynamic>> _refreshTokenIfNeeded() async {
     if (_refreshToken.isEmpty) {
       return {};
     }
@@ -382,17 +428,17 @@ class AuthRepos {
       print("refresh token $error");
       rethrow;
     }
-  }
+  } */
 
-  void _autoLogout(DateTime expiryDate) {
+  /*  void _autoLogout(DateTime expiryDate) {
     if (_authTimer != Timer(Duration.zero, () {})) {
       _authTimer.cancel();
     }
     final timeToExpiry = expiryDate.difference(DateTime.now()).inSeconds;
     _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
   }
-
-  Future<bool?> updateAccount(String token, String phonenumber, String name,
+ */
+  Future<bool?> updateAccount(String token, String name, String uid,
       File? imageFile, bool isAdmin) async {
     /*  final url = Uri.https(
       "identitytoolkit.googleapis.com",
@@ -423,8 +469,7 @@ class AuthRepos {
 
       final params = {'auth': token}; //
 
-      await _addInfoTOServer(name, auth.currentUser!.uid, imageFile,
-          phonenumber, isAdmin, token, params);
+      await _updateInfoTOServer(name, uid, imageFile, isAdmin, params);
 
       // Update the email in the Realtime Database if necessary
       /* final prefs = await SharedPreferences.getInstance();

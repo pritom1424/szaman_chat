@@ -18,6 +18,7 @@ void main() async {
           projectId: "szaman-chat"));
 
   auth = FirebaseAuth.instanceFor(app: app);
+
   runApp(const ProviderScope(child: MyApp()));
 }
 

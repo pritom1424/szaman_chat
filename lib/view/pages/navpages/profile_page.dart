@@ -42,7 +42,7 @@ class _ProfileFormState extends State<ProfileForm> {
 
     final message = await ref
         .read(authViewModel)
-        .update(Usercredential.token!, phone, username, profileImage);
+        .update(Usercredential.token!, username, profileImage);
 
     // Show a success message
     ref.read(profileViewModel).setIsLoading(false);

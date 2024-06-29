@@ -1,8 +1,6 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:szaman_chat/utils/components/app_component.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/constants/app_colors.dart';
@@ -25,6 +23,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
   Color actionButtonBgColor = const Color.fromARGB(255, 68, 156, 204);
   Color actionButtonFgColor = Colors.white;
   final _formInfoKey = GlobalKey<FormState>();
+  String? countryCode;
 
   @override
   void initState() {
@@ -78,7 +77,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      /* const SizedBox(height: 10),
                       SizedBox(
                         child: Consumer(
                           builder: (ctx, ref, _) => Column(
@@ -120,7 +119,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                             ],
                           ),
                         ),
-                      ),
+                      ), */
                       const SizedBox(height: 10),
                       TextFormField(
                         readOnly: (ref.read(authViewModel).isMessageSent)
@@ -156,7 +155,20 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                         },
                       ),
                       const SizedBox(height: 20),
-                      TextFormField(
+                      /* IntlPhoneField(
+                        controller: ref.read(authViewModel).mobileController,
+                        readOnly: (ref.read(authViewModel).isMessageSent)
+                            ? true
+                            : false,
+                        decoration: InputDecoration(
+                          labelText: 'Phone Number',
+                          border: OutlineInputBorder(
+                            borderSide: BorderSide(),
+                          ),
+                        ),
+                      ), */
+                      IntlPhoneField(
+                        initialCountryCode: "BD",
                         readOnly: (ref.read(authViewModel).isMessageSent)
                             ? true
                             : false,
@@ -167,7 +179,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                             fontSize: 18, fontWeight: FontWeight.normal),
                         //autofocus: false,
                         enabled: true,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           errorBorder: OutlineInputBorder(
                               borderSide:
                                   BorderSide(color: Colors.grey, width: 0.3)),
@@ -177,8 +189,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                           enabledBorder: OutlineInputBorder(
                               borderSide:
                                   BorderSide(color: Colors.grey, width: 0.3)),
-                          hintText: 'Phone',
-                          labelText: 'Phone',
+                          hintText: "Phone",
                           labelStyle:
                               TextStyle(fontSize: 18, color: Colors.grey),
                           prefixIcon:
@@ -188,6 +199,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                           if (value != null && value == "") {
                             return "Phone error";
                           }
+                          countryCode = value?.countryCode;
                           return null;
                         },
                       ),
@@ -268,8 +280,9 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                                   if (_formInfoKey.currentState!.validate()) {
                                     _formInfoKey.currentState!.save();
 
-                                    authVm.signData = await authVm
-                                        .signin(authVm.mobileController.text);
+                                    authVm.signData = await authVm.signin(
+                                        countryCode.toString() +
+                                            authVm.mobileController.text);
 
                                     print("data struct ${authVm.signData}");
                                     ref
@@ -306,15 +319,15 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                                       authVm.nameController.text,
                                       authVm.storedImage,
                                       authVm.isAdmin,
-                                      authVm.mobileController.text);
+                                      countryCode.toString() +
+                                          authVm.mobileController.text);
 
                                   if (didRegister) {
                                     authVm.resetAuthForm();
                                     didRegister = false;
-                                    print("is come this section");
+
                                     // otpController.text = "";
 
-                                    print("auth su");
                                     ScaffoldMessenger.of(context).showSnackBar(
                                         const SnackBar(
                                             content: Text(

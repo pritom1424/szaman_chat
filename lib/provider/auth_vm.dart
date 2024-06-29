@@ -197,11 +197,13 @@ class AuthVm with ChangeNotifier {
     }
   }
 
-  Future<String> update(
-      String token, String email, String name, File? imageFile) async {
+  Future<String> update(String token, String name, File? imageFile) async {
     try {
+      if (Usercredential.id == null) {
+        return "info update failed!";
+      }
       final authData = await _authRepos.updateAccount(
-          token, email, name, imageFile, isAdmin);
+          token, name, Usercredential.id!, imageFile, isAdmin);
       if (authData == null || authData == false) {
         return "info update failed!";
       }
@@ -246,6 +248,7 @@ class AuthVm with ChangeNotifier {
 
       Usercredential.id = userId;
       Usercredential.token = _token;
+      //await auth.signInWithCustomToken()
       notifyListeners();
       return true;
     } else {

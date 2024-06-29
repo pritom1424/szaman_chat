@@ -13,11 +13,13 @@ class CallScreen extends StatefulWidget {
   final String channelName;
   final String fid;
   final String imageURL;
+  final bool isVideoOn;
   const CallScreen(
       {super.key,
       required this.channelName,
       required this.fid,
-      required this.imageURL});
+      required this.imageURL,
+      required this.isVideoOn});
 
   @override
   _CallScreenState createState() => _CallScreenState();
@@ -43,20 +45,23 @@ class _CallScreenState extends State<CallScreen> {
   }
 
   Future<void> _initializeAgora() async {
-    timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (client.users.length > 0) {
-        customTimer.incrementTime();
-      }
-    });
-
     client = AgoraClient(
       agoraConnectionData: AgoraConnectionData(
         appId: 'f4183852ed674c139ff303c84fcf29e0',
         channelName: widget.channelName,
       ),
     );
+
     await client.initialize();
-    client.engine.disableVideo();
+    if (!widget.isVideoOn) {
+      client.engine.disableVideo();
+      timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+        if (client.users.isNotEmpty) {
+          customTimer.incrementTime();
+        }
+      });
+    }
+
 //client.users.length
 
     client.engine.enableAudio();
@@ -72,7 +77,7 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("channel name" + widget.channelName);
+    print("channel name${widget.channelName}");
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -84,45 +89,48 @@ class _CallScreenState extends State<CallScreen> {
                 Usercredential.token!, Usercredential.id!, widget.fid),
             builder: (ctx, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return SizedBox.shrink();
+                return const SizedBox.shrink();
               }
               if (!snapshot.hasData) {
-                return SizedBox.shrink();
+                return const SizedBox.shrink();
               }
               if (snapshot.data!.last.isCalling == false &&
                   snapshot.data!.last.isCallExit == true) {
                 Navigator.of(context).pop();
                 print("leave Channel");
               }
-              return Container(
+              return SizedBox(
                 height: AppVars.screenSize.height,
                 //   color: Colors.black,
                 child: Stack(
                   children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Container(
-                          height: AppVars.screenSize.height * 0.1,
-                          child: FittedBox(
-                            child: CircleAvatar(
-                              radius: 20,
-                              backgroundImage: NetworkImage(widget.imageURL),
-                            ),
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text(
-                          (client.users.length == 0)
-                              ? "Ringing..."
-                              : customTimer.formattedTime(),
-                          textAlign: TextAlign.center,
-                        )
-                      ],
-                    )
+                    (!widget.isVideoOn)
+                        ? Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              SizedBox(
+                                height: AppVars.screenSize.height * 0.1,
+                                child: FittedBox(
+                                  child: CircleAvatar(
+                                    radius: 20,
+                                    backgroundImage:
+                                        NetworkImage(widget.imageURL),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Text(
+                                (client.users.isEmpty)
+                                    ? "Ringing..."
+                                    : customTimer.formattedTime(),
+                                textAlign: TextAlign.center,
+                              )
+                            ],
+                          )
+                        : AgoraVideoViewer(client: client)
 
                     /* (widget.channelName == Usercredential.id)
                         ? AgoraVideoViewer(
@@ -161,8 +169,9 @@ class _CallScreenState extends State<CallScreen> {
                             ],
                           ) */
                     ,
-                    AgoraVideoButtons(enabledButtons: const [
+                    AgoraVideoButtons(enabledButtons: [
                       BuiltInButtons.callEnd,
+                      if (widget.isVideoOn) BuiltInButtons.switchCamera
                     ], client: client),
                   ],
                 ),

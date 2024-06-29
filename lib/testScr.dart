@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:szaman_chat/main.dart';
@@ -19,14 +20,32 @@ class TestScript extends StatelessWidget {
           ElevatedButton(
               onPressed: () async {
                 // AuthRepos().signInWithPhoneNumber("+16505551234");
-                final token = await auth.currentUser!.getIdToken();
-                var params = {'auth': token};
-                print("params$params");
+                /*  final token = await auth.currentUser!.getIdToken();
+                var params = {'auth': token}; */
+                /*      print("params$params");
                 final url = Uri.https(ApiLinks.baseUrl, '/test.json', params);
                 final response = await http.post(url,
                     body: jsonEncode({"admin": auth.currentUser!.uid}));
+                      print("Checking test:${json.decode(response.body)}");
+                    
+                     */
+                /*  final Locale? deviceLocale = CountryCodes.getDeviceLocale();
+                print("deviceLocale $deviceLocale");
+                print(
+                    "auth mobile: ${CountryCodes.detailsForLocale().dialCode.toString()}"); */
+                /* final ref =
+                    FirebaseStorage.instanceFor(bucket: ApiLinks.baseCloudURl)
+                        .ref()
+                        .child('profile_images')
+                        .child("1234");
 
-                print("Checking test:${json.decode(response.body)}");
+                String? durl;
+                try {
+                  durl = await ref.getDownloadURL();
+                } catch (e) {
+                  durl = null;
+                }
+                print("Checking test:${durl}"); */
               },
               child: const Text("Api Test")),
           ElevatedButton(
