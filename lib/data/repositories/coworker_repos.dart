@@ -36,6 +36,7 @@ class CoworkerRepos {
           imageUrl: model.imageUrl,
           isImageExist: model.isImageExist,
           isCalling: model.isCalling,
+          isVideoOn: false,
           senderID: userId,
           isME: false);
       final bodyDataFriend = messageModelToJson(friendModel);

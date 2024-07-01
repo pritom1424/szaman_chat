@@ -54,17 +54,15 @@ class InboxMessagesWidget extends StatelessWidget {
     ]; */
     print("friend name : $fName");
     final messageList = messages.reversed.toList();
-    return Expanded(
-      child: ListView.builder(
-          itemCount: messageList.length,
-          reverse: true,
-          itemBuilder: (ctx, ind) => ChatBubble(
-              date: AppMethods().dateFormatter(messageList[ind].createdAt),
-              isMe: messageList[ind].isME,
-              username: (messageList[ind].isME) ? "You" : fName!,
-              message: messageList[ind].message ?? "",
-              userimage: messageList[ind].imageUrl ?? "",
-              didImageExist: messageList[ind].isImageExist ?? false)),
-    );
+    return ListView.builder(
+        itemCount: messageList.length,
+        reverse: true,
+        itemBuilder: (ctx, ind) => ChatBubble(
+            date: AppMethods().dateFormatter(messageList[ind].createdAt),
+            isMe: messageList[ind].isME,
+            username: (messageList[ind].isME) ? "You" : fName!,
+            message: messageList[ind].message ?? "",
+            userimage: messageList[ind].imageUrl ?? "",
+            didImageExist: messageList[ind].isImageExist ?? false));
   }
 }

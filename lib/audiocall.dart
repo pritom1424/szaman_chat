@@ -53,14 +53,25 @@ class _CallScreenState extends State<CallScreen> {
     );
 
     await client.initialize();
+
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (client.users.isNotEmpty) {
+        customTimer.incrementTime();
+      }
+    });
+
     if (!widget.isVideoOn) {
+      client.engine.disableVideo();
+    }
+
+    /* if (!widget.isVideoOn) {
       client.engine.disableVideo();
       timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         if (client.users.isNotEmpty) {
           customTimer.incrementTime();
         }
       });
-    }
+    } */
 
 //client.users.length
 
@@ -81,7 +92,7 @@ class _CallScreenState extends State<CallScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Audio Call'),
+        title: Text((!widget.isVideoOn) ? 'Voice Call' : 'Video Call'),
       ),
       body: Consumer(
         builder: (ctx, ref, _) => StreamBuilder(
@@ -130,8 +141,21 @@ class _CallScreenState extends State<CallScreen> {
                               )
                             ],
                           )
-                        : AgoraVideoViewer(client: client)
-
+                        : AgoraVideoViewer(client: client),
+                    if (widget.isVideoOn)
+                      Center(
+                        child: Container(
+                          color: Colors.black87,
+                          padding: EdgeInsets.all(8),
+                          child: Text(
+                            (client.users.isEmpty)
+                                ? "Ringing..."
+                                : customTimer.formattedTime(),
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                        ),
+                      )
                     /* (widget.channelName == Usercredential.id)
                         ? AgoraVideoViewer(
                             client: client,
@@ -168,6 +192,13 @@ class _CallScreenState extends State<CallScreen> {
                               )
                             ],
                           ) */
+                    /*   ,
+                    Text(
+                      (client.users.isEmpty)
+                          ? "Ringing..."
+                          : customTimer.formattedTime(),
+                      textAlign: TextAlign.center,
+                    ) */
                     ,
                     AgoraVideoButtons(enabledButtons: [
                       BuiltInButtons.callEnd,

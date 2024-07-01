@@ -79,6 +79,7 @@ class _CwlistTemplateState extends State<CwlistTemplate> {
                                 imageUrl: widget.imageURL,
                                 isImageExist: false,
                                 isCalling: false,
+                                isVideoOn: false,
                                 senderID: Usercredential.id,
                                 /* name: meName,
                           friendName: userName, */

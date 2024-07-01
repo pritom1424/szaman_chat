@@ -24,6 +24,7 @@ class MessageModel {
   final bool? isCalling;
   final bool? isCallExit;
   final String? senderID;
+  final bool? isVideoOn;
   // final String? name;
   //final String? friendName;
   final bool isME;
@@ -36,17 +37,20 @@ class MessageModel {
       isCalling: json["isCalling"],
       senderID: json["senderID"],
       isCallExit: json["isCallExit"],
+      isVideoOn: json["isVideoOn"],
       isME: json['isME']);
 
-  MessageModel(
-      {required this.isCallExit,
-      required this.createdAt,
-      required this.message,
-      required this.imageUrl,
-      required this.isImageExist,
-      required this.isCalling,
-      required this.senderID,
-      required this.isME});
+  MessageModel({
+    required this.isCallExit,
+    required this.createdAt,
+    required this.message,
+    required this.imageUrl,
+    required this.isImageExist,
+    required this.isCalling,
+    required this.isVideoOn,
+    required this.senderID,
+    required this.isME,
+  });
 
   Map<String, dynamic> toJson() => {
         "createdAt": createdAt.toIso8601String(),
@@ -56,6 +60,7 @@ class MessageModel {
         "isCalling": isCalling,
         "senderID": senderID,
         "isCallExit": isCallExit,
+        "isVideoOn": isVideoOn,
         "isME": isME
       };
 }

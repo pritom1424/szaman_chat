@@ -55,9 +55,9 @@ class CoworkerlistPage extends ConsumerWidget {
                     .getFriendIDs(Usercredential.id!),
                 builder: (ctx, snapFid) =>
                     (snapFid.connectionState == ConnectionState.waiting)
-                        ? SizedBox.shrink()
+                        ? const SizedBox.shrink()
                         : (!snapFid.hasData)
-                            ? SizedBox.shrink()
+                            ? const SizedBox.shrink()
                             : FutureBuilder(
                                 future: ref
                                     .read(userViewModel)

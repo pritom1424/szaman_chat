@@ -21,8 +21,8 @@ class InboxPage extends ConsumerWidget {
 
     bool didCall = false;
     bool didVideoOn = false;
-    Future<void> sendCallMessages(
-        String callString, bool isCalling, bool endCalling) async {
+    Future<void> sendCallMessages(String callString, bool isCalling,
+        bool endCalling, bool isVidOn) async {
       final resultModel = MessageModel(
           createdAt: DateTime.now(),
           message: callString,
@@ -30,6 +30,7 @@ class InboxPage extends ConsumerWidget {
           isImageExist: false,
           isCalling: isCalling,
           isCallExit: endCalling,
+          isVideoOn: isVidOn,
           senderID: Usercredential.id!,
           /*   name: Usercredential.name,
             friendName: widget.fName, */
@@ -102,7 +103,7 @@ class InboxPage extends ConsumerWidget {
                   return;
                 }
 
-                await sendCallMessages("Call Started!", true, false);
+                await sendCallMessages("Call Started!", true, false, true);
                 didVideoOn = true;
                 await Navigator.of(context).push(MaterialPageRoute(
                     builder: (ctx) => CallScreen(
@@ -111,8 +112,8 @@ class InboxPage extends ConsumerWidget {
                           imageURL: fImageUrl,
                           isVideoOn: didVideoOn,
                         )));
+                await sendCallMessages("Call Ended!", false, true, false);
                 didVideoOn = false;
-                await sendCallMessages("Call Ended!", false, true);
               },
               icon: const Icon(Icons.video_camera_front)),
           IconButton(
@@ -121,17 +122,17 @@ class InboxPage extends ConsumerWidget {
                   return;
                 }
 
-                await sendCallMessages("Call Started!", true, false);
+                await sendCallMessages("Call Started!", true, false, false);
                 didVideoOn = false;
                 await Navigator.of(context).push(MaterialPageRoute(
                     builder: (ctx) => CallScreen(
                           fid: fId,
                           channelName: Usercredential.id!,
                           imageURL: fImageUrl,
-                          isVideoOn: false,
+                          isVideoOn: didVideoOn,
                         )));
 
-                await sendCallMessages("Call Ended!", false, true);
+                await sendCallMessages("Call Ended!", false, true, false);
               },
               icon: const Icon(Icons.phone))
         ],
@@ -171,7 +172,7 @@ class InboxPage extends ConsumerWidget {
                           didCall = (snapshot.data!.last.isCalling == true &&
                               snapshot.data!.last.isCallExit == false &&
                               snapshot.data!.last.isME == false);
-
+                          print("before error");
                           return (didCall)
                               ? SizedBox(
                                   height: AppVars.screenSize.height * 0.8,
@@ -204,24 +205,42 @@ class InboxPage extends ConsumerWidget {
                                                           BorderRadius.circular(
                                                               10))),
                                               onPressed: () async {
-                                                await sendCallMessages(
+                                                /*  await sendCallMessages(
                                                     "Call Started!",
                                                     true,
-                                                    false);
+                                                    false,
+                                                    didVideoOn); */
                                                 await Navigator.of(context)
                                                     .push(MaterialPageRoute(
                                                         builder: (ctx) =>
                                                             CallScreen(
-                                                              isVideoOn:
-                                                                  didVideoOn,
+                                                              isVideoOn: snapshot
+                                                                      .data!
+                                                                      .last
+                                                                      .isVideoOn ??
+                                                                  false,
                                                               fid: fId,
                                                               channelName: fId,
                                                               imageURL:
                                                                   fImageUrl,
                                                             )));
-                                                await sendCallMessages(
-                                                    "Call Ended!", false, true);
                                                 didVideoOn = false;
+                                                await Future.delayed(
+                                                    Duration(seconds: 1),
+                                                    () async {
+                                                  if (snapshot.data!.last
+                                                              .isCalling ==
+                                                          true &&
+                                                      snapshot.data!.last
+                                                              .isCallExit ==
+                                                          false) {
+                                                    await sendCallMessages(
+                                                        "Call Ended!",
+                                                        false,
+                                                        true,
+                                                        didVideoOn);
+                                                  }
+                                                });
                                               },
                                               child: const Text("Receive")),
                                           const SizedBox(
@@ -237,7 +256,10 @@ class InboxPage extends ConsumerWidget {
                                                               10))),
                                               onPressed: () async {
                                                 await sendCallMessages(
-                                                    "Call Ended!", false, true);
+                                                    "Call Ended!",
+                                                    false,
+                                                    true,
+                                                    false);
                                               },
                                               child: const Text("Cancel")),
                                         ],

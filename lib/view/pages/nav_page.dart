@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:szaman_chat/testScr.dart';
+import 'package:szaman_chat/main.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/constants/data.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
@@ -33,27 +33,37 @@ class NavPage extends ConsumerWidget {
     return Scaffold(
       body: (!ref.read(navpageViewModel).isInit)
           ? FutureBuilder(
-              future: ref
-                  .read(profileViewModel)
-                  .getInfo(Usercredential.token!, Usercredential.id!),
-              builder: (ctx, snapProf) {
-                if (snapProf.connectionState == ConnectionState.waiting) {
-                  return SizedBox(
-                    height: AppVars.screenSize.height,
-                    child: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
+              future: auth.currentUser?.getIdToken(),
+              builder: (ctx, snapToken) =>
+                  (snapToken.connectionState == ConnectionState.waiting ||
+                          !snapToken.hasData)
+                      ? const SizedBox.shrink()
+                      : FutureBuilder(
+                          future: ref
+                              .read(profileViewModel)
+                              .getInfo(snapToken.data!, Usercredential.id!),
+                          builder: (ctx, snapProf) {
+                            if (snapProf.connectionState ==
+                                ConnectionState.waiting) {
+                              return SizedBox(
+                                height: AppVars.screenSize.height,
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            }
 
-                if (!snapProf.hasData) {
-                  return const Blockpage();
-                }
-                Usercredential.name = snapProf.data!.name;
-                Usercredential.isAdmin = snapProf.data!.isAdmin;
-                ref.read(navpageViewModel).setIsInit(true);
-                return mainBody(widthSize, ref, context, navViews);
-              })
+                            if (!snapProf.hasData) {
+                              return const Blockpage();
+                            }
+                            Usercredential.token = snapToken.data!;
+                            Usercredential.id = auth.currentUser?.uid;
+                            Usercredential.name = snapProf.data!.name;
+                            Usercredential.isAdmin = snapProf.data!.isAdmin;
+                            ref.read(navpageViewModel).setIsInit(true);
+                            return mainBody(widthSize, ref, context, navViews);
+                          }),
+            )
           : mainBody(widthSize, ref, context, navViews),
     );
   }

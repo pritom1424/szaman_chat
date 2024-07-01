@@ -57,6 +57,7 @@ class _GroupListPageState extends State<GroupListPage> {
                                     imageUrl: null,
                                     isImageExist: false,
                                     isCalling: false,
+                                    isVideoOn: false,
                                     senderID: Usercredential.id,
                                     /* name: meName,
                           friendName: userName, */

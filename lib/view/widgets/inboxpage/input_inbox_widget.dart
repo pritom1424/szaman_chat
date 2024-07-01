@@ -133,6 +133,7 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
             isImageExist: rp.IsImageExist ?? false,
             isCalling: false,
             isCallExit: false,
+            isVideoOn: false,
             senderID: Usercredential.id!,
             /*   name: Usercredential.name,
             friendName: widget.fName, */

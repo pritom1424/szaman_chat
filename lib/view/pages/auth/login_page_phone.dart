@@ -179,7 +179,7 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                             fontSize: 18, fontWeight: FontWeight.normal),
                         //autofocus: false,
                         enabled: true,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           errorBorder: OutlineInputBorder(
                               borderSide:
                                   BorderSide(color: Colors.grey, width: 0.3)),

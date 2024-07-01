@@ -10,13 +10,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:szaman_chat/main.dart';
-import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/constants/api_links.dart';
 import 'package:szaman_chat/utils/constants/app_paths.dart';
 
 class AuthRepos {
   final String _refreshToken = "";
-  Timer _authTimer = Timer(Duration.zero, () {});
+  final Timer _authTimer = Timer(Duration.zero, () {});
   final _params = {
     'key': 'AIzaSyA1Hortv46XM9Nc8QummVhoqa3JWBycHJY',
 

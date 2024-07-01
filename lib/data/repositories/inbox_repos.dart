@@ -21,6 +21,7 @@ class InboxRepos {
           imageUrl: mModel.imageUrl,
           isImageExist: mModel.isImageExist,
           isCalling: mModel.isCalling,
+          isVideoOn: mModel.isVideoOn,
           senderID: uid,
           isME: false);
       final bodyDataFriend = messageModelToJson(friendModel);
