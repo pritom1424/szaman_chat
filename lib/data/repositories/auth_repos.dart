@@ -89,7 +89,6 @@ class AuthRepos {
         // Auto-retrieval or instant validation
         try {
           final userCredential = await auth.signInWithCredential(credential);
-          print("Verification completed: ${userCredential.user?.uid}");
         } catch (e) {
           print("Error in verificationCompleted: $e");
         }
@@ -101,7 +100,7 @@ class AuthRepos {
       codeSent: (String verId, int? resToken) {
         verificationId = verId;
         resendToken = resToken;
-        print("Verification code sent: $verId");
+
         // Complete the completer with verificationId and resendToken
         completer.complete([verificationId.toString(), resendToken]);
       },
@@ -136,7 +135,7 @@ class AuthRepos {
         await userInfo.user!
             .reload(); // Reload the user to ensure the display name is updated
         final token = await userInfo.user!.getIdToken();
-        print("userinfo updated");
+
         final params = {"auth": token};
         await _addInfoTOServer(
             auth.currentUser?.displayName,
@@ -231,9 +230,8 @@ class AuthRepos {
 
   Future<void> _addInfoTOServerUpdateToken(
       String idToken, String userId, Map<String, dynamic> params) async {
-    print("before update token");
     final link = Uri.https(ApiLinks.baseUrl, '/users/$userId.json', params);
-    print("before patch");
+
     await http.patch(link, body: json.encode({"token": idToken}));
   }
 
@@ -247,7 +245,6 @@ class AuthRepos {
       Map<String, dynamic> params) async {
     if (username != null) {
       final link = Uri.https(ApiLinks.baseUrl, '/users/$userId.json', params);
-      print("user ID Login $userId");
 
       final ref = FirebaseStorage.instanceFor(bucket: ApiLinks.baseCloudURl)
               .ref()
@@ -274,7 +271,6 @@ class AuthRepos {
         durl = await ref.getDownloadURL();
       }
 
-      print("profile name update: $username");
       final response = await http.put(link,
           body: json.encode({
             "creatorId": DateTime.now().toIso8601String(),
@@ -284,8 +280,6 @@ class AuthRepos {
             "name": username,
             "token": token
           }));
-      print(
-          "profile name update: ${response.statusCode}: ${json.decode(response.body)}");
     }
   }
 
@@ -293,7 +287,7 @@ class AuthRepos {
       File? imageFile, bool isAdmin, Map<String, dynamic> params) async {
     if (username != null) {
       final link = Uri.https(ApiLinks.baseUrl, '/users/$userId.json', params);
-      print("user ID Login $userId");
+
       final ref = FirebaseStorage.instanceFor(bucket: ApiLinks.baseCloudURl)
               .ref()
               .child('profile_images')
@@ -317,15 +311,12 @@ class AuthRepos {
         }
       }
 
-      print("profile name update: $username");
       final response = await http.patch(link,
           body: json.encode({
             "imageUrl": durl,
             "isAdmin": isAdmin,
             "name": username,
           }));
-      print(
-          "profile name update: ${response.statusCode}: ${json.decode(response.body)}");
     }
   }
 

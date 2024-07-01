@@ -1,7 +1,10 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:szaman_chat/main.dart';
+import 'package:szaman_chat/utils/audio/sound_manager.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
+import 'package:szaman_chat/utils/constants/app_paths.dart';
 import 'package:szaman_chat/utils/constants/data.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
@@ -70,6 +73,9 @@ class NavPage extends ConsumerWidget {
 
   Scaffold mainBody(double widthSize, WidgetRef ref, BuildContext context,
       List<Widget?> Function() navViews) {
+    /*    if (ref.read(navpageViewModel).isSoundOn) {
+      SoundManager().playSound(AppPaths.callStartSoundPath);
+    } */
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,

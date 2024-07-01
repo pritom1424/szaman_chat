@@ -83,6 +83,24 @@ class InboxPageVm with ChangeNotifier {
     }
   }
 
+  Future<int> getCallStatus() async {
+    if (Usercredential.token == null || Usercredential.id == null) {
+      return 2;
+    }
+    final result =
+        await _inboxRepos.getCallLog(Usercredential.id!, Usercredential.token!);
+    if (result['error'] != null) {
+      return 3;
+    } else if (result['isCall'] == true) {
+      (result['isMe'] == false) ? 1 : 2;
+    }
+    return 0;
+    //3 error
+    //1 got a call already
+    // 2 make a call;
+    // 0 free
+  }
+
   Future<void> lastMessageUpdate(String fid, bool isSeen) async {
     if (Usercredential.id == null || Usercredential.token == null) {
       return;
@@ -158,7 +176,6 @@ class InboxPageVm with ChangeNotifier {
     final res = await _inboxRepos.isLastMessageSeen(
         Usercredential.id!, fid, Usercredential.token!);
 
-    print("is seen vm $res");
     return res;
   }
 
@@ -167,7 +184,6 @@ class InboxPageVm with ChangeNotifier {
       return [];
     }
     final mapData = await _inboxRepos.getFriendIds(uid, Usercredential.token!);
-    print("friend ids ${mapData.keys.toList()}");
 
     return mapData.keys.toList();
   }

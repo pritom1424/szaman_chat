@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:agora_uikit/agora_uikit.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:szaman_chat/utils/audio/sound_manager.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/components/custom_clock.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
@@ -63,6 +64,7 @@ class _CallScreenState extends State<CallScreen> {
     if (!widget.isVideoOn) {
       client.engine.disableVideo();
     }
+    await SoundManager().stopSound();
 
     /* if (!widget.isVideoOn) {
       client.engine.disableVideo();
@@ -110,6 +112,7 @@ class _CallScreenState extends State<CallScreen> {
                 Navigator.of(context).pop();
                 print("leave Channel");
               }
+
               return SizedBox(
                 height: AppVars.screenSize.height,
                 //   color: Colors.black,
@@ -146,13 +149,14 @@ class _CallScreenState extends State<CallScreen> {
                       Center(
                         child: Container(
                           color: Colors.black87,
-                          padding: EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
                           child: Text(
                             (client.users.isEmpty)
                                 ? "Ringing..."
                                 : customTimer.formattedTime(),
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white, fontSize: 18),
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 18),
                           ),
                         ),
                       )

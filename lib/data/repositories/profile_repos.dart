@@ -15,11 +15,10 @@ class ProfileRepos {
     final url = Uri.https(ApiLinks.baseUrl, '/users/$uid.json', params);
 
     final response = await http.get(url);
-    print("Profile print ${json.decode(response.body)} ${token.toString()}");
+
     Map<String, dynamic> responseMap = {};
     if (response.statusCode == 200) {
       responseMap = json.decode(response.body) as Map<String, dynamic>;
-      print("Profile print");
     }
     return responseMap;
   }

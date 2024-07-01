@@ -43,7 +43,7 @@ class InboxReposGroup {
     );
 
     final response = await http.get(url);
-    print("is seen repos ${json.decode(response.body)}");
+
     return json.decode(response.body)['communicate'];
   }
 
@@ -94,7 +94,7 @@ class InboxReposGroup {
     final response = await http.get(url);
     if (response.statusCode == 200) {
       var val = json.decode(response.body) as Map<String, dynamic>;
-      print("test: ${val.values.toList()[0]['groupName']}");
+
       return val.values.toList()[0]['groupName'];
     }
     return "";
@@ -163,11 +163,10 @@ class InboxReposGroup {
       );
 
       final response = await http.get(url);
-      print("message response ${json.decode(response.body)}");
 
       if (response.statusCode == 200) {
         final messages = messagesModelFromJson(response.body);
-        print("messages response1 $messages");
+
         return messages;
       } else {
         return {};

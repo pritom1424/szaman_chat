@@ -119,13 +119,12 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
         FocusScope.of(context).unfocus();
         var rp = ref.read(inboxpageViewModel);
         if (rp.IsImageExist == null || url == null || url!.isEmpty) {
-          print("eneteredd");
           rp.setImageExist(false);
         }
         if (rp.IsImageExist ?? false) {
           ref.read(inboxpageViewModel).setIsDocLoading(true);
         }
-        print("enetered1 ${rp.IsImageExist}");
+
         final resultModel = MessageModel(
             createdAt: DateTime.now(),
             message: (rp.IsImageExist!) ? url : _controller.text,

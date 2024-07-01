@@ -62,10 +62,7 @@ class InboxPageVmGroup with ChangeNotifier {
   }
 
   Future<bool> addMember(String gID, String gName, String fID) async {
-    print("gidREsult $gID");
     try {
-      print("gidREsult $gID, name $gName");
-
       if (Usercredential.id != null || Usercredential.token != null) {
         final didSuccess = await _inboxRepos.addToGroup(
             Usercredential.token!, gID, fID, gName);
@@ -126,7 +123,6 @@ class InboxPageVmGroup with ChangeNotifier {
     final res = await _inboxRepos.isLastMessageSeen(
         Usercredential.id!, gid, Usercredential.token!);
 
-    print("is seen vm $res");
     return res;
   }
 
@@ -144,7 +140,6 @@ class InboxPageVmGroup with ChangeNotifier {
     }
     final mapData = await _inboxRepos.getGroupIds(
         Usercredential.token!, uid); //getFriendIds(uid, Usercredential.token!);
-    print("friend ids $mapData");
 
     return mapData;
   }
@@ -155,7 +150,6 @@ class InboxPageVmGroup with ChangeNotifier {
     }
     final mapData = await _inboxRepos.getGroupMembers(
         Usercredential.token!, gid); //getFriendIds(uid, Usercredential.token!);
-    print("friend ids $mapData");
 
     return mapData;
   }
@@ -166,7 +160,6 @@ class InboxPageVmGroup with ChangeNotifier {
     }
     final gName = await _inboxRepos.getGroupNameBYID(gid, Usercredential.token!,
         Usercredential.id!); //getFriendIds(uid, Usercredential.token!);
-    print("groupName $gName");
 
     return gName;
   }

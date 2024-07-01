@@ -52,7 +52,7 @@ class InboxMessagesWidget extends StatelessWidget {
             "hi there! how are you im jack and you and what is your purpose 3"
       }
     ]; */
-    print("friend name : $fName");
+
     final messageList = messages.reversed.toList();
     return ListView.builder(
         itemCount: messageList.length,

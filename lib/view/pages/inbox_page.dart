@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:szaman_chat/audiocall.dart';
 import 'package:szaman_chat/data/models/message_model.dart';
+import 'package:szaman_chat/utils/audio/sound_manager.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
+import 'package:szaman_chat/utils/constants/app_paths.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
 import 'package:szaman_chat/view/widgets/inboxpage/inbox_messages_widget.dart';
@@ -21,6 +23,7 @@ class InboxPage extends ConsumerWidget {
 
     bool didCall = false;
     bool didVideoOn = false;
+    bool isPush = false;
     Future<void> sendCallMessages(String callString, bool isCalling,
         bool endCalling, bool isVidOn) async {
       final resultModel = MessageModel(
@@ -35,9 +38,14 @@ class InboxPage extends ConsumerWidget {
           /*   name: Usercredential.name,
             friendName: widget.fName, */
           isME: true);
-
-      await ref.watch(inboxpageViewModel).addMessage(
-          Usercredential.token!, resultModel, Usercredential.id!, fId);
+      final callStatus = await ref.watch(inboxpageViewModel).getCallStatus();
+      if (callStatus == 1 || callStatus == 2) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("$fName is busy!")));
+      } else {
+        await ref.watch(inboxpageViewModel).addMessage(
+            Usercredential.token!, resultModel, Usercredential.id!, fId);
+      }
     }
 
     return Scaffold(
@@ -171,8 +179,16 @@ class InboxPage extends ConsumerWidget {
 
                           didCall = (snapshot.data!.last.isCalling == true &&
                               snapshot.data!.last.isCallExit == false &&
-                              snapshot.data!.last.isME == false);
-                          print("before error");
+                              snapshot.data!.last.isME == false &&
+                              !isPush);
+                          if (didCall) {
+                            SoundManager()
+                                .playSound(AppPaths.callStartSoundPath);
+                          } else if (snapshot.data!.last.isCalling == false &&
+                              snapshot.data!.last.isCallExit == true) {
+                            SoundManager().stopSound();
+                          }
+
                           return (didCall)
                               ? SizedBox(
                                   height: AppVars.screenSize.height * 0.8,
@@ -205,6 +221,7 @@ class InboxPage extends ConsumerWidget {
                                                           BorderRadius.circular(
                                                               10))),
                                               onPressed: () async {
+                                                isPush = true;
                                                 /*  await sendCallMessages(
                                                     "Call Started!",
                                                     true,
@@ -225,8 +242,9 @@ class InboxPage extends ConsumerWidget {
                                                                   fImageUrl,
                                                             )));
                                                 didVideoOn = false;
+
                                                 await Future.delayed(
-                                                    Duration(seconds: 1),
+                                                    const Duration(seconds: 1),
                                                     () async {
                                                   if (snapshot.data!.last
                                                               .isCalling ==
@@ -239,6 +257,7 @@ class InboxPage extends ConsumerWidget {
                                                         false,
                                                         true,
                                                         didVideoOn);
+                                                    isPush = false;
                                                   }
                                                 });
                                               },
@@ -255,11 +274,13 @@ class InboxPage extends ConsumerWidget {
                                                           BorderRadius.circular(
                                                               10))),
                                               onPressed: () async {
+                                                isPush = true;
                                                 await sendCallMessages(
                                                     "Call Ended!",
                                                     false,
                                                     true,
                                                     false);
+                                                isPush = false;
                                               },
                                               child: const Text("Cancel")),
                                         ],

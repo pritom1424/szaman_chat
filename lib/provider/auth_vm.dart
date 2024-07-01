@@ -160,27 +160,20 @@ class AuthVm with ChangeNotifier {
   Future<bool> verifySignIn(List<dynamic> data, String otpCode, String userName,
       File? imageFile, bool isAdmin, String phoneNumber) async {
     try {
-      print("did pass VM UP");
-      print(
-          "evrydata: $data otp $otpCode username $userName File $imageFile bool $isAdmin Phone $phoneNumber");
       if (data[0] != null && data[1] != null) {
-        print("did pass VM UPS");
         await _authRepos.verifyOtp(data[0].toString(), otpCode, userName,
             imageFile, isAdmin, phoneNumber);
-
-        print("user info ${auth.currentUser?.uid}");
 
         Usercredential.id = auth.currentUser?.uid;
         Usercredential.isAdmin = isAdmin;
         Usercredential.name = auth.currentUser?.displayName;
         Usercredential.token = await auth.currentUser?.getIdToken();
-        print("did pass VM");
+
         return true;
       }
-      print("did pass VM}");
+
       return false;
     } catch (e) {
-      print("did pass VM}");
       return false;
     }
   }
@@ -190,7 +183,7 @@ class AuthVm with ChangeNotifier {
     try {
       final List<dynamic> data =
           await _authRepos.signInWithPhoneNumber(phoneNumber);
-      print("vm test ${data.length}");
+
       return data;
     } catch (e) {
       return [];

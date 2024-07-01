@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
 import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/utils/constants/api_links.dart';
 import 'package:http/http.dart' as http;
@@ -28,6 +29,26 @@ class InboxRepos {
       final urlfriend =
           Uri.https(ApiLinks.baseUrl, '/messages/$fid/$uid.json', params);
 
+      final callURl =
+          Uri.https(ApiLinks.baseUrl, '/call_log/$uid.json', params);
+      final callURlFriend =
+          Uri.https(ApiLinks.baseUrl, '/call_log/$fid.json', params);
+
+//call log
+      if (mModel.isCalling == true && mModel.isCallExit == false) {
+        final respCall = await http.put(callURl,
+            body: jsonEncode({"isCall": true, "isMe": true}));
+        final respCallF = await http.put(callURlFriend,
+            body: jsonEncode({"isCall": true, "isMe": false}));
+      }
+
+      if (mModel.isCalling == false && mModel.isCallExit == true) {
+        final respCall = await http.put(callURl,
+            body: jsonEncode({"isCall": false, "isMe": true}));
+        final respCallF = await http.put(callURlFriend,
+            body: jsonEncode({"isCall": false, "isMe": false}));
+      }
+
       final responseFriend = await http.post(urlfriend, body: bodyDataFriend);
       final response = await http.post(url, body: bodyData);
 
@@ -44,9 +65,23 @@ class InboxRepos {
     }
   }
 
+  Future<Map<String, dynamic>> getCallLog(String uid, String token) async {
+    var params = {'auth': token};
+    final url = Uri.https(ApiLinks.baseUrl, '/call_log/$uid.json', params);
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body) as Map<String, dynamic>;
+      } else {
+        return {"error": "no respose"};
+      }
+    } catch (e) {
+      return {"error": "no respose"};
+    }
+  }
+
   Future<Map<String, MessageModel>> getMessages(
       String token, String uid, String fid) async {
-    print("message response ");
     var params = {
       'auth': token,
       'orderBy': '"createdAt"',
@@ -60,11 +95,10 @@ class InboxRepos {
       );
 
       final response = await http.get(url);
-      print("message response ${json.decode(response.body)}");
 
       if (response.statusCode == 200) {
         final messages = messagesModelFromJson(response.body);
-        print("messages response1 $messages");
+
         return messages;
       } else {
         return {};
