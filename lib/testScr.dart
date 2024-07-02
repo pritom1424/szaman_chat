@@ -1,5 +1,6 @@
-
 import 'package:flutter/material.dart';
+import 'package:szaman_chat/utils/credential/UserCredential.dart';
+import 'package:szaman_chat/utils/push_notification/firebase_push.dart';
 
 class TestScript extends StatelessWidget {
   const TestScript({super.key});
@@ -14,6 +15,8 @@ class TestScript extends StatelessWidget {
         children: [
           ElevatedButton(
               onPressed: () async {
+                await FirebasePush().sendV1PushNotification(
+                    "hello", "hi there!", Usercredential.id!);
                 // AuthRepos().signInWithPhoneNumber("+16505551234");
                 /*  final token = await auth.currentUser!.getIdToken();
                 var params = {'auth': token}; */

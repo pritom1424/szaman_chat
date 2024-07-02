@@ -114,16 +114,38 @@ class InboxPageVmGroup with ChangeNotifier {
     });
   }
 
-  Future<bool> islastMessageSeen(
+  Future<Map<String, dynamic>> islastMessageSeen(
     String gid,
   ) async {
     if (Usercredential.id == null || Usercredential.token == null) {
-      return false;
+      return {};
     }
     final res = await _inboxRepos.isLastMessageSeen(
         Usercredential.id!, gid, Usercredential.token!);
-
+    if (res['error'] != null) {
+      return {};
+    }
     return res;
+  }
+
+  Stream<Map<String, dynamic>> isLastMessageSeenStream(String fid) {
+    return Stream.periodic(const Duration(milliseconds: 100))
+        .asyncMap((_) async {
+      if (Usercredential.id == null || Usercredential.token == null) {
+        return {};
+      }
+
+      try {
+        final res = await _inboxRepos.isLastMessageSeen(
+            Usercredential.id!, fid, Usercredential.token!);
+        if (res['error'] != null) {
+          return {};
+        }
+        return res;
+      } catch (e) {
+        return {};
+      }
+    });
   }
 
   Future<void> lastMessageUpdate(String gid, bool isSeen) async {
@@ -131,7 +153,7 @@ class InboxPageVmGroup with ChangeNotifier {
       return;
     }
     await _inboxRepos.lastMessageUpdate(
-        Usercredential.id!, Usercredential.token!, gid, isSeen);
+        Usercredential.id!, Usercredential.token!, gid, isSeen, null);
   }
 
   Future<List<String>> getGroupIDs(String uid) async {

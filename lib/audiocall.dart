@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:agora_uikit/agora_uikit.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:szaman_chat/utils/audio/sound_manager.dart';
+
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/components/custom_clock.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
@@ -64,7 +64,6 @@ class _CallScreenState extends State<CallScreen> {
     if (!widget.isVideoOn) {
       client.engine.disableVideo();
     }
-    await SoundManager().stopSound();
 
     /* if (!widget.isVideoOn) {
       client.engine.disableVideo();

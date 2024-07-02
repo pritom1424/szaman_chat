@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
 import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/utils/constants/api_links.dart';
 import 'package:http/http.dart' as http;
@@ -53,10 +52,13 @@ class InboxRepos {
       final response = await http.post(url, body: bodyData);
 
       if (response.statusCode == 200 && responseFriend.statusCode == 200) {
-        await lastMessageUpdate(uid, token, fid, true);
-        await lastMessageUpdate(fid, token, uid, false);
+        print("entered last message");
+        await lastMessageUpdate(uid, token, fid, true, mModel);
+        await lastMessageUpdate(fid, token, uid, false, friendModel);
+        print("entered last message exit");
         return true;
       } else {
+        print("entered last message exit");
         return false;
       }
     } catch (e) {
@@ -109,30 +111,41 @@ class InboxRepos {
     }
   }
 
-  Future<void> lastMessageUpdate(
-      String uid, String token, String fid, bool isSeen) async {
+  Future<void> lastMessageUpdate(String uid, String token, String fid,
+      bool isSeen, MessageModel? mModel) async {
     var params = {'auth': token};
     final url = Uri.https(
       ApiLinks.baseUrl,
       '/last_messages/$uid/$fid.json',
       params,
     );
-    final body = {"communicate": isSeen};
-    final responseFriend = await http.put(url, body: jsonEncode(body));
+    if (mModel != null) {
+      final body = {"communicate": isSeen, "message": mModel.toJson()};
+      final responseFriend = await http.put(url, body: jsonEncode(body));
+    } else {
+      final body = {"communicate": isSeen};
+      final responseFriend = await http.patch(url, body: jsonEncode(body));
+    }
   }
 
-  Future<bool> isLastMessageSeen(String uid, String fid, String token) async {
+  Future<Map<String, dynamic>> isLastMessageSeen(
+      String uid, String fid, String token) async {
     var params = {'auth': token};
+    try {
+      final url = Uri.https(
+        ApiLinks.baseUrl,
+        '/last_messages/$uid/$fid.json',
+        params,
+      );
 
-    final url = Uri.https(
-      ApiLinks.baseUrl,
-      '/last_messages/$uid/$fid.json',
-      params,
-    );
-
-    final response = await http.get(url);
-    print("is seen repos ${json.decode(response.body)}");
-    return json.decode(response.body)['communicate'];
+      final response = await http.get(url);
+      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
+      print("is seen repos ${json.decode(response.body)}");
+      final model = MessageModel.fromJson(jsonResponse['message']);
+      return {"communicate": jsonResponse['communicate'], 'message': model};
+    } catch (e) {
+      return {"error": "something went wrong!"};
+    }
   }
 
   Future<Map<String, dynamic>> getFriendIds(String userId, String token) async {

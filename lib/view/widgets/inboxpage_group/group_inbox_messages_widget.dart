@@ -58,21 +58,19 @@ class GroupInboxMessagesWidget extends StatelessWidget {
     ]; */
     print("friend name : $gName");
     final messageList = messages.reversed.toList();
-    return Expanded(
-      child: ListView.builder(
-          itemCount: messageList.length,
-          reverse: true,
-          itemBuilder: (ctx, ind) => GroupChatBubble(
-                date: AppMethods().dateFormatter(messageList[ind].createdAt),
-                isMe: messageList[ind].isME,
-                username: (messageList[ind].senderID == Usercredential.id)
-                    ? "You"
-                    : userData[messageList[ind].senderID]!.name ?? "name",
-                message: messageList[ind].message ?? "",
-                userimage: messageList[ind].imageUrl ?? "",
-                didImageExist: messageList[ind].isImageExist ?? false,
-                senderID: messageList[ind].senderID ?? "",
-              )),
-    );
+    return ListView.builder(
+        itemCount: messageList.length,
+        reverse: true,
+        itemBuilder: (ctx, ind) => GroupChatBubble(
+              date: AppMethods().dateFormatter(messageList[ind].createdAt),
+              isMe: messageList[ind].isME,
+              username: (messageList[ind].senderID == Usercredential.id)
+                  ? "You"
+                  : userData[messageList[ind].senderID]!.name ?? "name",
+              message: messageList[ind].message ?? "",
+              userimage: messageList[ind].imageUrl ?? "",
+              didImageExist: messageList[ind].isImageExist ?? false,
+              senderID: messageList[ind].senderID ?? "",
+            ));
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:szaman_chat/utils/audio/sound_manager.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
+import 'package:szaman_chat/utils/constants/app_paths.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
 
@@ -53,38 +55,57 @@ class CoworkerlistPage extends ConsumerWidget {
                 future: ref
                     .read(inboxpageViewModel)
                     .getFriendIDs(Usercredential.id!),
-                builder: (ctx, snapFid) =>
-                    (snapFid.connectionState == ConnectionState.waiting)
-                        ? const SizedBox.shrink()
-                        : (!snapFid.hasData)
-                            ? const SizedBox.shrink()
-                            : FutureBuilder(
-                                future: ref
-                                    .read(userViewModel)
-                                    .getInfo(Usercredential.token!),
-                                builder: (ctx, snap) {
-                                  if (snap.connectionState ==
-                                      ConnectionState.waiting) {
-                                    return SizedBox(
-                                      height: AppVars.screenSize.height,
-                                      child: const Center(
-                                        child: CircularProgressIndicator(),
-                                      ),
-                                    );
+                builder: (ctx, snapFid) => (snapFid.connectionState ==
+                        ConnectionState.waiting)
+                    ? SizedBox(
+                        height: AppVars.screenSize.height,
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    : FutureBuilder(
+                        future: ref
+                            .read(userViewModel)
+                            .getInfo(Usercredential.token!),
+                        builder: (ctx, snap) {
+                          if (snap.connectionState == ConnectionState.waiting) {
+                            return SizedBox(
+                              height: AppVars.screenSize.height,
+                              child: const Center(
+                                child: Text("Loading..."),
+                              ),
+                            );
+                          }
+                          if (!snap.hasData) {
+                            return SizedBox(
+                              height: AppVars.screenSize.height,
+                              child: const Center(
+                                child: Text("No User found!"),
+                              ),
+                            );
+                          }
+                          return StreamBuilder(
+                              stream: ref
+                                  .read(inboxpageViewModel)
+                                  .getCallStatusStream(),
+                              builder: (context, snapCall) {
+                                if (snapCall.hasData) {
+                                  if (snapCall.data == 1 &&
+                                      !SoundManager.isPush) {
+                                    print("is call when calling...");
+                                    SoundManager()
+                                        .playSound(AppPaths.callStartSoundPath);
+                                  } else {
+                                    SoundManager().stopSound();
                                   }
-                                  if (!snap.hasData) {
-                                    return SizedBox(
-                                      height: AppVars.screenSize.height,
-                                      child: const Center(
-                                        child: Text("No User found!"),
-                                      ),
-                                    );
-                                  }
-                                  return CwlistWidget(
-                                    uModel: snap.data!,
-                                    fid: snapFid.data,
-                                  );
-                                }),
+                                }
+
+                                return CwlistWidget(
+                                  uModel: snap.data!,
+                                  fid: snapFid.data,
+                                );
+                              });
+                        }),
               ));
   }
 }

@@ -1,10 +1,7 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:szaman_chat/main.dart';
-import 'package:szaman_chat/utils/audio/sound_manager.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
-import 'package:szaman_chat/utils/constants/app_paths.dart';
 import 'package:szaman_chat/utils/constants/data.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
@@ -14,7 +11,7 @@ import 'package:szaman_chat/view/pages/navpages/chatlist_page.dart';
 import 'package:szaman_chat/view/pages/navpages/coworkerlist_page.dart';
 import 'package:szaman_chat/view/pages/navpages/grouplist_page.dart';
 import 'package:szaman_chat/view/pages/navpages/profile_page.dart';
-
+import 'package:szaman_chat/testScr.dart';
 import 'package:szaman_chat/view/widgets/navpage/navbar_widget.dart';
 
 class NavPage extends ConsumerWidget {
@@ -106,7 +103,7 @@ class NavPage extends ConsumerWidget {
           ),
         ),
         actions: [
-          /* TextButton.icon(
+          /*  TextButton.icon(
               onPressed: () {
                 Navigator.of(context).push(
                     MaterialPageRoute(builder: (ctx) => const TestScript()));

@@ -147,8 +147,6 @@ class AuthRepos {
             params);
         _storeUserData();
 
-        print(
-            "Compare UserInfo ${userInfo.user!.displayName} <--> ${auth.currentUser?.displayName ?? "no name"}");
         return userInfo;
       }
     } catch (e) {

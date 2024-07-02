@@ -89,10 +89,11 @@ class InboxPageVm with ChangeNotifier {
     }
     final result =
         await _inboxRepos.getCallLog(Usercredential.id!, Usercredential.token!);
+
     if (result['error'] != null) {
       return 3;
     } else if (result['isCall'] == true) {
-      (result['isMe'] == false) ? 1 : 2;
+      return (result['isMe'] == false) ? 1 : 2;
     }
     return 0;
     //3 error
@@ -101,12 +102,33 @@ class InboxPageVm with ChangeNotifier {
     // 0 free
   }
 
+  Stream<int> getCallStatusStream() {
+    return Stream.periodic(const Duration(milliseconds: 1000))
+        .asyncMap((_) async {
+      if (Usercredential.token == null || Usercredential.id == null) {
+        return 2;
+      }
+      try {
+        final result = await _inboxRepos.getCallLog(
+            Usercredential.id!, Usercredential.token!);
+        if (result['error'] != null) {
+          return 3;
+        } else if (result['isCall'] == true) {
+          return (result['isMe'] == false) ? 1 : 2;
+        }
+        return 0;
+      } catch (e) {
+        return 3;
+      }
+    });
+  }
+
   Future<void> lastMessageUpdate(String fid, bool isSeen) async {
     if (Usercredential.id == null || Usercredential.token == null) {
       return;
     }
     await _inboxRepos.lastMessageUpdate(
-        Usercredential.id!, Usercredential.token!, fid, isSeen);
+        Usercredential.id!, Usercredential.token!, fid, isSeen, null);
   }
 
   Stream<List<MessageModel>> getAllMessagesStream(
@@ -167,16 +189,40 @@ class InboxPageVm with ChangeNotifier {
     return controller.stream;
   }
 
-  Future<bool> islastMessageSeen(
+  Future<Map<String, dynamic>> islastMessageSeen(
     String fid,
   ) async {
     if (Usercredential.id == null || Usercredential.token == null) {
-      return false;
+      return {};
     }
     final res = await _inboxRepos.isLastMessageSeen(
         Usercredential.id!, fid, Usercredential.token!);
+    if (res['error'] != null) {
+      return {};
+    }
 
     return res;
+  }
+
+  Stream<Map<String, dynamic>> isLastMessageSeenStream(String fid) {
+    return Stream.periodic(const Duration(milliseconds: 100))
+        .asyncMap((_) async {
+      if (Usercredential.id == null || Usercredential.token == null) {
+        return {};
+      }
+
+      try {
+        final res = await _inboxRepos.isLastMessageSeen(
+            Usercredential.id!, fid, Usercredential.token!);
+        if (res['error'] != null) {
+          return {};
+        }
+
+        return res;
+      } catch (e) {
+        return {};
+      }
+    });
   }
 
   Future<List<String>> getFriendIDs(String uid) async {

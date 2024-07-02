@@ -23,7 +23,7 @@ class InboxPage extends ConsumerWidget {
 
     bool didCall = false;
     bool didVideoOn = false;
-    bool isPush = false;
+
     Future<void> sendCallMessages(String callString, bool isCalling,
         bool endCalling, bool isVidOn) async {
       final resultModel = MessageModel(
@@ -39,7 +39,8 @@ class InboxPage extends ConsumerWidget {
             friendName: widget.fName, */
           isME: true);
       final callStatus = await ref.watch(inboxpageViewModel).getCallStatus();
-      if (callStatus == 1 || callStatus == 2) {
+      if ((callStatus == 1 || callStatus == 2) &&
+          (isCalling == true && endCalling == false)) {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text("$fName is busy!")));
       } else {
@@ -180,12 +181,13 @@ class InboxPage extends ConsumerWidget {
                           didCall = (snapshot.data!.last.isCalling == true &&
                               snapshot.data!.last.isCallExit == false &&
                               snapshot.data!.last.isME == false &&
-                              !isPush);
+                              !SoundManager.isPush);
                           if (didCall) {
                             SoundManager()
                                 .playSound(AppPaths.callStartSoundPath);
-                          } else if (snapshot.data!.last.isCalling == false &&
-                              snapshot.data!.last.isCallExit == true) {
+                            print("entered call ring");
+                          } else {
+                            print("entered call ring exit");
                             SoundManager().stopSound();
                           }
 
@@ -221,7 +223,7 @@ class InboxPage extends ConsumerWidget {
                                                           BorderRadius.circular(
                                                               10))),
                                               onPressed: () async {
-                                                isPush = true;
+                                                SoundManager.isPush = true;
                                                 /*  await sendCallMessages(
                                                     "Call Started!",
                                                     true,
@@ -242,24 +244,21 @@ class InboxPage extends ConsumerWidget {
                                                                   fImageUrl,
                                                             )));
                                                 didVideoOn = false;
-
-                                                await Future.delayed(
-                                                    const Duration(seconds: 1),
-                                                    () async {
-                                                  if (snapshot.data!.last
-                                                              .isCalling ==
-                                                          true &&
-                                                      snapshot.data!.last
-                                                              .isCallExit ==
-                                                          false) {
-                                                    await sendCallMessages(
-                                                        "Call Ended!",
-                                                        false,
-                                                        true,
-                                                        didVideoOn);
-                                                    isPush = false;
-                                                  }
-                                                });
+                                                await SoundManager()
+                                                    .stopSound();
+                                                if (snapshot.data!.last
+                                                            .isCalling ==
+                                                        true &&
+                                                    snapshot.data!.last
+                                                            .isCallExit ==
+                                                        false) {
+                                                  await sendCallMessages(
+                                                      "Call Ended!",
+                                                      false,
+                                                      true,
+                                                      didVideoOn);
+                                                  SoundManager.isPush = false;
+                                                }
                                               },
                                               child: const Text("Receive")),
                                           const SizedBox(
@@ -274,13 +273,15 @@ class InboxPage extends ConsumerWidget {
                                                           BorderRadius.circular(
                                                               10))),
                                               onPressed: () async {
-                                                isPush = true;
+                                                SoundManager.isPush = false;
+                                                await SoundManager()
+                                                    .stopSound();
                                                 await sendCallMessages(
                                                     "Call Ended!",
                                                     false,
                                                     true,
                                                     false);
-                                                isPush = false;
+                                                SoundManager.isPush = false;
                                               },
                                               child: const Text("Cancel")),
                                         ],

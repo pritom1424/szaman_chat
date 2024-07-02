@@ -21,30 +21,42 @@ class InboxReposGroup {
     return "";
   }
 
-  Future<void> lastMessageUpdate(
-      String uid, String token, String gid, bool isSeen) async {
+  Future<void> lastMessageUpdate(String uid, String token, String gid,
+      bool isSeen, MessageModel? mModel) async {
     var params = {'auth': token};
     final url = Uri.https(
       ApiLinks.baseUrl,
       '/last_group_messages/$uid/$gid.json',
       params,
     );
-    final body = {"communicate": isSeen};
-    final responseFriend = await http.put(url, body: jsonEncode(body));
+    try {
+      if (mModel != null) {
+        final body = {"communicate": isSeen, "message": mModel.toJson()};
+        final response = await http.put(url, body: jsonEncode(body));
+      } else {
+        final body = {"communicate": isSeen};
+        final response = await http.patch(url, body: jsonEncode(body));
+      }
+    } catch (e) {}
   }
 
-  Future<bool> isLastMessageSeen(String uid, String gid, String token) async {
+  Future<Map<String, dynamic>> isLastMessageSeen(
+      String uid, String gid, String token) async {
     var params = {'auth': token};
+    try {
+      final url = Uri.https(
+        ApiLinks.baseUrl,
+        '/last_group_messages/$uid/$gid.json',
+        params,
+      );
 
-    final url = Uri.https(
-      ApiLinks.baseUrl,
-      '/last_group_messages/$uid/$gid.json',
-      params,
-    );
-
-    final response = await http.get(url);
-
-    return json.decode(response.body)['communicate'];
+      final response = await http.get(url);
+      final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
+      final model = MessageModel.fromJson(jsonResponse['message']);
+      return {"communicate": jsonResponse['communicate'], 'message': model};
+    } catch (e) {
+      return {"error": "something went wrong!"};
+    }
   }
 
   Future<bool> addToGroup(
@@ -126,11 +138,21 @@ class InboxReposGroup {
 
       final bodyData = messageModelToJson(mModel);
       final members = await getGroupMembers(token, gid);
+      final friendModel = MessageModel(
+          isCallExit: mModel.isCallExit,
+          createdAt: mModel.createdAt,
+          message: mModel.message,
+          imageUrl: mModel.imageUrl,
+          isImageExist: mModel.isImageExist,
+          isCalling: mModel.isCalling,
+          isVideoOn: mModel.isVideoOn,
+          senderID: uid,
+          isME: false);
       for (int i = 0; i < members.length; i++) {
         if (members[i] == uid) {
-          await lastMessageUpdate(members[i], token, gid, true);
+          await lastMessageUpdate(members[i], token, gid, true, mModel);
         } else {
-          await lastMessageUpdate(members[i], token, gid, false);
+          await lastMessageUpdate(members[i], token, gid, false, friendModel);
         }
       }
 

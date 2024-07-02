@@ -7,7 +7,8 @@ class SoundManager {
     return _instance;
   }
   static final AudioPlayer _audioPlayer = AudioPlayer();
-  bool _isPlaying = false;
+  static bool _isPlaying = false;
+  static bool isPush = false;
   Future<void> playSound(String path) async {
     if (!_isPlaying) {
       try {

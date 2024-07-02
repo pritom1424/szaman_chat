@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/utils/audio/sound_manager.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/constants/app_methods.dart';
@@ -66,94 +67,106 @@ class GrouplistWidget extends StatelessWidget {
                                   ),
                                 );
                               }
-                              print("id print ${snapId.data!.length}");
 
                               return ListView.builder(
                                   reverse: false,
                                   itemCount: snapId.data!.length,
-                                  itemBuilder: (ctx, ind) => StreamBuilder(
-                                      /* future: ref
-                                          .read(inboxpageGroupViewModel)
-                                          .getAllMessages(Usercredential.token!,
-                                              snapId.data![ind]), */ //fID
-                                      stream: ref
-                                          .read(inboxpageGroupViewModel)
-                                          .getAllMessagesStream(
-                                              Usercredential.token!,
-                                              snapId.data![ind]),
-                                      builder: (context, snap) {
-                                        if (!snap.hasData) {
-                                          return const SizedBox.shrink();
+                                  itemBuilder: (ctx, ind) => FutureBuilder(
+                                      future: ref
+                                          .read(inboxpageViewModel)
+                                          .getCallStatus(),
+                                      builder: (context, snapCall) {
+                                        if (!snapCall.hasData) {
+                                          const SizedBox.shrink();
+                                        }
+                                        if (snapCall.data == 1 &&
+                                            !SoundManager.isPush) {
+                                          SoundManager().playSound(
+                                              AppPaths.callStartSoundPath);
+                                        } else {
+                                          SoundManager().stopSound();
                                         }
 
                                         return FutureBuilder(
                                             future: ref
-                                                .read(inboxpageViewModel)
-                                                .getCallStatus(),
-                                            builder: (context, snapCall) {
-                                              if (!snapCall.hasData) {
-                                                SizedBox.shrink();
-                                              }
-                                              if (snapCall.data == 1) {
-                                                SoundManager().playSound(
-                                                    AppPaths
-                                                        .callStartSoundPath);
-                                              }
-                                              if (snapCall.data == 0) {
-                                                SoundManager().stopSound();
+                                                .read(inboxpageGroupViewModel)
+                                                .getGroupNameById(
+                                                    snapId.data![ind]),
+                                            builder: (ctx, snapGroupName) {
+                                              if (!snapGroupName.hasData) {
+                                                return const SizedBox.shrink();
                                               }
 
-                                              return FutureBuilder(
-                                                  future: ref
+                                              return StreamBuilder(
+                                                  stream: ref
                                                       .read(
                                                           inboxpageGroupViewModel)
-                                                      .getGroupNameById(
+                                                      .isLastMessageSeenStream(
                                                           snapId.data![ind]),
-                                                  builder:
-                                                      (ctx, snapGroupName) {
-                                                    if (!snapGroupName
-                                                        .hasData) {
+                                                  builder: (ctx, snapIsSeen) {
+                                                    if (!snapIsSeen.hasData) {
                                                       return const SizedBox
                                                           .shrink();
                                                     }
                                                     bool isEmpty = false;
-                                                    if (snap.data!.isEmpty) {
+                                                    MessageModel? mModel;
+                                                    if (snapIsSeen
+                                                        .data!.isEmpty) {
                                                       isEmpty = true;
+                                                    } else {
+                                                      mModel = snapIsSeen
+                                                              .data!['message']
+                                                          as MessageModel;
                                                     }
 
+                                                    //groupList.reversed.toList();
                                                     return FutureBuilder(
                                                         future: ref
                                                             .read(
-                                                                inboxpageGroupViewModel)
-                                                            .islastMessageSeen(
-                                                                snapId.data![
-                                                                    ind]),
-                                                        builder:
-                                                            (ctx, snapIsSeen) {
-                                                          //groupList.reversed.toList();
+                                                                inboxpageViewModel)
+                                                            .getCallStatus(),
+                                                        builder: (context,
+                                                            snapCall) {
+                                                          if (!snapCall
+                                                              .hasData) {
+                                                            const SizedBox
+                                                                .shrink();
+                                                          }
+
+                                                          if (snapCall.data ==
+                                                              1) {
+                                                            print(
+                                                                "is call when calling...");
+                                                            SoundManager()
+                                                                .playSound(AppPaths
+                                                                    .callStartSoundPath);
+                                                          }
+                                                          if (snapCall.data ==
+                                                              0) {
+                                                            SoundManager()
+                                                                .stopSound();
+                                                          }
                                                           return GroupListTemplet(
                                                             snapId.data!
                                                                 .toList()[ind],
                                                             snapGroupName.data!,
                                                             (isEmpty)
                                                                 ? "welcome!"
-                                                                : snap
-                                                                    .data
-                                                                    ?.last
-                                                                    .message,
+                                                                : mModel?.message ??
+                                                                    "welcome",
                                                             AppMethods()
                                                                 .dateFormatter(
                                                                     DateTime
                                                                         .now()), //   snap.data?.last.createdAt ??
                                                             (isEmpty)
                                                                 ? false
-                                                                : snapIsSeen
-                                                                        .data ??
+                                                                : snapIsSeen.data![
+                                                                        'communicate'] ??
                                                                     true,
                                                             (isEmpty)
                                                                 ? true
-                                                                : snap.data!
-                                                                    .last.isME,
+                                                                : mModel?.isME ??
+                                                                    true,
                                                             userimageUrl:
                                                                 snapUserProfile
                                                                     .data!
