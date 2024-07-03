@@ -52,10 +52,11 @@ class InboxPageVm with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> addMessage(
-      String token, MessageModel mModel, String uid, String fid) async {
+  Future<bool> addMessage(String token, MessageModel mModel, String uid,
+      String fid, String userName) async {
     try {
-      final didSuccess = await _inboxRepos.addMessage(token, mModel, uid, fid);
+      final didSuccess =
+          await _inboxRepos.addMessage(token, mModel, uid, fid, userName);
       if (didSuccess) {
         return true;
       }
@@ -175,7 +176,6 @@ class InboxPageVm with ChangeNotifier {
               controller.add(currentFriendIDs);
             }
           } catch (e) {
-            print("Error occurred: ${e.toString()}");
             controller.addError(e);
           }
         });

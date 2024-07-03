@@ -114,48 +114,6 @@ class AuthVm with ChangeNotifier {
     return _refreshToken;
   }
 
-  /* Future<bool> signup(String email, String password, String name, File? file,
-      bool isAdmin) async {
-    try {
-      setIsLoading(true);
-      final authData = await _authRepos.authenticate(
-          email, password, 'signUp', name, file, isAdmin);
-      setIsLoading(false);
-
-      _token = authData['token'];
-      _expiryDate = DateTime.parse(authData['expiryDate']);
-      _userId = authData['userId'];
-      _refreshToken = authData['refreshToken'];
-
-      return true;
-    } catch (e) {
-      setIsLoading(false);
-      print(e);
-      return false;
-    }
-  } */
-
-  /* Future<bool> login(String phoneNumber, String password) async {
-    try {
-      setIsLoading(true);
-      final authData = await _authRepos.authenticate(
-          phoneNumber, password, 'signInWithPassword');
-
-      _token = authData['token'];
-      _expiryDate = DateTime.parse(authData['expiryDate']);
-      _userId = authData['userId'];
-      _refreshToken = authData['refreshToken'];
-      Usercredential.id = userId;
-      Usercredential.token = _token;
-      setIsLoading(false);
-      return true;
-    } catch (e) {
-      setIsLoading(false);
-      print(e);
-      return false;
-    }
-  } */
-
 //this
   Future<bool> verifySignIn(List<dynamic> data, String otpCode, String userName,
       File? imageFile, bool isAdmin, String phoneNumber) async {
@@ -231,9 +189,8 @@ class AuthVm with ChangeNotifier {
 
   Future<bool> tryAutoLogin() async {
     final authData = await _authRepos.tryAutoLogin();
-    print("auth data $authData");
+
     if (authData != null) {
-      print("authentic data $authData");
       _token = authData['token']!;
       _userId = authData['id'];
       //_refreshToken = authData['refreshToken']!;
@@ -241,12 +198,12 @@ class AuthVm with ChangeNotifier {
 
       Usercredential.id = userId;
       Usercredential.token = _token;
+      await _authRepos.updateDeviceToken(
+          Usercredential.id!, Usercredential.token!);
       //await auth.signInWithCustomToken()
       notifyListeners();
       return true;
     } else {
-      print("auth data ${auth.currentUser?.uid ?? "null"}");
-
       notifyListeners();
       return false;
     }

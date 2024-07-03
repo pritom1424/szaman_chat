@@ -16,13 +16,15 @@ class InputInboxWidget extends StatefulWidget {
   final String userUrl;
   final String? folderName;
   final String? imageFolderName;
+  final String userName;
   const InputInboxWidget(
       {super.key,
       required this.fId,
       required this.fName,
       required this.userUrl,
       this.folderName,
-      this.imageFolderName});
+      this.imageFolderName,
+      required this.userName});
   static TextStyle customHintTextStyle = TextStyle(
     color: Colors.grey.withOpacity(0.5),
     fontSize: 15, /* fontFamily: AppStrings.currentFontFamily */
@@ -93,7 +95,6 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
     await ref.putFile(File(imageFile.path));
 
     final String url = await ref.getDownloadURL();
-    print('urlis: $url');
 
     return url;
   }
@@ -142,8 +143,8 @@ class _InputInboxWidgetState extends State<InputInboxWidget> {
         rp.setImageExist(false);
 
         url = null;
-        await ref.watch(inboxpageViewModel).addMessage(
-            Usercredential.token!, resultModel, Usercredential.id!, widget.fId);
+        await ref.watch(inboxpageViewModel).addMessage(Usercredential.token!,
+            resultModel, Usercredential.id!, widget.fId, widget.userName);
         ref.read(inboxpageViewModel).setIsDocLoading(false);
       }
 

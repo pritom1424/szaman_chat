@@ -12,68 +12,15 @@ import 'package:http/http.dart' as http;
 import 'package:szaman_chat/main.dart';
 import 'package:szaman_chat/utils/constants/api_links.dart';
 import 'package:szaman_chat/utils/constants/app_paths.dart';
+import 'package:szaman_chat/utils/push_notification/firebase_push.dart';
 
 class AuthRepos {
-  final String _refreshToken = "";
-  final Timer _authTimer = Timer(Duration.zero, () {});
   final _params = {
     'key': 'AIzaSyA1Hortv46XM9Nc8QummVhoqa3JWBycHJY',
 
     // Replace with your actual API key
   };
-/*   String _token = "";
-  DateTime _expiryDate = DateTime(0);
-  String _userId = "";
-  String _refreshToken = "";
-  Timer _authTimer = Timer(Duration.zero, () {});
-  bool get isAuth {
-    return token.isNotEmpty;
-  } */
 
-/*   String get userId {
-    return _userId;
-  }
-
-  String get token {
-    if (_expiryDate.isAfter(DateTime.now())) {
-      return _token;
-    }
-    _refreshTokenIfNeeded();
-    return "";
-  } */
-
-  /* Future<List<dynamic>> signInWithPhoneNumber(String phoneNumber) async {
-    String? verId;
-    int? resToken;
-    await auth.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
-      timeout: const Duration(seconds: 60),
-      verificationCompleted: (PhoneAuthCredential credential) async {
-/*         // await _storeUserData();
-        print("credVErComp ${credential.smsCode}");
-        final cred = await auth.signInWithCredential(credential); */
-      },
-      verificationFailed: (FirebaseAuthException e) {
-        print(e.toString());
-        throw e;
-      },
-      codeSent: (String verificationId, int? resendToken) {
-        verId = verificationId;
-        resToken = resendToken;
-        print("vm test rep $verificationId");
-
-        // Handle the code sent logic here (Save verificationId if needed)
-      },
-      codeAutoRetrievalTimeout: (String verificationId) {},
-    );
-
-    if (verId != null) {
-      print("vm test repl $verId");
-      return [verId, resToken];
-    } else {
-      return [];
-    }
-  } */
   //this
   Future<List<dynamic>> signInWithPhoneNumber(String phoneNumber) async {
     String? verificationId;
@@ -137,13 +84,14 @@ class AuthRepos {
         final token = await userInfo.user!.getIdToken();
 
         final params = {"auth": token};
+        final deviceToken = await FirebasePush().getDeviceToken();
         await _addInfoTOServer(
             auth.currentUser?.displayName,
             userInfo.user!.uid,
             imageFile,
             phoneNumber,
             isAdmin,
-            token!,
+            deviceToken ?? "",
             params);
         _storeUserData();
 
@@ -154,6 +102,21 @@ class AuthRepos {
       return null;
     }
     return null;
+  }
+
+  Future<bool> updateDeviceToken(String uid, String token) async {
+    final deviceToken = await FirebasePush().getDeviceToken();
+    var params = {'auth': token};
+
+    final url = Uri.https(ApiLinks.baseUrl, '/users/$uid.json', params);
+
+    final body = {"token": deviceToken ?? "default"};
+    final response = await http.patch(url, body: jsonEncode(body));
+    print("device token patched ${json.decode(response.body)}");
+    if (response.statusCode == 200) {
+      return true;
+    }
+    return false;
   }
 
 // will store to shared preferences
@@ -176,55 +139,6 @@ class AuthRepos {
       prefs.setString('userData', json.encode(data));
     }
   }
-
-  /* Future<Map<String, dynamic>> authenticate(
-      String phoneNumber, String urlSegment,
-      [String? name, File? imageFile, bool isAdmin = false]) async {
-    final url = Uri.https(
-      "identitytoolkit.googleapis.com",
-      "/v1/accounts:$urlSegment",
-      _params,
-    );
-
-    try {
-      final response = await http.post(
-        url,
-        body: json.encode(
-          {
-            'phoeneNumber': phoneNumber,
-            'temporaryProof': true,
-          },
-        ),
-      );
-      final responseData = jsonDecode(response.body);
-      print("responseData: $responseData");
-
-      if (responseData['error'] != null) {
-        throw Exception(responseData['error']['message']);
-      }
-
-      final params = {'auth': responseData['idToken']};
-
-      await _addInfoTOServer(name, responseData['localId'], imageFile,
-          phoneNumber, isAdmin, responseData['idToken'], params);
-
-      final prefs = await SharedPreferences.getInstance();
-      final expiryDate = DateTime.now().add(
-        Duration(seconds: int.parse(responseData['expiresIn'])),
-      );
-      final data = {
-        'token': responseData['idToken'],
-        'userId': responseData['localId'],
-        'expiryDate': expiryDate.toIso8601String(),
-        'refreshToken': responseData['refreshToken'],
-      };
-      final userData = json.encode(data);
-      prefs.setString('userData', userData);
-      return data;
-    } catch (error) {
-      rethrow;
-    }
-  } */
 
   Future<void> _addInfoTOServerUpdateToken(
       String idToken, String userId, Map<String, dynamic> params) async {
@@ -339,132 +253,19 @@ class AuthRepos {
     if (!prefs.containsKey("userData")) {
       return null;
     }
-    //print("extract data ${prefs.getString('userData')!}");
 
     final extractedData =
         json.decode(prefs.getString('userData')!) as Map<String, dynamic>;
 
     return extractedData;
-
-    /* print("extract data $extractedData");
-    final expiryDate = DateTime.parse(extractedData['expiryDate'] as String);
-    //_refreshToken = extractedData['refreshToken'];
-    print("isexpired:${expiryDate.isBefore(DateTime.now())}");
-    if (expiryDate.isBefore(DateTime.now())) {
-      final data = await _refreshTokenIfNeeded();
-
-      final date = DateTime.parse(data['expiryDate'].toString());
-      final params = {'auth': extractedData['token']};
-      await _addInfoTOServerUpdateToken(
-          extractedData['token'], extractedData['userId'], params);
-      //_autoLogout(date);
-      return data;
-    } else {
-      final params = {'auth': extractedData['token']};
-
-      print("before update token$extractedData");
-      await _addInfoTOServerUpdateToken(
-          extractedData['token'], extractedData['id'], params);
-      print("before update token");
-      // _autoLogout(expiryDate);
-      return extractedData;
-    } */
-    //  return extractedData;
-
-/*     UserCredential.token = _token;
-    UserCredential.userId = _userId;
-    UserCredential.refreshToken = _refreshToken;
-    UserCredential.expiryDate = _expiryDate; */
   }
 
-  /* Future<Map<String, dynamic>> _refreshTokenIfNeeded() async {
-    if (_refreshToken.isEmpty) {
-      return {};
-    }
-    final url = Uri.parse(
-        'https://securetoken.googleapis.com/v1/token?key=${_params['key']}');
-    try {
-      final response = await http.post(
-        url,
-        body: json.encode({
-          'grant_type': 'refresh_token',
-          'refresh_token': _refreshToken,
-        }),
-      );
-      final responseData = json.decode(response.body);
-      if (responseData['error'] != null) {
-        throw Exception(responseData['error']['message']);
-      }
-/*       _token = responseData['id_token'];
-      _refreshToken = responseData['refresh_token'];
-      _expiryDate = DateTime.now().add(
-        Duration(seconds: int.parse(responseData['expires_in'])),
-      ); */
-      final prefs = await SharedPreferences.getInstance();
-      final data = {
-        'token': responseData['idToken'],
-        'id': responseData['localId'],
-        'expiryDate': DateTime.now()
-            .add(Duration(seconds: int.parse(responseData['expiresIn'])))
-            .toIso8601String(),
-        'refreshToken': responseData['refreshToken'],
-      };
-      final userData = json.encode(data);
-      prefs.setString('userData', userData);
-      return data;
-    } catch (error) {
-      print("refresh token $error");
-      rethrow;
-    }
-  } */
-
-  /*  void _autoLogout(DateTime expiryDate) {
-    if (_authTimer != Timer(Duration.zero, () {})) {
-      _authTimer.cancel();
-    }
-    final timeToExpiry = expiryDate.difference(DateTime.now()).inSeconds;
-    _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
-  }
- */
   Future<bool?> updateAccount(String token, String name, String uid,
       File? imageFile, bool isAdmin) async {
-    /*  final url = Uri.https(
-      "identitytoolkit.googleapis.com",
-      "/v1/accounts:update",
-      {'auth': token, 'key': 'AIzaSyA1Hortv46XM9Nc8QummVhoqa3JWBycHJY'},
-    ); */
-/* 
-    Map<String, dynamic> data = {};
- */
-    /*  data = {
-      'idToken': token,
-      'phoneNumber': phonenumber,
-      'returnSecureToken': true
-    }; */
-
     try {
-      /* final response = await http.post(
-        url,
-        body: json.encode(data),
-      );
-      final responseData = jsonDecode(response.body);
-
-      if (responseData['error'] != null) {
-        throw Exception(responseData['error']['message']);
-      }
-
-      print("update response profile ${responseData}"); */
-
       final params = {'auth': token}; //
 
       await _updateInfoTOServer(name, uid, imageFile, isAdmin, params);
-
-      // Update the email in the Realtime Database if necessary
-      /* final prefs = await SharedPreferences.getInstance();
-      final userData =
-          json.decode(prefs.getString('userData')!) as Map<String, dynamic>;
-      userData['phone'] = phonenumber;
-      prefs.setString('userData', json.encode(userData)); */
 
       return true;
     } catch (error) {

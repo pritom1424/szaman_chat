@@ -36,7 +36,6 @@ class _CwlistTemplateState extends State<GroupCwlistTemplate> {
 
   @override
   Widget build(BuildContext context) {
-    print("added $isAdded");
     return Consumer(
       builder: (ctx, ref, _) => ListTile(
         leading: const CircleAvatar(
@@ -73,30 +72,25 @@ class _CwlistTemplateState extends State<GroupCwlistTemplate> {
                         : () async {
                             if (widget.userID != null) {
                               isAdded = true;
-                              print(
-                                  "before added memb  ${widget.mainGroupName!}");
+
                               final didSuccess = await ref
                                   .watch(inboxpageGroupViewModel)
                                   .addMember(widget.gId!, widget.mainGroupName!,
                                       widget.userID!);
-                              print("after added memb");
 
                               ScaffoldMessenger.of(context)
                                   .hideCurrentSnackBar();
                               if (didSuccess) {
-                                print("added memb");
                                 setState(() {});
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                         content: Text("Member Added!")));
                               } else {
-                                print("not added memb");
                                 ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                         content: Text("Member Not Added!")));
                               }
                             } else {
-                              print("no user memb");
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text("No User Found")));

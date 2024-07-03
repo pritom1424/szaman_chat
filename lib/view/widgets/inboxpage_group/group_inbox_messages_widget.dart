@@ -56,7 +56,7 @@ class GroupInboxMessagesWidget extends StatelessWidget {
             "hi there! how are you im jack and you and what is your purpose 3"
       }
     ]; */
-    print("friend name : $gName");
+
     final messageList = messages.reversed.toList();
     return ListView.builder(
         itemCount: messageList.length,

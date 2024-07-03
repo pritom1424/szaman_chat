@@ -73,7 +73,6 @@ class _ProfileFormState extends State<ProfileForm> {
             final refProv = ref.read(profileViewModel);
 
             if (!isInit) {
-              print('first init');
               return FutureBuilder(
                   future: refProv.getInfo(
                       Usercredential.token!, Usercredential.id!),
@@ -91,7 +90,7 @@ class _ProfileFormState extends State<ProfileForm> {
                         child: Text("no data found"),
                       );
                     }
-                    print("first init reah");
+
                     isInit = true;
 
                     profileModel = snap.data;

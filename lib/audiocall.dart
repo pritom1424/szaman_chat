@@ -89,7 +89,6 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("channel name${widget.channelName}");
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -109,7 +108,6 @@ class _CallScreenState extends State<CallScreen> {
               if (snapshot.data!.last.isCalling == false &&
                   snapshot.data!.last.isCallExit == true) {
                 Navigator.of(context).pop();
-                print("leave Channel");
               }
 
               return SizedBox(

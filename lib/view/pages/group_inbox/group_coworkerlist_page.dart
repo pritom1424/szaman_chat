@@ -54,7 +54,7 @@ class GroupCoworkerlistPage extends ConsumerWidget {
                           ),
                         );
                       }
-                      print("groupID ${snapFid.data}");
+
                       return GroupCwlistWidget(
                         uModel: snap.data!,
                         fid: snapFid.data,

@@ -155,7 +155,6 @@ class AppComponent {
       String downloadURL = await ref.getDownloadURL();
       return downloadURL;
     } catch (e) {
-      print("Failed to upload file: $e");
       return null;
     }
   }

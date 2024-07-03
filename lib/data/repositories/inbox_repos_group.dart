@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:szaman_chat/data/models/message_model.dart';
+import 'package:szaman_chat/data/models/user_model.dart';
 import 'package:szaman_chat/utils/constants/api_links.dart';
 import 'package:http/http.dart' as http;
+import 'package:szaman_chat/utils/push_notification/firebase_push.dart';
 
 class InboxReposGroup {
   Future<String> createGroup(
@@ -159,6 +161,26 @@ class InboxReposGroup {
       //final responseFriend = await http.post(urlfriend, body: bodyDataFriend);
       final response = await http.post(url, body: bodyData);
 
+      final fids = await getGroupMembers(token, gid);
+      final gName = await getGroupNameBYID(gid, token, uid);
+
+      for (int i = 0; i < fids.length; i++) {
+        if (fids[i] != uid) {
+          final fUrl =
+              Uri.https(ApiLinks.baseUrl, '/users/${fids[i]}.json', params);
+          final responseName = await http.get(fUrl);
+          if (responseName.statusCode == 200) {
+            final responseModel =
+                UserModel.fromJson(jsonDecode(responseName.body));
+
+            final dToken = responseModel.token;
+            if (dToken != null && dToken != "default") {
+              await FirebasePush().sendV1PushNotification(
+                  gName, mModel.message ?? "", uid, dToken);
+            }
+          }
+        }
+      }
       if (response.statusCode == 200) {
         return true;
       } else {
@@ -172,7 +194,6 @@ class InboxReposGroup {
 
   Future<Map<String, MessageModel>> getMessages(
       String token, String gid) async {
-    print("message response ");
     var params = {
       'auth': token,
       'orderBy': '"createdAt"',

@@ -91,8 +91,8 @@ class ChatListTemplet extends StatelessWidget {
             trailing: Text(lastTextDate),
             onTap: () async {
               await Navigator.of(context).push(MaterialPageRoute(
-                  builder: (ctx) =>
-                      InboxPage(userId, friendName, imageUrl, fimageUrl)));
+                  builder: (ctx) => InboxPage(
+                      userId, friendName, imageUrl, fimageUrl, username)));
 
               //fID
             }),

@@ -14,7 +14,9 @@ class InboxPage extends ConsumerWidget {
   final String fId, fName;
   final String userimageUrl;
   final String fImageUrl;
-  const InboxPage(this.fId, this.fName, this.userimageUrl, this.fImageUrl,
+  final String userName;
+  const InboxPage(
+      this.fId, this.fName, this.userimageUrl, this.fImageUrl, this.userName,
       {super.key});
 
   @override
@@ -44,8 +46,8 @@ class InboxPage extends ConsumerWidget {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text("$fName is busy!")));
       } else {
-        await ref.watch(inboxpageViewModel).addMessage(
-            Usercredential.token!, resultModel, Usercredential.id!, fId);
+        await ref.watch(inboxpageViewModel).addMessage(Usercredential.token!,
+            resultModel, Usercredential.id!, fId, userName);
       }
     }
 
@@ -185,9 +187,7 @@ class InboxPage extends ConsumerWidget {
                           if (didCall) {
                             SoundManager()
                                 .playSound(AppPaths.callStartSoundPath);
-                            print("entered call ring");
                           } else {
-                            print("entered call ring exit");
                             SoundManager().stopSound();
                           }
 
@@ -315,6 +315,7 @@ class InboxPage extends ConsumerWidget {
                                       fId: fId,
                                       fName: fName,
                                       userUrl: userimageUrl,
+                                      userName: userName,
                                     )
                                   ],
                                 );

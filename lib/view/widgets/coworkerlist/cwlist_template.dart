@@ -35,7 +35,6 @@ class _CwlistTemplateState extends State<CwlistTemplate> {
 
   @override
   Widget build(BuildContext context) {
-    print("added $isAdded");
     return Consumer(
       builder: (ctx, ref, _) => ListTile(
         leading: CircleAvatar(

@@ -14,18 +14,16 @@ class SoundManager {
       try {
         await _audioPlayer.setReleaseMode(ReleaseMode.loop);
         await _audioPlayer.play(AssetSource(path));
-        print("did Sound");
+
         _isPlaying = true;
-      } catch (e) {
-        print("did Sound error: $e");
-      }
+      } catch (e) {}
     }
   }
 
   Future<void> stopSound() async {
     if (_isPlaying) {
       await _audioPlayer.stop();
-      print("did Sound off");
+
       _isPlaying = false;
     }
   }

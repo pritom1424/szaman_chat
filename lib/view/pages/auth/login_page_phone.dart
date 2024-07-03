@@ -284,7 +284,6 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                                         countryCode.toString() +
                                             authVm.mobileController.text);
 
-                                    print("data struct ${authVm.signData}");
                                     ref
                                         .read(authViewModel)
                                         .setMessageSent(false);
@@ -342,7 +341,6 @@ class _RegistrationFormState extends State<LoginPhoneForm> {
                                             content: Text(
                                                 "Authentication  failed!")));
                                   }
-                                  print("did pass $didRegister");
                                 }
                               },
                         child: Text(

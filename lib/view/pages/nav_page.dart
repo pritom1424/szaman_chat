@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:szaman_chat/main.dart';
+import 'package:szaman_chat/testScr.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/constants/data.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
+import 'package:szaman_chat/utils/push_notification/firebase_push.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
 import 'package:szaman_chat/view/pages/auth/login_page_phone.dart';
 import 'package:szaman_chat/view/pages/blockpage.dart';
@@ -11,7 +13,6 @@ import 'package:szaman_chat/view/pages/navpages/chatlist_page.dart';
 import 'package:szaman_chat/view/pages/navpages/coworkerlist_page.dart';
 import 'package:szaman_chat/view/pages/navpages/grouplist_page.dart';
 import 'package:szaman_chat/view/pages/navpages/profile_page.dart';
-import 'package:szaman_chat/testScr.dart';
 import 'package:szaman_chat/view/widgets/navpage/navbar_widget.dart';
 
 class NavPage extends ConsumerWidget {
@@ -30,12 +31,19 @@ class NavPage extends ConsumerWidget {
 
     AppVars.screenSize = MediaQuery.of(context).size;
     const widthSize = 0.5;
+
     return Scaffold(
       body: (!ref.read(navpageViewModel).isInit)
           ? FutureBuilder(
-              future: auth.currentUser?.getIdToken(),
-              builder: (ctx, snapToken) =>
-                  (snapToken.connectionState == ConnectionState.waiting ||
+              future: FirebasePush().showNotification(context),
+              builder: (context, snapNotify) {
+                if (!snapNotify.hasData) {
+                  return SizedBox.shrink();
+                }
+                return FutureBuilder(
+                  future: auth.currentUser?.getIdToken(),
+                  builder: (ctx, snapToken) => (snapToken.connectionState ==
+                              ConnectionState.waiting ||
                           !snapToken.hasData)
                       ? const SizedBox.shrink()
                       : FutureBuilder(
@@ -63,7 +71,8 @@ class NavPage extends ConsumerWidget {
                             ref.read(navpageViewModel).setIsInit(true);
                             return mainBody(widthSize, ref, context, navViews);
                           }),
-            )
+                );
+              })
           : mainBody(widthSize, ref, context, navViews),
     );
   }

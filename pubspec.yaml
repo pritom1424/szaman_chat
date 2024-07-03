@@ -59,6 +59,8 @@ dependencies:
   firebase_messaging: ^15.0.2
   googleapis_auth: ^1.6.0
   googleapis: ^13.2.0
+  permission_handler: ^11.3.1
+
  
 
 

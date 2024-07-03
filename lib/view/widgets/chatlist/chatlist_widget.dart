@@ -112,8 +112,6 @@ class ChatlistWidget extends ConsumerWidget {
 
                                                   if (snapCall.data == 1 &&
                                                       !SoundManager.isPush) {
-                                                    print(
-                                                        "is call when calling...");
                                                     SoundManager().playSound(
                                                         AppPaths
                                                             .callStartSoundPath);

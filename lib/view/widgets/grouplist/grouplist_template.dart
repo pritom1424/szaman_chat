@@ -21,7 +21,6 @@ class GroupListTemplet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("grouup Name temp $groupName");
     return Dismissible(
       key: ValueKey(groupID),
       direction: DismissDirection.endToStart,

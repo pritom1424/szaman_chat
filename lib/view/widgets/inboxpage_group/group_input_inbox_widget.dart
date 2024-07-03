@@ -94,7 +94,6 @@ class _GroupInputInboxWidget extends State<GroupInputInboxWidget> {
     await ref.putFile(File(imageFile.path));
 
     final String url = await ref.getDownloadURL();
-    print('urlis: $url');
 
     return url;
   }

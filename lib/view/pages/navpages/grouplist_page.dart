@@ -78,15 +78,8 @@ class _GroupListPageState extends State<GroupListPage> {
                             child: const Text("Create"))
                       ],
                     ));
-            print("dialog off");
 
             setState(() {});
-            print("dialog on");
-            /* await Navigator.of(context)
-                                    .push(MaterialPageRoute(
-                                        builder: (ctx) => const RegistrationForm(
-                                              title: "Add Member",
-                                            ))); */
           },
           child: isLoading
               ? const CircularProgressIndicator(

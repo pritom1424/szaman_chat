@@ -1,9 +1,11 @@
+import 'package:agora_uikit/agora_uikit.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:szaman_chat/utils/components/app_component.dart';
+import 'package:szaman_chat/utils/push_notification/firebase_push.dart';
 import 'package:szaman_chat/view/pages/splash_screen.dart';
 
 late final FirebaseAuth auth;
@@ -28,6 +30,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    /*  if (!notifyStat.isGranted) {
+      FirebasePush().showNotification(contex);
+    } */
     return MaterialApp(
         title: 'Flutter Demo',
         theme: AppComponent.theme,

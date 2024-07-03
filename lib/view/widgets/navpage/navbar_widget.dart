@@ -1,6 +1,8 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:szaman_chat/utils/constants/app_colors.dart';
 import 'package:szaman_chat/utils/constants/data.dart';
+import 'package:szaman_chat/utils/push_notification/firebase_push.dart';
 
 class NavBarWidget extends StatelessWidget {
   final int currentIndex;

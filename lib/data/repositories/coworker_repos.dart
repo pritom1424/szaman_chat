@@ -71,13 +71,11 @@ class CoworkerRepos {
       final response = await http.post(url, body: bodyData);
 
       if (response.statusCode == 200 && responseFriend.statusCode == 200) {
-        print("entered last message");
         await lastMessageUpdate(uid, token, fid, true, mModel);
         await lastMessageUpdate(fid, token, uid, false, friendModel);
-        print("entered last message exit");
+
         return true;
       } else {
-        print("entered last message exit");
         return false;
       }
     } catch (e) {
@@ -116,7 +114,7 @@ class CoworkerRepos {
         // return data.keys.toList();
       } else {
         print("Failed to load friend IDs");
-        //throw Exception("Failed to load friend IDs: ${response.statusCode}");
+
         return false;
       }
     } catch (e) {

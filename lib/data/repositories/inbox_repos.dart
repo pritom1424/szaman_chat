@@ -1,12 +1,14 @@
 import 'dart:convert';
 
 import 'package:szaman_chat/data/models/message_model.dart';
+import 'package:szaman_chat/data/models/user_model.dart';
 import 'package:szaman_chat/utils/constants/api_links.dart';
 import 'package:http/http.dart' as http;
+import 'package:szaman_chat/utils/push_notification/firebase_push.dart';
 
 class InboxRepos {
-  Future<bool> addMessage(
-      String token, MessageModel mModel, String uid, String fid) async {
+  Future<bool> addMessage(String token, MessageModel mModel, String uid,
+      String fid, String userName) async {
     var params = {'auth': token};
 
     try {
@@ -51,14 +53,25 @@ class InboxRepos {
       final responseFriend = await http.post(urlfriend, body: bodyDataFriend);
       final response = await http.post(url, body: bodyData);
 
+      final fUrl = Uri.https(ApiLinks.baseUrl, '/users/$fid.json', params);
+
+      final responseName = await http.get(fUrl);
+      if (responseName.statusCode == 200) {
+        final responseModel = UserModel.fromJson(jsonDecode(responseName.body));
+
+        final dToken = responseModel.token;
+        if (dToken != null && dToken != "default") {
+          await FirebasePush().sendV1PushNotification(
+              userName, mModel.message ?? "", uid, dToken);
+        }
+      }
+
       if (response.statusCode == 200 && responseFriend.statusCode == 200) {
-        print("entered last message");
         await lastMessageUpdate(uid, token, fid, true, mModel);
         await lastMessageUpdate(fid, token, uid, false, friendModel);
-        print("entered last message exit");
+
         return true;
       } else {
-        print("entered last message exit");
         return false;
       }
     } catch (e) {
@@ -140,7 +153,7 @@ class InboxRepos {
 
       final response = await http.get(url);
       final jsonResponse = json.decode(response.body) as Map<String, dynamic>;
-      print("is seen repos ${json.decode(response.body)}");
+
       final model = MessageModel.fromJson(jsonResponse['message']);
       return {"communicate": jsonResponse['communicate'], 'message': model};
     } catch (e) {
@@ -155,10 +168,10 @@ class InboxRepos {
       final url = Uri.https(ApiLinks.baseUrl, '/messages/$userId.json', params);
 
       final response = await http.get(url);
-      print("Chat list $response");
+
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
-        print("Chat list $data");
+
         return data;
         // return data.keys.toList();
       } else {

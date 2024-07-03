@@ -28,7 +28,6 @@ class GroupChatBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("sender ID $senderID");
     bool isMyself = (senderID == Usercredential.id) ? true : false;
     Future<Directory?> getDownloadsDirectory() async {
       if (Platform.isAndroid) {
@@ -51,57 +50,12 @@ class GroupChatBubble extends StatelessWidget {
         File file = File(filePath);
         try {
           await file.writeAsBytes(bytes);
-          print('download success File downloaded to: $filePath');
+
           ScaffoldMessenger.of(context).hideCurrentSnackBar();
           ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text("File downloaded to  $filePath")));
-        } catch (e) {
-          print("download $e");
-        }
+        } catch (e) {}
       }
-      /*  try {
-        /*  final permissionStatus = await Permission.storage.status;
-        if (permissionStatus.isDenied) {
-          // Here just ask for the permission for the first time
-          await Permission.storage.request();
-
-          // I noticed that sometimes popup won't show after user press deny
-          // so I do the check once again but now go straight to appSettings
-          if (permissionStatus.isDenied) {
-            await openAppSettings();
-          }
-        } else if (permissionStatus.isPermanentlyDenied) {
-          // Here open app settings for user to manually enable permission in case
-          // where permission was permanently denied
-          await openAppSettings();
-        } else {
-          // Do stuff that require permission here
-        } */
-        // Request storage permission
-        if (await Permission.storage.request().isGranted) {
-          // Get the directory for the external storage
-          final directory = await path.getDownloadsDirectory();
-          if (directory != null) {
-            String filePath = '${directory.path}/$fileName';
-
-            // Create HttpClient to download the file
-            var response = await http.get(Uri.parse(url));
-            var bytes = response.bodyBytes;
-
-            // Write the file
-            File file = File(filePath);
-            await file.writeAsBytes(bytes);
-
-            print('File downloaded to: $filePath');
-          } else {
-            print('Could not get the downloads directory');
-          }
-        } else {
-          print('Permission denied');
-        }
-      } catch (e) {
-        print('Failed to download file: $e');
-      } */
     }
 
     bool isImageFormat(String url) {
@@ -125,9 +79,7 @@ class GroupChatBubble extends StatelessWidget {
     }
 
     bool didshowDate = true;
-    if (didImageExist) {
-      print("message inbox: $message");
-    }
+    if (didImageExist) {}
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5),
       child: Row(
