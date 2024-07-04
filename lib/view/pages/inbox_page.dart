@@ -4,6 +4,7 @@ import 'package:szaman_chat/audiocall.dart';
 import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/utils/audio/sound_manager.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
+import 'package:szaman_chat/utils/constants/app_methods.dart';
 import 'package:szaman_chat/utils/constants/app_paths.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
@@ -21,7 +22,7 @@ class InboxPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const widthSize = 0.5;
+    const widthSize = 0.8;
 
     bool didCall = false;
     bool didVideoOn = false;
@@ -104,6 +105,49 @@ class InboxPage extends ConsumerWidget {
                 maxLines: 1,
                 textAlign: TextAlign.left,
               ),
+              SizedBox(
+                width: 10,
+              ),
+              SizedBox(
+                width: AppVars.screenSize.width * (0.3),
+                child: StreamBuilder(
+                    stream: ref.read(userViewModel).getStatusStream(fId),
+                    builder: (context, snapState) {
+                      bool status = false;
+                      if (snapState.hasData) {
+                        if (snapState.data!.isNotEmpty) {
+                          status = snapState.data![0];
+                        }
+                        print("has data");
+                      }
+                      print("has data");
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: 6,
+                            backgroundColor: (status)
+                                ? Colors.yellow
+                                : const Color.fromARGB(255, 71, 70, 70),
+                          ),
+                          if (snapState.hasData && snapState.data!.isNotEmpty)
+                            SizedBox(
+                              width: 5,
+                            ),
+                          if (snapState.hasData && snapState.data!.isNotEmpty)
+                            Text(
+                              (status)
+                                  ? "active now"
+                                  : AppMethods().formatTimeAgoOrDate(
+                                      snapState.data![1],
+                                    ),
+                              style: TextStyle(fontSize: 15),
+                            )
+                        ],
+                      );
+                    }),
+              )
             ],
           ),
         ),

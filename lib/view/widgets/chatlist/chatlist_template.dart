@@ -29,7 +29,38 @@ class ChatListTemplet extends StatelessWidget {
       required this.ref});
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
+    return Card(
+      color: Colors.white, //Theme.of(context).primaryColor,
+      elevation: 0,
+      child: ListTile(
+          leading: CircleAvatar(
+            backgroundImage: NetworkImage(fimageUrl),
+          ),
+          title: Text(
+            friendName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+                fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
+          ),
+          subtitle: Text(
+            lastText ?? "sent a photo",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+                fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
+          ),
+          trailing: Text(lastTextDate),
+          onTap: () async {
+            await Navigator.of(context).push(MaterialPageRoute(
+                builder: (ctx) => InboxPage(
+                    userId, friendName, imageUrl, fimageUrl, username)));
+
+            //fID
+          }),
+    );
+
+    /*Dismissible (
       key: ValueKey(userId),
       direction: DismissDirection.endToStart,
       background: Container(
@@ -97,6 +128,6 @@ class ChatListTemplet extends StatelessWidget {
               //fID
             }),
       ),
-    );
+    ); */
   }
 }

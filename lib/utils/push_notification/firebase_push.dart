@@ -1,6 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
+
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+//import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import 'package:http/http.dart' as http;
 import "package:googleapis_auth/auth_io.dart" as googleauth;
@@ -96,6 +99,49 @@ class FirebasePush {
       print("push error $e");
     }
   }
+
+  /* Future<void> _showIncomingCallNotification(RemoteMessage message) async {
+    print("show incoming call notification begin before");
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+        AndroidNotificationDetails(
+      'incoming_call_channel', // id
+      'Incoming Calls', // name
+      channelDescription: 'Channel for incoming calls', // description
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+      fullScreenIntent: true,
+    );
+    print("show incoming call notification begin");
+    const NotificationDetails platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+    print("show incoming call notification before");
+    await FlutterLocalNotificationsPlugin().show(
+      0, // notification id
+      message.data['caller_name'],
+      'is calling you...',
+      platformChannelSpecifics,
+    );
+    print("show incoming call notification after");
+
+    // Optionally, repeat the notification
+    // Repeat logic here (e.g., using a timer or scheduling multiple notifications)
+  } */
+
+  /* Future<void> repeatIncomingCallNotification(RemoteMessage message) async {
+    print("show incoming call notification begin before rep");
+    await Firebase.initializeApp(
+        options: const FirebaseOptions(
+            apiKey: "AIzaSyAcHQuKlLrw59V6hD96CxEzqhjSj94LmJA",
+            appId: "1:434564582098:android:fdec4b070aca961bbd3b0b",
+            messagingSenderId: "434564582098",
+            projectId: "szaman-chat"));
+    Timer.periodic(Duration(seconds: 10), (timer) async {
+      // Show the notification again
+      print("show incoming call notification begin before rep");
+      await _showIncomingCallNotification(message);
+    });
+  } */
 
   Future<bool> showNotification(BuildContext context) async {
     final notifyStat = await Permission.notification.status;

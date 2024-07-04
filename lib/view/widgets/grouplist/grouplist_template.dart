@@ -21,7 +21,38 @@ class GroupListTemplet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
+    return Card(
+      color: Colors.white, //Theme.of(context).primaryColor,
+      elevation: 0,
+      child: ListTile(
+          leading: const CircleAvatar(
+            child: Icon(Icons.person_3),
+          ),
+          title: Text(
+            groupName,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+                fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
+          ),
+          subtitle: Text(
+            lastText ?? "sent a photo",
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+                fontWeight: (!isSeen) ? FontWeight.bold : FontWeight.normal),
+          ),
+          trailing: Text(lastTextDate),
+          onTap: () async {
+            await Navigator.of(context).push(MaterialPageRoute(
+                builder: (ctx) => GroupInboxPage(
+                    groupID, groupName, userimageUrl, userModel)));
+
+            //fID
+          }),
+    );
+
+    /* Dismissible(
       key: ValueKey(groupID),
       direction: DismissDirection.endToStart,
       background: Container(
@@ -89,6 +120,6 @@ class GroupListTemplet extends StatelessWidget {
               //fID
             }),
       ),
-    );
+    ); */
   }
 }

@@ -130,8 +130,16 @@ class ChatlistWidget extends ConsumerWidget {
                                                         "user",
                                                     /*     /* snap.data![0].name ??  */ "user", */
                                                     mModel.message ?? "message",
-                                                    AppMethods().dateFormatter(
-                                                        mModel.createdAt),
+                                                    (AppMethods().isToday(
+                                                            mModel.createdAt))
+                                                        ? AppMethods()
+                                                            .timeFormatter(
+                                                                mModel
+                                                                    .createdAt)
+                                                        : AppMethods()
+                                                            .dateFormatter(
+                                                                mModel
+                                                                    .createdAt),
                                                     snapPhoto.data!.imageUrl!,
                                                     snapIsSeen.data![
                                                             "communicate"] ??

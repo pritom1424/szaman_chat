@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:szaman_chat/data/models/message_model.dart';
-import 'package:szaman_chat/utils/constants/app_methods.dart';
 import 'package:szaman_chat/view/widgets/inboxpage/chat_bubble.dart';
 
 class InboxMessagesWidget extends StatelessWidget {
@@ -58,7 +57,7 @@ class InboxMessagesWidget extends StatelessWidget {
         itemCount: messageList.length,
         reverse: true,
         itemBuilder: (ctx, ind) => ChatBubble(
-            date: AppMethods().dateFormatter(messageList[ind].createdAt),
+            dateTime: messageList[ind].createdAt,
             isMe: messageList[ind].isME,
             username: (messageList[ind].isME) ? "You" : fName!,
             message: messageList[ind].message ?? "",

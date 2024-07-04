@@ -123,4 +123,36 @@ class CoworkerRepos {
       return false;
     }
   }
+
+  Future<bool> updateStatus(String userID, String token, bool status) async {
+    try {
+      var params = {'auth': token};
+      final body = {"status": status, "date": DateTime.now().toIso8601String()};
+      final url = Uri.https(ApiLinks.baseUrl, '/status/$userID.json', params);
+      final response = await http.put(url, body: jsonEncode(body));
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<Map<String, dynamic>> getStatus(String userID, String token) async {
+    try {
+      var params = {'auth': token};
+
+      final url = Uri.https(ApiLinks.baseUrl, '/status/$userID.json', params);
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        return jsonDecode(response.body);
+      } else {
+        return {"error": "something went wrong!"};
+      }
+    } catch (e) {
+      return {"error": "something went wrong!"};
+    }
+  }
 }

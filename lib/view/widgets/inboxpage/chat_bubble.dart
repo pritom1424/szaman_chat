@@ -5,10 +5,11 @@ import 'package:path_provider/path_provider.dart';
 import 'package:szaman_chat/utils/components/app_component.dart';
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:http/http.dart' as http;
+import 'package:szaman_chat/utils/constants/app_methods.dart';
 
 class ChatBubble extends StatelessWidget {
   final String message;
-  final String date;
+  final DateTime dateTime;
   final bool isMe;
   final String username, userimage;
 
@@ -16,7 +17,7 @@ class ChatBubble extends StatelessWidget {
   const ChatBubble(
       {super.key,
       required this.message,
-      required this.date,
+      required this.dateTime,
       required this.isMe,
       required this.username,
       required this.userimage,
@@ -167,12 +168,27 @@ class ChatBubble extends StatelessWidget {
                               : Theme.of(context).colorScheme.onSecondary),
                     ),
                   if (didshowDate)
-                    Text(date,
-                        style: TextStyle(
-                            fontSize: 10,
-                            color: isMe
-                                ? Colors.black
-                                : Theme.of(context).colorScheme.onSecondary))
+                    Row(
+                      children: [
+                        Text(AppMethods().timeFormatter(dateTime),
+                            style: TextStyle(
+                                fontSize: 10,
+                                color: isMe
+                                    ? Colors.black
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary)),
+                        const Spacer(),
+                        Text(AppMethods().dateFormatter(dateTime),
+                            style: TextStyle(
+                                fontSize: 10,
+                                color: isMe
+                                    ? Colors.black
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSecondary)),
+                      ],
+                    )
                 ],
               ),
             ),
