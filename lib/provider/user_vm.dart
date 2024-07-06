@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:szaman_chat/data/models/message_model.dart';
 import 'package:szaman_chat/data/models/user_model.dart';

@@ -105,11 +105,11 @@ class InboxPage extends ConsumerWidget {
                 maxLines: 1,
                 textAlign: TextAlign.left,
               ),
-              SizedBox(
+              const SizedBox(
                 width: 10,
               ),
-              SizedBox(
-                width: AppVars.screenSize.width * (0.3),
+              Expanded(
+                //width: AppVars.screenSize.width * (0.2),
                 child: StreamBuilder(
                     stream: ref.read(userViewModel).getStatusStream(fId),
                     builder: (context, snapState) {
@@ -132,7 +132,7 @@ class InboxPage extends ConsumerWidget {
                                 : const Color.fromARGB(255, 71, 70, 70),
                           ),
                           if (snapState.hasData && snapState.data!.isNotEmpty)
-                            SizedBox(
+                            const SizedBox(
                               width: 5,
                             ),
                           if (snapState.hasData && snapState.data!.isNotEmpty)
@@ -142,7 +142,7 @@ class InboxPage extends ConsumerWidget {
                                   : AppMethods().formatTimeAgoOrDate(
                                       snapState.data![1],
                                     ),
-                              style: TextStyle(fontSize: 15),
+                              style: const TextStyle(fontSize: 15),
                             )
                         ],
                       );

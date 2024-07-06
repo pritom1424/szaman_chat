@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:szaman_chat/utils/components/app_component.dart';
+import 'package:szaman_chat/utils/constants/app_constant.dart';
 
 import 'package:szaman_chat/view/pages/splash_screen.dart';
 
@@ -13,12 +14,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   /*  FirebaseMessaging.onBackgroundMessage(
       FirebasePush().repeatIncomingCallNotification); */
-  final app = await Firebase.initializeApp(
-      options: const FirebaseOptions(
-          apiKey: "AIzaSyAcHQuKlLrw59V6hD96CxEzqhjSj94LmJA",
-          appId: "1:434564582098:android:fdec4b070aca961bbd3b0b",
-          messagingSenderId: "434564582098",
-          projectId: "szaman-chat"));
+  final app = await Firebase.initializeApp(options: AppConstant.firebaseOption);
 
   auth = FirebaseAuth.instanceFor(app: app);
 

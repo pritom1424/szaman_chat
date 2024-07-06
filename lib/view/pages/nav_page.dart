@@ -24,7 +24,6 @@ class NavPage extends ConsumerStatefulWidget {
 class _NavPageState extends ConsumerState<NavPage> with WidgetsBindingObserver {
   @override
   void initState() {
-    print("full app init");
     WidgetsBinding.instance.addObserver(this);
     ref.read(userViewModel).updateStatus(true);
     // TODO: implement initState
@@ -33,7 +32,6 @@ class _NavPageState extends ConsumerState<NavPage> with WidgetsBindingObserver {
 
   @override
   void dispose() {
-    print("full app disposed");
     WidgetsBinding.instance.removeObserver(this);
     // TODO: implement dispose
     super.dispose();
@@ -43,19 +41,18 @@ class _NavPageState extends ConsumerState<NavPage> with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       ref.read(userViewModel).updateStatus(true);
-      print("App is in the foreground");
+
       // Perform actions when the app is in the foreground
     } else if (state == AppLifecycleState.paused) {
-      print("App is in the background");
       ref.read(userViewModel).updateStatus(false);
       // Perform actions when the app is in the background
     } else if (state == AppLifecycleState.inactive) {
       ref.read(userViewModel).updateStatus(false);
-      print("App is inactive");
+
       // Perform actions when the app is inactive
     } else if (state == AppLifecycleState.detached) {
       ref.read(userViewModel).updateStatus(false);
-      print("App is detached");
+
       // Perform actions when the app is detached
     }
     // TODO: implement didChangeAppLifecycleState

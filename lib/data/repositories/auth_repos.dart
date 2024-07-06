@@ -112,7 +112,7 @@ class AuthRepos {
 
     final body = {"token": deviceToken ?? "default"};
     final response = await http.patch(url, body: jsonEncode(body));
-    print("device token patched ${json.decode(response.body)}");
+
     if (response.statusCode == 200) {
       return true;
     }
@@ -138,13 +138,6 @@ class AuthRepos {
       };
       prefs.setString('userData', json.encode(data));
     }
-  }
-
-  Future<void> _addInfoTOServerUpdateToken(
-      String idToken, String userId, Map<String, dynamic> params) async {
-    final link = Uri.https(ApiLinks.baseUrl, '/users/$userId.json', params);
-
-    await http.patch(link, body: json.encode({"token": idToken}));
   }
 
   Future<void> _addInfoTOServer(

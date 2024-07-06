@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 
 import 'package:szaman_chat/utils/components/app_vars.dart';
 import 'package:szaman_chat/utils/components/custom_clock.dart';
+import 'package:szaman_chat/utils/constants/app_constant.dart';
 import 'package:szaman_chat/utils/credential/UserCredential.dart';
 import 'package:szaman_chat/utils/view_models/view_models.dart';
 
@@ -27,7 +28,6 @@ class CallScreen extends StatefulWidget {
 }
 
 class _CallScreenState extends State<CallScreen> {
-  final appId = 'f4183852ed674c139ff303c84fcf29e0';
   DateFormat formatter = DateFormat('HH:mm:ss');
 
   late Timer timer;
@@ -48,7 +48,7 @@ class _CallScreenState extends State<CallScreen> {
   Future<void> _initializeAgora() async {
     client = AgoraClient(
       agoraConnectionData: AgoraConnectionData(
-        appId: 'f4183852ed674c139ff303c84fcf29e0',
+        appId: AppConstant.AgoraAppId,
         channelName: widget.channelName,
       ),
     );
