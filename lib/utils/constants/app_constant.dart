@@ -1,7 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 
 class AppConstant {
-  static const AgoraAppId = 'f4183852ed674c139ff303c84fcf29e0';
+  static const agoraAppId =
+      '03079b65e8e24b7f91de7fc1ea916ae6'; //'f4183852ed674c139ff303c84fcf29e0';
 
   static const firebaseOption = FirebaseOptions(
       apiKey: "AIzaSyAcHQuKlLrw59V6hD96CxEzqhjSj94LmJA",

@@ -48,7 +48,7 @@ class _CallScreenState extends State<CallScreen> {
   Future<void> _initializeAgora() async {
     client = AgoraClient(
       agoraConnectionData: AgoraConnectionData(
-        appId: AppConstant.AgoraAppId,
+        appId: AppConstant.agoraAppId,
         channelName: widget.channelName,
       ),
     );
